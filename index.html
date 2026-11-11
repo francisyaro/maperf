@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <title>MAPERF 2027 — Les Journées & Matinées de la Performance à Brazzaville (17 Juin 2027)</title>
+  <meta name="description" content="MAPERF 2027 (2e édition le 17 juin 2027 au Hilton Brazzaville) : Baromètre national de la performance des entreprises publiques et privées du Congo, Matinées et Trophées de la Performance." />
+
+  <!-- SEO & Open Graph -->
+  <meta property="og:title" content="MAPERF 2027 — Les Journées de la Performance & Baromètre National au Congo" />
+  <meta property="og:description" content="Mesure, vérification contradictoire et valorisation de la performance des entreprises publiques et privées en République du Congo. 2e Édition : 17 juin 2027." />
+  <meta property="og:image" content="1.jpg" />
+  <meta property="og:type" content="website" />
+  <meta property="og:locale" content="fr_FR" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="MAPERF 2027 — Les Journées de la Performance à Brazzaville" />
+  <meta name="twitter:description" content="2e Édition le 17 juin 2027 : Baromètre de la performance des entreprises publiques et privées du Congo." />
+  <meta name="twitter:image" content="1.jpg" />
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="favicon.PNG" />
+
+  <!-- Tailwind CSS & Lucide Icons -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="assets/css/maperf-design.css" />
+
+  <style>
+    @keyframes scroll {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+    .animate-scroll {
+      display: flex;
+      animation: scroll 25s linear infinite;
+      width: calc(200%);
+    }
+    .group:hover .animate-scroll {
+      animation-play-state: paused;
+    }
+  </style>
+</head>
+
+<body class="antialiased">
+  <!-- Bandeau & Header unifiés par maperf-layout.js -->
+  <div class="w-full"></div>
+  <header></header>
+
+  <!-- HERO -->
+  <section id="hero" class="relative overflow-hidden bg-gradient-to-br from-[#00236D] via-[#0A2240] to-[#003C8F] text-white">
+    <div class="container mx-auto px-4 py-14 md:py-20 grid lg:grid-cols-12 gap-10 items-center">
+      <div class="lg:col-span-7 space-y-5">
+        <div class="flex flex-wrap items-center gap-2">
+          <span class="px-3.5 py-1 rounded-full text-xs font-extrabold uppercase tracking-wider bg-[#F39A1E] text-white">2e Édition · 17 Juin 2027</span>
+          <span class="px-3.5 py-1 rounded-full text-xs font-bold bg-white/10 text-[#2CC3A0] border border-[#2CC3A0]/30">Hilton Brazzaville Les Tours Jumelles</span>
+        </div>
+
+        <h1 class="font-display text-4xl md:text-5xl font-extrabold leading-tight">
+          Les Journées & Matinées de la <span class="text-[#F6C332]">Performance</span> au Congo
+        </h1>
+
+        <p class="text-lg text-[#2CC3A0] font-display font-semibold">
+          Outiller · Mesurer · Vérifier · Performer
+        </p>
+
+        <blockquote class="italic text-white/85 border-l-4 border-[#F39A1E] pl-4 text-sm sm:text-base">
+          « La performance durable des entreprises publiques et privées se mesure avec rigueur et se construit ensemble. »
+        </blockquote>
+
+        <p class="text-white/80 text-sm sm:text-base max-w-2xl leading-relaxed">
+          Rendez-vous national de référence réunissant dirigeants d'entreprises publiques et privées, institutions, régulateurs et experts autour du <strong>Baromètre MAPERF 2027</strong> : collecte pluriannuelle (2023–2025), vérification contradictoire par notre équipe d'analystes et publication de l'Indice National de Performance.
+        </p>
+
+        <div class="pt-2 flex flex-wrap gap-3">
+          <a href="barometre.html#espace-collecte" class="btn btn-primary">
+            <i data-lucide="bar-chart-big" class="w-4 h-4"></i>
+            <span>Accéder au Baromètre 2027 (Entreprises)</span>
+          </a>
+          <a href="barometre.html#espace-validation" class="btn btn-teal">
+            <i data-lucide="shield-check" class="w-4 h-4"></i>
+            <span>Espace Vérification Équipe MAPERF</span>
+          </a>
+          <a href="inscription.html" class="btn bg-white/10 text-white border border-white/25 hover:bg-white/20">
+            <i data-lucide="calendar-check" class="w-4 h-4 text-[#F6C332]"></i>
+            <span>S'inscrire au Forum du 17 Juin 2027</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Slider Photo -->
+      <div class="lg:col-span-5">
+        <div class="rounded-3xl overflow-hidden shadow-2xl border-4 border-white/15 relative aspect-[4/3] bg-slate-900">
+          <img id="hero-slider" src="1.jpg" alt="Journées de la Performance MAPERF" class="w-full h-full object-cover transition-opacity duration-1000 opacity-100" />
+          <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-950/90 via-slate-950/50 to-transparent p-5 text-white">
+            <span class="text-[11px] font-bold uppercase tracking-wider text-[#F6C332]">Co-initiateurs officiels</span>
+            <p class="font-display font-bold text-sm">Owando Consulting · ACE · Agence Ambition</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MISE EN AVANT PRIORITAIRE : LE BAROMÈTRE MAPERF 2027 -->
+  <section id="barometre-2027" class="py-16 md:py-20 bg-white border-b border-slate-200/70">
+    <div class="container mx-auto px-4 space-y-10">
+      <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
+        <div class="space-y-2 max-w-3xl">
+          <span class="chip"><i data-lucide="sparkles" class="w-3.5 h-3.5 text-[#F39A1E]"></i> Cœur de l'Édition 2027</span>
+          <h2 class="font-display text-3xl md:text-4xl font-extrabold text-[#00236D]">
+            Le Baromètre MAPERF 2027 : Mesurer & Valider la Performance
+          </h2>
+          <p class="text-slate-600 text-sm sm:text-base">
+            Un dispositif numérique complet où chaque entreprise publique ou privée renseigne ses données (2023–2025) et ses preuves, tandis que l'équipe technique MAPERF assure la vérification contradictoire pour incrémenter et certifier le taux de performance sur 100.
+          </p>
+        </div>
+        <a href="barometre.html" class="btn btn-primary shrink-0">
+          <i data-lucide="arrow-up-right" class="w-4 h-4"></i>
+          <span>Ouvrir le Portail Baromètre</span>
+        </a>
+      </div>
+
+      <!-- Processus en 4 étapes -->
+      <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="card border-t-4 border-t-[#00236D] space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-extrabold px-2.5 py-1 rounded-full bg-[#00236D]/10 text-[#00236D]">Étape 1 · Enrôlement</span>
+            <i data-lucide="building-2" class="w-5 h-5 text-[#00236D]"></i>
+          </div>
+          <h3 class="font-display font-bold text-base text-slate-900">Identification & Code Anonyme</h3>
+          <p class="text-xs text-slate-600 leading-relaxed">
+            Qualification du volet (<strong>Secteur Public</strong> ou <strong>Secteur Privé ≥ 10 salariés</strong>), affectation au groupe homogène et génération du code <code>PUB-2027-NNN</code> ou <code>PRI-2027-NNN</code>.
+          </p>
+        </div>
+
+        <div class="card border-t-4 border-t-[#F39A1E] space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-extrabold px-2.5 py-1 rounded-full bg-[#F39A1E]/15 text-[#F39A1E]">Étape 2 · Collecte</span>
+            <i data-lucide="file-spreadsheet" class="w-5 h-5 text-[#F39A1E]"></i>
+          </div>
+          <h3 class="font-display font-bold text-base text-slate-900">Saisie 2023–2025 & Preuves</h3>
+          <p class="text-xs text-slate-600 leading-relaxed">
+            Renseignement des 5 rubriques (Finances, Opérations, Gouvernance, Transformation, RH) et dépôt des preuves (États financiers OHADA, CAC, CNSS, ISO).
+          </p>
+        </div>
+
+        <div class="card border-t-4 border-t-[#2CC3A0] space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-extrabold px-2.5 py-1 rounded-full bg-[#2CC3A0]/20 text-emerald-800">Étape 3 · Validation</span>
+            <i data-lucide="shield-check" class="w-5 h-5 text-emerald-700"></i>
+          </div>
+          <h3 class="font-display font-bold text-base text-slate-900">Vérification & Incrémentation</h3>
+          <p class="text-xs text-slate-600 leading-relaxed">
+            36 contrôles automatiques + revue par l'équipe MAPERF faisant évoluer les données de <strong>Déclarée (50%)</strong> à <strong>Vérifiée (80%)</strong> puis <strong>Auditée (100%)</strong>.
+          </p>
+        </div>
+
+        <div class="card border-t-4 border-t-[#F6C332] space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-extrabold px-2.5 py-1 rounded-full bg-[#F6C332]/25 text-amber-900">Étape 4 · Restitution</span>
+            <i data-lucide="trophy" class="w-5 h-5 text-amber-600"></i>
+          </div>
+          <h3 class="font-display font-bold text-base text-slate-900">Scoring 0–100 & Trophées</h3>
+          <p class="text-xs text-slate-600 leading-relaxed">
+            Génération de la fiche individuelle confidentielle (radar 6 dimensions, écart Pratiques–Résultats) et publication lors de la cérémonie du <strong>17 juin 2027</strong>.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ÉVÉNEMENTS & MATINÉES DE LA PERFORMANCE -->
+  <section id="evenements" class="py-16 md:py-20 bg-[#F4F7FB]">
+    <div class="container mx-auto px-4 space-y-8">
+      <div class="flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <span class="chip">Rendez-vous Institutionnel</span>
+          <h2 class="font-display text-3xl font-extrabold text-[#00236D] mt-2">Les Éditions MAPERF</h2>
+        </div>
+        <a href="agenda.html" class="btn btn-outline text-xs">Consulter le programme détaillé →</a>
+      </div>
+
+      <div class="grid lg:grid-cols-2 gap-8">
+        <!-- Édition 2027 (2e édition) -->
+        <article class="card p-0 overflow-hidden flex flex-col justify-between border-2 border-[#00236D]/15">
+          <div>
+            <img src="maperf-2025.jpg" alt="MAPERF 2027 Brazzaville" class="h-60 w-full object-cover" />
+            <div class="p-6 space-y-3">
+              <div class="flex flex-wrap items-center gap-2">
+                <span class="px-3 py-1 rounded-full text-xs font-extrabold bg-[#F39A1E] text-white">2e Édition · 17 Juin 2027</span>
+                <span class="chip">Hilton Brazzaville Les Tours Jumelles</span>
+              </div>
+              <h3 class="font-display text-xl font-extrabold text-[#00236D]">
+                MAPERF 2027 — Restitution Officielle du Baromètre National de la Performance
+              </h3>
+              <p class="text-sm text-slate-600 leading-relaxed">
+                Présentation du rapport public du Baromètre MAPERF 2027 (volets Secteur Public et Secteur Privé), panels de haut niveau des dirigeants et remise des distinctions sectorielles.
+              </p>
+            </div>
+          </div>
+          <div class="px-6 pb-6 pt-2 flex flex-wrap gap-3">
+            <a href="barometre.html#espace-collecte" class="btn btn-primary text-xs">Participer au Baromètre 2027</a>
+            <a href="inscription.html" class="btn btn-ghost text-xs">Réserver sa place</a>
+          </div>
+        </article>
+
+        <!-- Édition Fondatrice & Trophées (#trophees) -->
+        <article id="trophees" class="card p-0 overflow-hidden flex flex-col justify-between">
+          <div>
+            <img src="2.jpg" alt="Trophées de la Performance MAPERF" class="h-60 w-full object-cover" />
+            <div class="p-6 space-y-3">
+              <div class="flex flex-wrap items-center gap-2">
+                <span class="chip">Distinctions Officielles</span>
+                <span class="chip">Comité Scientifique Indépendant</span>
+              </div>
+              <h3 class="font-display text-xl font-extrabold text-[#00236D]">
+                Les Trophées & Prix Spéciaux de la Performance MAPERF 2027
+              </h3>
+              <p class="text-sm text-slate-600 leading-relaxed">
+                Adossés aux résultats audités du Baromètre (complétude ≥ 75 %, fiabilité ≥ 50 %), les Trophées distinguent : Performance Globale Publique & Privée, Gouvernance & Redevabilité, Transformation Digitale, Capital Humain et Contenu Local.
+              </p>
+            </div>
+          </div>
+          <div class="px-6 pb-6 pt-2 flex flex-wrap gap-3">
+            <a href="barometre.html#presentation" class="btn btn-outline text-xs">Critères d'éligibilité & Méthodologie</a>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- SPEAKERS / INTERVENANTS DE RÉFÉRENCE -->
+  <section id="speakers" class="py-16 md:py-20 bg-white">
+    <div class="container mx-auto px-4">
+      <div class="text-center max-w-2xl mx-auto mb-12 space-y-2">
+        <span class="chip">Comité & Intervenants</span>
+        <h2 class="font-display text-3xl font-extrabold text-[#00236D]">Experts & Dirigeants Engagés</h2>
+        <p class="text-sm text-slate-600">
+          Découvrez les experts institutionnels, dirigeants du secteur privé et spécialistes en management de la performance mobilisés autour de MAPERF.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+        <!-- Speaker 1 (Correction extension .JPG) -->
+        <div class="card p-4 text-center">
+          <div class="rounded-xl overflow-hidden mb-4 aspect-[4/4] bg-slate-100">
+            <img src="orateur-1.JPG" alt="Dr Séverin Aimé Blanchard OUADIKA" class="w-full h-full object-cover" />
+          </div>
+          <h3 class="font-display font-bold text-[#00236D] text-base">Dr Séverin Aimé Blanchard OUADIKA</h3>
+          <p class="text-xs text-slate-600 mt-1.5 leading-relaxed">
+            Maître-assistant CAMES · Directeur général de l’évaluation des réformes au ministère en charge de la réforme de l’État.
+          </p>
+        </div>
+
+        <!-- Speaker 2 -->
+        <div class="card p-4 text-center">
+          <div class="rounded-xl overflow-hidden mb-4 aspect-[4/4] bg-slate-100">
+            <img src="orateur-2.JPG" alt="Ariel IBATA BIDIE" class="w-full h-full object-cover" />
+          </div>
+          <h3 class="font-display font-bold text-[#00236D] text-base">Ariel IBATA BIDIE</h3>
+          <p class="text-xs text-slate-600 mt-1.5 leading-relaxed">
+            Managing Partner de Owando Consulting · Senior consultant en systèmes de management & excellence opérationnelle certifié PMP®, ISO 9001/31000/22301.
+          </p>
+        </div>
+
+        <!-- Speaker 3 -->
+        <div class="card p-4 text-center">
+          <div class="rounded-xl overflow-hidden mb-4 aspect-[4/4] bg-slate-100">
+            <img src="orateur-3.JPG" alt="Sebilo AMÉGAS" class="w-full h-full object-cover" />
+          </div>
+          <h3 class="font-display font-bold text-[#00236D] text-base">Sebilo AMÉGAS</h3>
+          <p class="text-xs text-slate-600 mt-1.5 leading-relaxed">
+            Conseiller à la qualité du service public au ministère du contrôle d’État, de la qualité du service public et de la lutte contre les antivaleurs.
+          </p>
+        </div>
+
+        <!-- Speaker 4 -->
+        <div class="card p-4 text-center">
+          <div class="rounded-xl overflow-hidden mb-4 aspect-[4/4] bg-slate-100">
+            <img src="orateur-4.JPG" alt="Dr Jean Daniel OVAGA" class="w-full h-full object-cover" />
+          </div>
+          <h3 class="font-display font-bold text-[#00236D] text-base">Dr Jean Daniel OVAGA</h3>
+          <p class="text-xs text-slate-600 mt-1.5 leading-relaxed">
+            Président de l’Union Nationale des Opérateurs Économiques du Congo (UNOC) · Leader du secteur privé engagé pour la performance économique.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ACTUALITÉS & MÉDIAS -->
+  <section id="medias" class="py-16 md:py-20 bg-[#F4F7FB]">
+    <div class="container mx-auto px-4">
+      <div class="flex items-center justify-between mb-8">
+        <div>
+          <span class="chip">Publications & Décryptages</span>
+          <h2 class="font-display text-3xl font-extrabold text-[#00236D] mt-2">Actualités & Médias</h2>
+        </div>
+        <a href="actualites.html" class="text-sm font-bold text-[#00236D] hover:text-[#F39A1E] transition">Toutes les actualités →</a>
+      </div>
+
+      <div class="grid md:grid-cols-3 gap-6">
+        <article class="card p-0 overflow-hidden">
+          <img src="actu-1.jpg" alt="Renforcer la gouvernance publique au Congo" class="h-48 w-full object-cover" />
+          <div class="p-6">
+            <span class="chip">Baromètre Public</span>
+            <h3 class="mt-3 font-display text-lg font-bold text-[#00236D]">Renforcer la gouvernance et la redevabilité au Congo</h3>
+            <p class="mt-2 text-xs text-slate-600 leading-relaxed">Les leviers de performance économique, opérationnelle et de contrôle interne dans les entreprises et établissements publics.</p>
+          </div>
+        </article>
+
+        <article class="card p-0 overflow-hidden">
+          <img src="actu-2.jpg" alt="Innovation et transformation digitale" class="h-48 w-full object-cover" />
+          <div class="p-6">
+            <span class="chip">Transformation</span>
+            <h3 class="mt-3 font-display text-lg font-bold text-[#00236D]">Innovation, digitalisation et cybersécurité</h3>
+            <p class="mt-2 text-xs text-slate-600 leading-relaxed">Comment la maturité numérique (Dimension D du Baromètre) soutient la compétitivité et la résilience des organisations congolaises.</p>
+          </div>
+        </article>
+
+        <article class="card p-0 overflow-hidden">
+          <img src="actu-3.jpg" alt="Performance et Contenu Local" class="h-48 w-full object-cover" />
+          <div class="p-6">
+            <span class="chip">Impact National</span>
+            <h3 class="mt-3 font-display text-lg font-bold text-[#00236D]">Contenu local, emploi et RSE : un duo gagnant</h3>
+            <p class="mt-2 text-xs text-slate-600 leading-relaxed">Pourquoi l'ancrage local et le développement des PME congolaises comptent pour 15 % de l'Indice Global MAPERF 2027.</p>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- PARTENAIRES -->
+  <section id="partenaires" class="py-16 bg-white border-t border-slate-200/60">
+    <div class="container mx-auto px-4">
+      <h2 class="font-display text-2xl font-extrabold text-[#00236D] mb-3 text-center">Écosystème & Partenaires</h2>
+      <p class="text-center text-slate-600 text-sm max-w-2xl mx-auto mb-10">
+        Co-initié par <strong>Owando Consulting</strong>, <strong>ACE</strong> et <strong>Agence Ambition</strong>, avec l'appui des organisations patronales et institutions publiques.
+      </p>
+
+      <div class="relative overflow-hidden group">
+        <div id="partner-slider" class="flex items-center gap-12 animate-scroll">
+          <img src="part-1.png" alt="Partenaire 1" class="h-16 w-auto object-contain grayscale hover:grayscale-0 transition" />
+          <img src="part-2.png" alt="Partenaire 2" class="h-16 w-auto object-contain grayscale hover:grayscale-0 transition" />
+          <img src="part-3.png" alt="Partenaire 3" class="h-16 w-auto object-contain grayscale hover:grayscale-0 transition" />
+          <img src="part-4.png" alt="Partenaire 4" class="h-16 w-auto object-contain grayscale hover:grayscale-0 transition" />
+          <img src="part-5.png" alt="Partenaire 5" class="h-16 w-auto object-contain grayscale hover:grayscale-0 transition" />
+          <img src="part-6.png" alt="Partenaire 6" class="h-16 w-auto object-contain grayscale hover:grayscale-0 transition" />
+          <img src="part-1.png" alt="Partenaire 1" class="h-16 w-auto object-contain grayscale hover:grayscale-0 transition" />
+          <img src="part-2.png" alt="Partenaire 2" class="h-16 w-auto object-contain grayscale hover:grayscale-0 transition" />
+          <img src="part-3.png" alt="Partenaire 3" class="h-16 w-auto object-contain grayscale hover:grayscale-0 transition" />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION CONTACT & INSCRIPTION (#inscription) -->
+  <section id="inscription" class="py-16 bg-gradient-to-r from-[#00236D] to-[#0A2240] text-white">
+    <div class="container mx-auto px-4 flex flex-col lg:flex-row items-center justify-between gap-8">
+      <div class="space-y-2 max-w-2xl">
+        <span class="px-3 py-1 rounded-full text-xs font-bold bg-[#2CC3A0] text-[#00236D] uppercase">Campagne Ouverte</span>
+        <h2 class="font-display text-3xl font-extrabold">Prêt à évaluer et valoriser la performance de votre organisation ?</h2>
+        <p class="text-white/80 text-sm">
+          Désignez votre Point Focal pour accéder au questionnaire pluriannuel (2023–2025) du Baromètre MAPERF 2027 ou inscrivez votre délégation pour la journée du <strong>17 juin 2027</strong>.
+        </p>
+      </div>
+      <div class="flex flex-wrap gap-3 shrink-0">
+        <a href="barometre.html#espace-collecte" class="btn btn-primary">Accéder au Portail Baromètre</a>
+        <a href="inscription.html" class="btn bg-white text-[#00236D] hover:bg-[#F6C332]">Formulaire d'inscription</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer unifié injecté par maperf-layout.js -->
+  <footer></footer>
+
+  <script src="assets/js/maperf-layout.js"></script>
+  <script>
+    const images = ["1.jpg", "2.jpg", "3.jpg"];
+    let current = 0;
+    const slider = document.getElementById("hero-slider");
+    if (slider) {
+      setInterval(() => {
+        slider.classList.add("opacity-0");
+        setTimeout(() => {
+          current = (current + 1) % images.length;
+          slider.src = images[current];
+          slider.classList.remove("opacity-0");
+        }, 600);
+      }, 5000);
+    }
+  </script>
+</body>
+</html>

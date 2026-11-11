@@ -1,0 +1,31 @@
+name: MAPERF 2027 — CI/CD, QA Méthodologique & Sécurité OWASP
+
+on:
+  push:
+    branches: [ main, master, develop ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  qa-and-security-audit:
+    name: Validation Moteur Baromètre 2027, UI & Sécurité
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout du dépôt MAPERF 2027
+        uses: actions/checkout@v4
+
+      - name: Configuration de Node.js 20 LTS
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Exécution de la Suite de Tests QA & Conformité Méthodologique (TDR & CDC 2027)
+        run: node tests/barometre-qa.test.js
+
+      - name: Vérification de la présence des kits officiels Excel & TDR 2027
+        run: |
+          test -f assets/docs/01_TDR_Barometre_MAPERF_2027.pdf
+          test -f assets/docs/MAPERF_Barometre_Collecte_Secteur_Public.xlsx
+          test -f assets/docs/MAPERF_Barometre_Collecte_Secteur_Prive.xlsx
+          test -f supabase/migrations/20270101000000_maperf_barometre_2027.sql

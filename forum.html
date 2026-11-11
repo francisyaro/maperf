@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Forum Communauté & Dirigeants | MAPERF 2027</title>
+  <meta name="description" content="Forum MAPERF 2027 : échanges entre dirigeants, Points Focaux, experts et acteurs institutionnels autour du Baromètre de la performance, de la gouvernance et de l'innovation au Congo." />
+  <link rel="icon" type="image/png" href="favicon.PNG" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="assets/css/maperf-design.css" />
+</head>
+
+<body class="bg-[#F4F7FB] text-slate-900">
+  <div class="w-full"></div>
+  <header></header>
+
+  <!-- Hero -->
+  <section class="bg-gradient-to-br from-[#00236D] via-[#0A2240] to-[#003C8F] text-white py-14 text-center border-b-4 border-[#F39A1E]">
+    <div class="container mx-auto px-4 space-y-3">
+      <span class="px-3 py-1 rounded-full text-xs font-extrabold uppercase tracking-wider bg-[#F39A1E] text-white">Communauté MAPERF 2027</span>
+      <h1 class="font-display text-3xl sm:text-4xl font-extrabold">Forum des Dirigeants, Points Focaux & Experts</h1>
+      <p class="text-white/80 max-w-2xl mx-auto text-sm sm:text-base">
+        Espace d’entraide méthodologique et d’échanges entre dirigeants du secteur public, opérateurs privés et analystes autour du Baromètre MAPERF 2027.
+      </p>
+    </div>
+  </section>
+
+  <!-- Forum categories -->
+  <section class="py-14">
+    <div class="container mx-auto px-4 space-y-10">
+      <!-- Barre de recherche -->
+      <div class="card p-4 flex flex-col sm:flex-row items-center gap-3">
+        <div class="flex items-center gap-3 w-full">
+          <i data-lucide="search" class="w-5 h-5 text-[#00236D] shrink-0"></i>
+          <input id="forum-search-input" type="text" placeholder="Rechercher une question méthodologique, un indicateur (ex: FIN.007, OSP, Gouvernance)..." class="barometre-input" />
+        </div>
+        <a href="barometre.html#espace-collecte" class="btn btn-primary text-xs shrink-0">Accéder au Baromètre →</a>
+      </div>
+
+      <!-- Liste des catégories -->
+      <div>
+        <h2 class="font-display text-2xl font-extrabold text-[#00236D] mb-5">Thématiques de Discussion</h2>
+        <div class="grid md:grid-cols-3 gap-6">
+          <a href="barometre.html#presentation" class="card hover:-translate-y-1 transition block">
+            <div class="flex items-start gap-4">
+              <div class="w-11 h-11 rounded-xl bg-[#00236D]/10 text-[#00236D] flex items-center justify-center shrink-0">
+                <i data-lucide="landmark" class="w-6 h-6"></i>
+              </div>
+              <div>
+                <h3 class="font-display font-bold text-[#00236D]">Volet Secteur Public & OSP</h3>
+                <p class="text-xs text-slate-600 mt-1 leading-relaxed">
+                  Contrats de performance État-Entreprises, modulation OSP (×0,5), recouvrement et continuité du service public.
+                </p>
+              </div>
+            </div>
+          </a>
+
+          <a href="barometre.html#espace-collecte" class="card hover:-translate-y-1 transition block">
+            <div class="flex items-start gap-4">
+              <div class="w-11 h-11 rounded-xl bg-[#F39A1E]/15 text-[#F39A1E] flex items-center justify-center shrink-0">
+                <i data-lucide="briefcase" class="w-6 h-6"></i>
+              </div>
+              <div>
+                <h3 class="font-display font-bold text-[#00236D]">Volet Secteur Privé (GE & PME)</h3>
+                <p class="text-xs text-slate-600 mt-1 leading-relaxed">
+                  Création de richesse, compétitivité commerciale, certification ISO, sous-traitance PME et contenu local.
+                </p>
+              </div>
+            </div>
+          </a>
+
+          <a href="barometre.html#espace-validation" class="card hover:-translate-y-1 transition block">
+            <div class="flex items-start gap-4">
+              <div class="w-11 h-11 rounded-xl bg-[#2CC3A0]/20 text-emerald-800 flex items-center justify-center shrink-0">
+                <i data-lucide="shield-check" class="w-6 h-6"></i>
+              </div>
+              <div>
+                <h3 class="font-display font-bold text-[#00236D]">Preuves & Vérification Contradictoire</h3>
+                <p class="text-xs text-slate-600 mt-1 leading-relaxed">
+                  Pièces justificatives attendues (DOC.01 à DOC.11), contrôles OHADA et passage au statut Auditée (100%).
+                </p>
+              </div>
+            </div>
+          </a>
+        </div>
+      </div>
+
+      <!-- Derniers sujets -->
+      <div>
+        <h2 class="font-display text-2xl font-extrabold text-[#00236D] mb-5">Discussions Récentes des Points Focaux & Experts</h2>
+        <div class="space-y-4" id="forum-topics-list">
+          <div class="card flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div class="space-y-1.5">
+              <h3 class="font-display font-bold text-[#00236D] text-base">Comment préparer le dossier de preuves pour maximiser le score de fiabilité (≥ 80 %) ?</h3>
+              <p class="text-xs text-slate-500">Publié par <strong>Ariel IBATA BIDIE</strong> (Secrétariat Technique) — Guide officiel Baromètre 2027</p>
+              <div class="flex flex-wrap gap-2 pt-1">
+                <span class="chip">Preuves DOC.01–DOC.11</span>
+                <span class="chip">Fiabilité & Scoring</span>
+              </div>
+            </div>
+            <a href="barometre.html#espace-validation" class="btn btn-outline text-xs shrink-0">Voir la grille analyste →</a>
+          </div>
+
+          <div class="card flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div class="space-y-1.5">
+              <h3 class="font-display font-bold text-[#00236D] text-base">Articuler la maturité des pratiques (0 à 4) et les résultats opérationnels sans écart > 25 pts</h3>
+              <p class="text-xs text-slate-500">Publié par <strong>Sebilo AMÉGAS</strong> — Qualité du service public & Contrôle interne</p>
+              <div class="flex flex-wrap gap-2 pt-1">
+                <span class="chip">Échelle 0–4</span>
+                <span class="chip">Écart Pratiques–Résultats</span>
+              </div>
+            </div>
+            <a href="barometre.html#tableau-de-bord" class="btn btn-outline text-xs shrink-0">Simuler sur le tableau de bord →</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer></footer>
+  <script src="assets/js/maperf-layout.js"></script>
+</body>
+</html>

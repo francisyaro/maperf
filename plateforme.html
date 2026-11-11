@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Observatoire PSRE & Réformes Publiques | MAPERF 2027</title>
+  <meta name="description" content="Observatoire sectoriel de l'avancement des réformes et politiques publiques au Congo — Complémentaire au Baromètre des Entreprises MAPERF 2027." />
+  <link rel="icon" type="image/png" href="favicon.PNG" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="assets/css/maperf-design.css" />
+</head>
+
+<body class="bg-[#F4F7FB] text-slate-900">
+  <div class="w-full"></div>
+  <header></header>
+
+  <!-- HERO -->
+  <section class="bg-gradient-to-br from-[#00236D] via-[#0A2240] to-[#003C8F] text-white py-14 text-center border-b-4 border-[#F39A1E]">
+    <div class="container mx-auto px-4 space-y-4">
+      <span class="px-3 py-1 rounded-full text-xs font-extrabold uppercase tracking-wider bg-[#2CC3A0] text-[#00236D]">Observatoire des Réformes & PSRE</span>
+      <h1 class="font-display text-3xl sm:text-4xl font-extrabold">Tableau de Bord des Réformes Sectorielles</h1>
+      <p class="max-w-2xl mx-auto text-white/80 text-sm sm:text-base">
+        Suivi de la finalisation, de la promulgation et de la publication des textes de réformes publiques par secteur ministériel, en complément du <strong>Baromètre des Entreprises Publiques et Privées 2027</strong>.
+      </p>
+      <div class="pt-1">
+        <a href="barometre.html" class="btn btn-primary text-xs">
+          <i data-lucide="building-2" class="w-4 h-4"></i>
+          <span>Accéder au Baromètre des Entreprises (Public & Privé) →</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- KPI GLOBAUX -->
+  <section id="global" class="py-12">
+    <div class="container mx-auto px-4">
+      <h2 class="font-display text-2xl font-extrabold text-[#00236D] mb-6">Vue d’ensemble des indicateurs réglementaires</h2>
+      <div class="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+        <div class="card kpi">
+          <i data-lucide="check-circle" class="w-6 h-6 text-[#2CC3A0]"></i>
+          <p class="text-xs text-slate-500 font-semibold">Finalisation</p>
+          <p class="value text-[#00236D]">78%</p>
+        </div>
+        <div class="card kpi">
+          <i data-lucide="clock" class="w-6 h-6 text-[#F39A1E]"></i>
+          <p class="text-xs text-slate-500 font-semibold">Promulgation</p>
+          <p class="value text-[#F39A1E]">38 j</p>
+        </div>
+        <div class="card kpi">
+          <i data-lucide="x-circle" class="w-6 h-6 text-[#00236D]"></i>
+          <p class="text-xs text-slate-500 font-semibold">Non promulguées</p>
+          <p class="value text-[#00236D]">15%</p>
+        </div>
+        <div class="card kpi">
+          <i data-lucide="book-open" class="w-6 h-6 text-[#2CC3A0]"></i>
+          <p class="text-xs text-slate-500 font-semibold">Publication</p>
+          <p class="value text-emerald-600">21 j</p>
+        </div>
+        <div class="card kpi">
+          <i data-lucide="activity" class="w-6 h-6 text-[#F39A1E]"></i>
+          <p class="text-xs text-slate-500 font-semibold">Taux d’avancement</p>
+          <p class="value text-[#F39A1E]">81%</p>
+        </div>
+        <div class="card kpi">
+          <i data-lucide="bar-chart-3" class="w-6 h-6 text-[#00236D]"></i>
+          <p class="text-xs text-slate-500 font-semibold">Projets actifs</p>
+          <p class="value text-[#00236D]">47</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- NAVIGATION SECTEURS -->
+  <section class="bg-white border-y border-slate-200 py-4 sticky top-[68px] z-40 shadow-sm">
+    <div class="container mx-auto px-4 flex gap-2.5 overflow-x-auto justify-start sm:justify-center">
+      <button class="tab active" data-sector="economie">Économie & Finances</button>
+      <button class="tab" data-sector="gouvernance">Gouvernance</button>
+      <button class="tab" data-sector="infrastructures">Infrastructures</button>
+      <button class="tab" data-sector="education">Éducation</button>
+      <button class="tab" data-sector="travail">Travail & Social</button>
+      <button class="tab" data-sector="culture">Culture & Env.</button>
+      <button class="tab" data-sector="defense">Défense & Sécurité</button>
+    </div>
+  </section>
+
+  <!-- CONTENU SECTEUR -->
+  <section id="secteur-detail" class="py-12">
+    <div class="container mx-auto px-4">
+      <div class="card p-6 sm:p-8 transition-opacity duration-300" id="sector-panel">
+        <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+          <h2 id="secteur-titre" class="font-display text-2xl font-extrabold text-[#00236D] flex items-center gap-2">
+            <i data-lucide="bar-chart-3" class="text-[#F39A1E]"></i> Secteur : Économie & Finances
+          </h2>
+          <a id="secteur-deep-link" href="barometre-economie.html" class="btn btn-outline text-xs py-1.5 px-4">Ouvrir la fiche sectorielle détaillée →</a>
+        </div>
+
+        <div class="grid sm:grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+          <div class="card bg-slate-50 text-center"><p class="text-xs text-slate-500">Finalisation</p><p id="sec-kpi-0" class="font-display text-2xl font-extrabold text-[#00236D]">82%</p></div>
+          <div class="card bg-slate-50 text-center"><p class="text-xs text-slate-500">Promulgation</p><p id="sec-kpi-1" class="font-display text-2xl font-extrabold text-[#F39A1E]">36 j</p></div>
+          <div class="card bg-slate-50 text-center"><p class="text-xs text-slate-500">Non promulguées</p><p id="sec-kpi-2" class="font-display text-2xl font-extrabold text-slate-800">14%</p></div>
+          <div class="card bg-slate-50 text-center"><p class="text-xs text-slate-500">Publication</p><p id="sec-kpi-3" class="font-display text-2xl font-extrabold text-emerald-600">18 j</p></div>
+        </div>
+
+        <div class="chart-wrap h-72">
+          <canvas id="chart-sector"></canvas>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TENDANCES -->
+  <section id="comparatif" class="py-14 bg-white border-t border-slate-200/70">
+    <div class="container mx-auto px-4">
+      <h2 class="font-display text-2xl font-extrabold text-[#00236D] mb-6 text-center">Comparatif Intersectoriel du Taux de Finalisation</h2>
+      <div class="card chart-wrap h-80">
+        <canvas id="chart-comparatif"></canvas>
+      </div>
+    </div>
+  </section>
+
+  <footer></footer>
+
+  <script src="assets/js/maperf-layout.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const dataSecteurs = {
+        economie: [82, 36, 14, 18],
+        gouvernance: [85, 31, 8, 15],
+        infrastructures: [78, 38, 15, 19],
+        education: [75, 42, 10, 20],
+        travail: [83, 29, 9, 16],
+        culture: [79, 33, 12, 20],
+        defense: [80, 34, 12, 17]
+      };
+
+      const labels = ["Finalisation (%)", "Promulgation (j)", "Non promulguées (%)", "Publication (j)"];
+      const colors = ["#00236D", "#F39A1E", "#64748B", "#2CC3A0"];
+
+      const ctx = document.getElementById("chart-sector").getContext("2d");
+      let chartSector = new Chart(ctx, {
+        type: "bar",
+        data: { labels, datasets: [{ data: dataSecteurs.economie, backgroundColor: colors, borderRadius: 8, maxBarThickness: 56 }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+      });
+
+      document.querySelectorAll(".tab[data-sector]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          document.querySelectorAll(".tab[data-sector]").forEach(t => t.classList.remove("active"));
+          btn.classList.add("active");
+
+          const sector = btn.dataset.sector;
+          const vals = dataSecteurs[sector];
+          chartSector.data.datasets[0].data = vals;
+          chartSector.update();
+
+          document.getElementById("sec-kpi-0").textContent = vals[0] + "%";
+          document.getElementById("sec-kpi-1").textContent = vals[1] + " j";
+          document.getElementById("sec-kpi-2").textContent = vals[2] + "%";
+          document.getElementById("sec-kpi-3").textContent = vals[3] + " j";
+
+          document.getElementById("secteur-titre").innerHTML =
+            `<i data-lucide="bar-chart-3" class="text-[#F39A1E]"></i> Secteur : ${btn.textContent}`;
+          document.getElementById("secteur-deep-link").href = `barometre-${sector}.html`;
+          if (window.lucide) lucide.createIcons();
+        });
+      });
+
+      new Chart(document.getElementById("chart-comparatif"), {
+        type: "line",
+        data: {
+          labels: ["Économie", "Gouvernance", "Infrastructures", "Éducation", "Travail", "Culture", "Défense"],
+          datasets: [{
+            label: "Taux de finalisation (%)",
+            data: Object.values(dataSecteurs).map(v => v[0]),
+            borderColor: "#00236D",
+            backgroundColor: "rgba(44, 195, 160, 0.2)",
+            tension: 0.35,
+            fill: true,
+            pointBackgroundColor: "#F39A1E",
+            pointRadius: 4
+          }]
+        },
+        options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, max: 100 } } }
+      });
+    });
+  </script>
+</body>
+</html>

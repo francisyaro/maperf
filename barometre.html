@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Portail Baromètre MAPERF 2027 — Mesure, Vérification & Validation de la Performance (Public & Privé)</title>
+  <meta name="description" content="Plateforme officielle du Baromètre MAPERF 2027 (17 juin 2027) : collecte pluriannuelle 2023-2025, contrôles de cohérence, vérification contradictoire et scoring 0-100 des entreprises publiques et privées du Congo." />
+  <link rel="icon" type="image/png" href="favicon.PNG" />
+
+  <!-- Tailwind CSS, Chart.js & Lucide Icons -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="assets/css/maperf-design.css" />
+</head>
+
+<body class="bg-[#F4F7FB] text-slate-900">
+  <!-- Bandeau & Header injectés et unifiés par maperf-layout.js -->
+  <div class="w-full"></div>
+  <header></header>
+
+  <main id="barometre-app-root">
+    <!-- HERO INSTITUTIONNEL BAROMÈTRE 2027 -->
+    <section class="relative overflow-hidden bg-gradient-to-br from-[#00236D] via-[#0A2240] to-[#003C8F] text-white pt-10 pb-12 border-b-4 border-[#F39A1E]">
+      <div class="container mx-auto px-4">
+        <div class="grid lg:grid-cols-12 gap-8 items-center">
+          <div class="lg:col-span-7 space-y-4">
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="px-3 py-1 rounded-full text-xs font-extrabold uppercase tracking-wider bg-[#F39A1E] text-white">2e Édition · 17 Juin 2027</span>
+              <span class="px-3 py-1 rounded-full text-xs font-bold bg-white/10 text-[#2CC3A0] border border-[#2CC3A0]/30">Secteur Public & Secteur Privé</span>
+              <span class="px-3 py-1 rounded-full text-xs font-semibold bg-white/10 text-[#F6C332]">Séries 2023 (N-2) · 2024 (N-1) · 2025 (N)</span>
+            </div>
+            <h1 class="font-display text-3xl sm:text-4xl lg:text-5xl font-extrabold leading-tight">
+              Portail National du <span class="text-[#F6C332]">Baromètre MAPERF 2027</span>
+            </h1>
+            <p class="text-white/85 text-sm sm:text-base leading-relaxed max-w-2xl">
+              Instrument indépendant de référence pour mesurer la performance globale des <strong>entreprises publiques</strong> et des <strong>entreprises privées</strong> de la République du Congo. Chaque organisation renseigne ses indicateurs et preuves ; l’équipe technique MAPERF procède aux <strong>vérifications contradictoires et validations</strong> afin d’incrémenter et certifier le taux de performance sur une base <strong>0 à 100</strong>.
+            </p>
+            <div class="flex flex-wrap gap-3 pt-2 no-print">
+              <button type="button" data-main-tab="espace-collecte" class="btn btn-primary">
+                <i data-lucide="building-2" class="w-4 h-4"></i>
+                <span>Espace Entreprise (Renseigner les données)</span>
+              </button>
+              <button type="button" data-main-tab="espace-validation" class="btn btn-teal">
+                <i data-lucide="shield-check" class="w-4 h-4"></i>
+                <span>Équipe MAPERF (Vérifier & Valider)</span>
+              </button>
+              <button type="button" id="btn-new-entreprise" class="btn bg-white/10 text-white border border-white/25 hover:bg-white/20">
+                <i data-lucide="plus-circle" class="w-4 h-4 text-[#F6C332]"></i>
+                <span>Enrôler une entreprise</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Carte Cockpit Temps Réel du Dossier Sélectionné -->
+          <div class="lg:col-span-5">
+            <div class="bg-white/10 backdrop-blur-md rounded-2xl p-5 border border-white/20 shadow-2xl space-y-4">
+              <div class="flex items-center justify-between gap-2 border-b border-white/15 pb-3">
+                <div>
+                  <span class="text-[11px] uppercase tracking-wider text-[#2CC3A0] font-bold block">Dossier Actif dans le Simulateur / Portail</span>
+                  <h2 id="summary-raison-sociale" class="font-display font-bold text-base text-white">Société Nationale d'Énergie (SNER)</h2>
+                </div>
+                <span id="summary-code-anonyme" class="font-mono text-xs font-extrabold px-2.5 py-1 rounded-lg bg-[#F39A1E] text-white">PUB-2027-001</span>
+              </div>
+
+              <div class="no-print">
+                <label for="barometre-dossier-select" class="text-[11px] text-white/75 font-semibold block mb-1">Changer d'entreprise ou d'institution à inspecter :</label>
+                <select id="barometre-dossier-select" class="w-full rounded-xl bg-slate-900/80 text-white border border-white/25 px-3 py-2 text-xs font-semibold focus:outline-none focus:border-[#F6C332]"></select>
+              </div>
+
+              <!-- Jauge Double : Score Déclaré vs Taux Validé par l'Équipe MAPERF -->
+              <div class="grid grid-cols-2 gap-3">
+                <div class="bg-slate-900/55 rounded-xl p-3 border border-white/10">
+                  <div class="text-[11px] text-white/70 font-medium">Potentiel Brut (Déclaré)</div>
+                  <div id="kpi-score-brut" class="font-display text-2xl font-extrabold text-[#F6C332] mt-0.5">0.0 / 100</div>
+                  <div class="w-full h-1.5 bg-white/10 rounded-full mt-2 overflow-hidden">
+                    <div id="bar-progression-brut" class="h-full bg-[#F6C332] rounded-full transition-all duration-500" style="width: 0%"></div>
+                  </div>
+                </div>
+                <div class="bg-emerald-950/60 rounded-xl p-3 border border-[#2CC3A0]/40">
+                  <div class="text-[11px] text-[#2CC3A0] font-bold flex items-center gap-1">
+                    <i data-lucide="check-check" class="w-3.5 h-3.5"></i> Taux Validé MAPERF
+                  </div>
+                  <div id="kpi-score-valide" class="font-display text-2xl font-extrabold text-white mt-0.5">0.0 / 100</div>
+                  <div class="w-full h-1.5 bg-white/10 rounded-full mt-2 overflow-hidden">
+                    <div id="bar-progression-valide" class="h-full bg-[#2CC3A0] rounded-full transition-all duration-500" style="width: 0%"></div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-2 gap-3 text-xs pt-1">
+                <div class="flex items-center justify-between bg-white/5 px-3 py-2 rounded-lg">
+                  <span class="text-white/70">Complétude (seuil 75%) :</span>
+                  <strong id="kpi-completude" class="font-display text-white">100 %</strong>
+                </div>
+                <div class="flex items-center justify-between bg-white/5 px-3 py-2 rounded-lg">
+                  <span class="text-white/70">Fiabilité (seuil 50%) :</span>
+                  <strong id="kpi-fiabilite" class="font-display text-[#2CC3A0]">80 %</strong>
+                </div>
+              </div>
+
+              <div class="flex flex-wrap items-center justify-between gap-2 pt-1 text-[11px] text-white/80">
+                <span id="kpi-counts-verif">0 Auditées · 0 Vérifiées · 0 Déclarées</span>
+                <span id="summary-workflow-statut" class="px-2.5 py-0.5 rounded-full bg-white/15 text-white font-semibold">En revue</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- BARRE D'ONGLETS DU PORTAIL BAROMÈTRE (STICKY) -->
+    <section class="sticky top-[68px] z-40 bg-white/95 backdrop-blur border-b border-slate-200 shadow-sm py-3 no-print">
+      <div class="container mx-auto px-4 flex flex-wrap items-center justify-between gap-3">
+        <div class="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0">
+          <button type="button" data-main-tab="presentation" class="tab">
+            <i data-lucide="compass" class="w-4 h-4"></i>
+            <span>1. Cadre & Méthodologie (6 Dimensions)</span>
+          </button>
+          <button type="button" data-main-tab="espace-collecte" class="tab active">
+            <i data-lucide="building-2" class="w-4 h-4"></i>
+            <span>2. Espace Entreprise (Collecte & Preuves)</span>
+          </button>
+          <button type="button" data-main-tab="espace-validation" class="tab">
+            <i data-lucide="shield-check" class="w-4 h-4"></i>
+            <span>3. Équipe MAPERF (Vérification & Validation)</span>
+          </button>
+          <button type="button" data-main-tab="tableau-de-bord" class="tab">
+            <i data-lucide="gauge" class="w-4 h-4"></i>
+            <span>4. Tableau de Bord 0–100 & Restitution</span>
+          </button>
+          <button type="button" data-main-tab="consolidation" class="tab">
+            <i data-lucide="layers" class="w-4 h-4"></i>
+            <span>5. Consolidation & Comité Scientifique</span>
+          </button>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <span id="summary-publiabilite-badge" class="badge-status badge-audited"></span>
+          <input type="file" id="input-import-dossier-file" accept=".json" class="hidden" />
+          <button type="button" id="btn-import-dossier" class="btn btn-outline text-xs py-1.5 px-3" title="Importer un dossier JSON MAPERF">
+            <i data-lucide="upload" class="w-3.5 h-3.5"></i>
+            <span class="hidden sm:inline">Importer</span>
+          </button>
+          <button type="button" id="btn-export-dossier" class="btn btn-outline text-xs py-1.5 px-3" title="Exporter le dossier JSON structuré">
+            <i data-lucide="download" class="w-3.5 h-3.5"></i>
+            <span>Exporter</span>
+          </button>
+          <button type="button" id="btn-reset-demo" class="btn btn-outline text-xs py-1.5 px-3 text-slate-600" title="Réinitialiser les dossiers de démonstration aux valeurs initiales">
+            <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+            <span class="hidden md:inline">Réinitialiser</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- =======================================================================
+         ONGLET 1 : PRÉSENTATION, 6 DIMENSIONS & MÉTHODOLOGIE OFFICIELLE 2027
+         ======================================================================= -->
+    <section id="panel-presentation" class="py-12 hidden">
+      <div class="container mx-auto px-4 space-y-12">
+        <!-- Pourquoi le Baromètre MAPERF 2027 -->
+        <div class="grid lg:grid-cols-3 gap-6">
+          <div class="card border-t-4 border-t-[#00236D]">
+            <div class="w-10 h-10 rounded-xl bg-[#00236D]/10 text-[#00236D] flex items-center justify-center mb-3">
+              <i data-lucide="scale" class="w-5 h-5"></i>
+            </div>
+            <h3 class="font-display font-bold text-lg text-[#00236D] mb-2">Architecture Duale Public / Privé</h3>
+            <p class="text-xs text-slate-600 leading-relaxed">
+              Le Baromètre MAPERF 2027 évalue de manière rigoureuse et séparée les <strong>entreprises publiques marchandes</strong> (cible : 20, seuil : 15) et les <strong>entreprises privées de ≥ 10 salariés</strong> (cible : 50, seuil : 30) à travers des groupes homogènes de comparaison (<em>Macro-secteur × Classe de taille</em>).
+            </p>
+          </div>
+
+          <div class="card border-t-4 border-t-[#F39A1E]">
+            <div class="w-10 h-10 rounded-xl bg-[#F39A1E]/15 text-[#F39A1E] flex items-center justify-center mb-3">
+              <i data-lucide="check-check" class="w-5 h-5"></i>
+            </div>
+            <h3 class="font-display font-bold text-lg text-[#00236D] mb-2">Incrémentation par Validation Contradictoire</h3>
+            <p class="text-xs text-slate-600 leading-relaxed">
+              Chaque donnée saisie par l'entreprise débute au statut <strong>Déclarée (pondération de fiabilité 50 %)</strong>. Au fur et à mesure que l'équipe MAPERF vérifie la cohérence et les pièces justificatives, la donnée passe à <strong>Vérifiée (80 %)</strong> puis <strong>Auditée / Certifiée (100 %)</strong>, faisant progresser le taux de performance validé.
+            </p>
+          </div>
+
+          <div class="card border-t-4 border-t-[#2CC3A0]">
+            <div class="w-10 h-10 rounded-xl bg-[#2CC3A0]/15 text-emerald-700 flex items-center justify-center mb-3">
+              <i data-lucide="lock" class="w-5 h-5"></i>
+            </div>
+            <h3 class="font-display font-bold text-lg text-[#00236D] mb-2">Confidentialité & Règles Scientifiques</h3>
+            <p class="text-xs text-slate-600 leading-relaxed">
+              Attribution d'un code anonyme (<code>PUB-2027-NNN</code> / <code>PRI-2027-NNN</code>), non-assimilation des données manquantes à zéro, modulation OSP (×0,5) pour le secteur public, et seuils stricts de publiabilité : <strong>Complétude ≥ 75 %</strong> (≥ 70 % par dimension) et <strong>Fiabilité ≥ 50 %</strong>.
+            </p>
+          </div>
+        </div>
+
+        <!-- Les 6 Dimensions du Baromètre (Switch Secteur Public / Secteur Privé) -->
+        <div class="space-y-6">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <span class="chip">Référentiel Scientifique MAPERF 2027</span>
+              <h2 class="font-display text-2xl font-extrabold text-[#00236D] mt-2">Les 6 Dimensions d'Évaluation et leurs Pondérations</h2>
+            </div>
+            <div class="flex items-center gap-2">
+              <button type="button" data-pres-volet="PUBLIC" class="tab active">Volet Secteur Public (102 données · 92 indicateurs)</button>
+              <button type="button" data-pres-volet="PRIVE" class="tab">Volet Secteur Privé (97 données · 89 indicateurs)</button>
+            </div>
+          </div>
+
+          <div id="presentation-dimensions-grid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+        </div>
+
+        <!-- Calendrier Officiel de l'Édition 2027 & Gouvernance -->
+        <div class="grid lg:grid-cols-12 gap-6">
+          <div class="lg:col-span-7 card space-y-4">
+            <h3 class="panel-title text-lg"><i data-lucide="calendar" class="w-5 h-5 text-[#F39A1E]"></i> Calendrier Opérationnel du Baromètre MAPERF 2027</h3>
+            <div class="grid sm:grid-cols-2 gap-4 text-xs">
+              <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/70">
+                <span class="font-bold text-[#00236D] block">Phase 1 · Nov. 2026 – 20 Janv. 2027</span>
+                <p class="font-semibold text-slate-800 mt-1">Cadrage, référentiel & enrôlement</p>
+                <p class="text-slate-500 mt-1">Validation par le Comité Scientifique, lancement officiel le 15 janvier 2027 et habilitation des Points Focaux.</p>
+              </div>
+              <div class="p-3.5 rounded-xl bg-amber-50/70 border border-amber-200">
+                <span class="font-bold text-[#F39A1E] block">Phase 2 · 21 Janv. – 19 Mars 2027 (8 sem.)</span>
+                <p class="font-semibold text-slate-800 mt-1">Campagne de collecte pluriannuelle</p>
+                <p class="text-slate-600 mt-1">Saisie des séries 2023 (N-2), 2024 (N-1) et 2025 (N) et téléversement des pièces justificatives.</p>
+              </div>
+              <div class="p-3.5 rounded-xl bg-emerald-50/70 border border-emerald-200">
+                <span class="font-bold text-emerald-700 block">Phase 3 · 22 Mars – 30 Avril 2027 (6 sem.)</span>
+                <p class="font-semibold text-slate-800 mt-1">Vérification contradictoire & Scoring</p>
+                <p class="text-slate-600 mt-1">Contrôles de cohérence, demandes de précision, validation par l'équipe MAPERF et homologation du Comité Scientifique.</p>
+              </div>
+              <div class="p-3.5 rounded-xl bg-blue-50/70 border border-blue-200">
+                <span class="font-bold text-[#00236D] block">Phase 4 · Mai – 17 Juin 2027</span>
+                <p class="font-semibold text-slate-800 mt-1">Publication & Cérémonie Officielle</p>
+                <p class="text-slate-600 mt-1">Remise des fiches individuelles confidentielles et restitution publique le <strong>17 juin 2027</strong> au Hilton Brazzaville.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="lg:col-span-5 card space-y-4 bg-[#00236D] text-white">
+            <h3 class="font-display font-bold text-lg text-[#F6C332] flex items-center gap-2">
+              <i data-lucide="award" class="w-5 h-5"></i> Gouvernance & Observatoire Sectoriel
+            </h3>
+            <p class="text-xs text-white/85 leading-relaxed">
+              Le Baromètre est placé sous la supervision du <strong>Comité d'Orientation Stratégique (COS)</strong>, du <strong>Comité Scientifique Indépendant</strong> et du Secrétariat Technique opéré par <strong>Owando Consulting</strong>, <strong>ACE</strong> et <strong>Agence Ambition</strong>.
+            </p>
+            <div class="border-t border-white/15 pt-3">
+              <p class="text-xs font-bold text-[#2CC3A0] uppercase tracking-wider mb-2">Accès rapide à l'Observatoire Sectoriel des Politiques Publiques :</p>
+              <div class="flex flex-wrap gap-2">
+                <a href="barometre-economie.html" class="px-3 py-1.5 rounded-lg bg-white/10 hover:bg-[#F39A1E] text-xs font-semibold transition">Économie & Finances</a>
+                <a href="barometre-gouvernance.html" class="px-3 py-1.5 rounded-lg bg-white/10 hover:bg-[#F39A1E] text-xs font-semibold transition">Gouvernance</a>
+                <a href="barometre-infrastructures.html" class="px-3 py-1.5 rounded-lg bg-white/10 hover:bg-[#F39A1E] text-xs font-semibold transition">Infrastructures</a>
+                <a href="barometre-education.html" class="px-3 py-1.5 rounded-lg bg-white/10 hover:bg-[#F39A1E] text-xs font-semibold transition">Éducation</a>
+                <a href="barometre-travail.html" class="px-3 py-1.5 rounded-lg bg-white/10 hover:bg-[#F39A1E] text-xs font-semibold transition">Travail</a>
+                <a href="barometre-culture.html" class="px-3 py-1.5 rounded-lg bg-white/10 hover:bg-[#F39A1E] text-xs font-semibold transition">Culture & Env.</a>
+                <a href="barometre-defense.html" class="px-3 py-1.5 rounded-lg bg-white/10 hover:bg-[#F39A1E] text-xs font-semibold transition">Défense</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Téléchargement des Kits Officiels de Collecte Excel & Documents de Référence -->
+        <div class="card border-l-4 border-l-[#F39A1E] bg-white">
+          <div class="flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <span class="chip">Intégration Microsoft Excel & Référentiel Officiel</span>
+              <h3 class="font-display font-bold text-lg text-[#00236D] mt-1">Kits Officiels de Collecte Hors-Ligne & Termes de Référence (TDR 2027)</h3>
+              <p class="text-xs text-slate-600">Téléchargez les classeurs officiels Microsoft Excel (10 feuilles verrouillées avec formules et 36 contrôles) ou renseignez directement vos données en ligne dans l'onglet 2.</p>
+            </div>
+            <div class="flex flex-wrap items-center gap-2.5">
+              <a href="assets/docs/MAPERF_Barometre_Collecte_Secteur_Public.xlsx" download class="btn btn-ghost text-xs py-2 px-3.5">
+                <i data-lucide="file-spreadsheet" class="w-4 h-4 text-[#2CC3A0]"></i>
+                <span>Excel Secteur Public (102 données)</span>
+              </a>
+              <a href="assets/docs/MAPERF_Barometre_Collecte_Secteur_Prive.xlsx" download class="btn btn-primary text-xs py-2 px-3.5">
+                <i data-lucide="file-spreadsheet" class="w-4 h-4"></i>
+                <span>Excel Secteur Privé (97 données)</span>
+              </a>
+              <a href="assets/docs/01_TDR_Barometre_MAPERF_2027.pdf" target="_blank" rel="noopener" class="btn btn-outline text-xs py-2 px-3.5">
+                <i data-lucide="file-text" class="w-4 h-4 text-[#00236D]"></i>
+                <span>TDR Officiels (PDF)</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =======================================================================
+         ONGLET 2 : ESPACE ENTREPRISE / POINT FOCAL (COLLECTE 2023-2025 & PREUVES)
+         ======================================================================= -->
+    <section id="panel-espace-collecte" class="py-10">
+      <div class="container mx-auto px-4 space-y-10">
+        <!-- Étape 1 : Identification de l'organisation et calcul du groupe homogène -->
+        <div class="card space-y-5">
+          <div class="flex flex-wrap items-center justify-between gap-4 border-b border-slate-100 pb-4">
+            <div>
+              <span class="chip">Volet 01_Identification</span>
+              <h2 class="font-display text-xl font-extrabold text-[#00236D] mt-1">Fiche d'Identification, Éligibilité & Groupe Homogène</h2>
+              <p class="text-xs text-slate-500">Les informations ci-dessous déterminent automatiquement le groupe homogène de comparaison de l'organisation.</p>
+            </div>
+            <div class="flex items-center gap-3">
+              <div class="text-right">
+                <span class="text-[11px] text-slate-400 block">Code Anonyme Attribué</span>
+                <span id="ident-code-anonyme" class="font-mono font-extrabold text-sm text-[#00236D]">PUB-2027-001</span>
+              </div>
+              <button type="button" id="btn-save-identification" class="btn btn-primary text-xs py-2 px-4">
+                <i data-lucide="save" class="w-4 h-4"></i>
+                <span>Enregistrer le profil</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
+            <div>
+              <label class="font-bold text-slate-700 block mb-1">Raison sociale officielle *</label>
+              <input id="ident-raison-sociale" type="text" class="barometre-input" />
+            </div>
+            <div>
+              <label class="font-bold text-slate-700 block mb-1">Sigle usuel</label>
+              <input id="ident-sigle" type="text" class="barometre-input" />
+            </div>
+            <div>
+              <label class="font-bold text-slate-700 block mb-1">Volet du Baromètre</label>
+              <input id="ident-volet" type="text" disabled class="barometre-input" />
+            </div>
+            <div>
+              <label class="font-bold text-slate-700 block mb-1">Forme / Statut juridique</label>
+              <input id="ident-statut-juridique" type="text" class="barometre-input" />
+            </div>
+            <div>
+              <label class="font-bold text-slate-700 block mb-1">Macro-secteur d'activité *</label>
+              <input id="ident-secteur" type="text" class="barometre-input" />
+            </div>
+            <div>
+              <label class="font-bold text-slate-700 block mb-1">Ville / Département du siège *</label>
+              <input id="ident-ville" type="text" class="barometre-input" />
+            </div>
+            <div>
+              <label class="font-bold text-slate-700 block mb-1">Effectif permanent fin 2025 *</label>
+              <input id="ident-effectif" type="number" min="1" class="barometre-input" />
+            </div>
+            <div>
+              <label class="font-bold text-slate-700 block mb-1">Soumis à des OSP (Secteur Public)</label>
+              <select id="ident-osp" class="barometre-input">
+                <option value="Oui">Oui (Modulation ×0,5 active)</option>
+                <option value="Non">Non</option>
+              </select>
+            </div>
+            <div>
+              <label class="font-bold text-slate-700 block mb-1">Nom & Prénom du Point Focal *</label>
+              <input id="ident-pf-nom" type="text" class="barometre-input" />
+            </div>
+            <div>
+              <label class="font-bold text-slate-700 block mb-1">Fonction du Point Focal *</label>
+              <input id="ident-pf-fonction" type="text" class="barometre-input" />
+            </div>
+            <div>
+              <label class="font-bold text-slate-700 block mb-1">E-mail professionnel *</label>
+              <input id="ident-pf-email" type="email" class="barometre-input" />
+            </div>
+            <div>
+              <label class="font-bold text-slate-700 block mb-1">Téléphone direct *</label>
+              <input id="ident-pf-tel" type="text" class="barometre-input" />
+            </div>
+          </div>
+
+          <div class="flex flex-wrap items-center justify-between gap-3 bg-slate-50 p-3.5 rounded-xl border border-slate-200/70 text-xs">
+            <div>
+              <span class="text-slate-500 font-medium">Groupe Homogène de Comparaison calculé : </span>
+              <strong id="ident-groupe-homogene" class="text-[#00236D] font-display">PUBLIC · Énergie, Eau & Utilités × GE 250+</strong>
+            </div>
+            <div class="text-emerald-700 font-semibold flex items-center gap-1.5">
+              <i data-lucide="shield-check" class="w-4 h-4"></i>
+              <span>Engagement de confidentialité & Déclaration de sincérité signés</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Étape 2 : Collecte Pluriannuelle (2023, 2024, 2025) par Rubrique Métier -->
+        <div class="card space-y-5">
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <span class="chip">Séries Pluriannuelles 2023 (N-2) · 2024 (N-1) · 2025 (N)</span>
+              <h2 class="font-display text-xl font-extrabold text-[#00236D] mt-1">Questionnaire de Collecte des Données de Performance</h2>
+              <p class="text-xs text-slate-500">
+                Renseignez vos données par rubrique. Une donnée <em>Non disponible</em> ou <em>Non applicable</em> n'est <strong>jamais assimilée à zéro</strong>. Pour les scores de maturité (0 à 4) : <code>0=Inexistant</code>, <code>1=Ad hoc</code>, <code>2=Formalisé</code>, <code>3=Déployé & Mesuré</code>, <code>4=Optimisé & Audité</code>.
+              </p>
+            </div>
+          </div>
+
+          <!-- Onglets des 5 Rubriques (FIN, OPE, GOU, TRA, RHD) -->
+          <div id="collecte-rubriques-tabs" class="flex flex-wrap gap-2 border-b border-slate-200 pb-4"></div>
+
+          <!-- Tableau de saisie -->
+          <div class="overflow-x-auto rounded-xl border border-slate-200">
+            <table class="w-full text-left barometre-table">
+              <thead>
+                <tr>
+                  <th class="p-3">Code</th>
+                  <th class="p-3">Intitulé de la donnée</th>
+                  <th class="p-3">Unité</th>
+                  <th class="p-3">Applicabilité</th>
+                  <th class="p-3 text-right">2023 (N-2)</th>
+                  <th class="p-3 text-right">2024 (N-1)</th>
+                  <th class="p-3 text-right">2025 (N)</th>
+                  <th class="p-3 text-center">Score Indic.</th>
+                  <th class="p-3 text-center">Statut Validation</th>
+                  <th class="p-3">Pièce liée</th>
+                </tr>
+              </thead>
+              <tbody id="collecte-fields-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Étape 3 : Registre des Preuves (07_Sources_et_preuves) & Contrôles de Cohérence (09_Controles_coherence) -->
+        <div class="grid lg:grid-cols-12 gap-6">
+          <!-- Registre des pièces justificatives -->
+          <div class="lg:col-span-7 card space-y-4">
+            <div>
+              <span class="chip">07_Sources_et_preuves</span>
+              <h3 class="font-display text-lg font-extrabold text-[#00236D] mt-1">Registre des Pièces Justificatives & Preuves</h3>
+              <p class="text-xs text-slate-500">Joignez vos documents probants (PDF/PDF-A, XLSX) pour permettre à l'équipe MAPERF de passer vos données en statut <strong>Vérifiée (80%)</strong> ou <strong>Auditée (100%)</strong>.</p>
+            </div>
+            <div class="overflow-x-auto rounded-xl border border-slate-200">
+              <table class="w-full text-left barometre-table">
+                <thead>
+                  <tr>
+                    <th class="p-3">Réf.</th>
+                    <th class="p-3">Document attendu & Codes rattachés</th>
+                    <th class="p-3 text-center">Statut</th>
+                    <th class="p-3">Fichier transmis</th>
+                    <th class="p-3">Observation Analyste</th>
+                    <th class="p-3 text-right">Action</th>
+                  </tr>
+                </thead>
+                <tbody id="collecte-evidences-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Contrôles automatiques de cohérence -->
+          <div class="lg:col-span-5 card space-y-4">
+            <div>
+              <span class="chip">09_Controles_coherence</span>
+              <h3 class="font-display text-lg font-extrabold text-[#00236D] mt-1">Contrôles Automatiques de Recevabilité & Cohérence</h3>
+              <p class="text-xs text-slate-500">Vérification en temps réel des équilibres comptables OHADA, des ratios logiques et des bornes méthodologiques.</p>
+            </div>
+            <div class="overflow-x-auto rounded-xl border border-slate-200">
+              <table class="w-full text-left barometre-table">
+                <thead>
+                  <tr>
+                    <th class="p-3">Code</th>
+                    <th class="p-3">Domaine</th>
+                    <th class="p-3">Règle contrôlée</th>
+                    <th class="p-3 text-center">Résultat</th>
+                    <th class="p-3">Détail</th>
+                  </tr>
+                </thead>
+                <tbody id="collecte-coherence-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =======================================================================
+         ONGLET 3 : ESPACE ÉQUIPE MAPERF (VÉRIFICATION, VALIDATION & INCRÉMENTATION)
+         ======================================================================= -->
+    <section id="panel-espace-validation" class="py-10 hidden">
+      <div class="container mx-auto px-4 space-y-8">
+        <!-- En-tête de la Console Analyste MAPERF -->
+        <div class="card bg-gradient-to-r from-[#00236D] to-[#0A2240] text-white p-6">
+          <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+            <div class="space-y-1">
+              <span class="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-xs font-bold bg-[#2CC3A0] text-[#00236D]">
+                <i data-lucide="shield-check" class="w-3.5 h-3.5"></i> Back-Office Équipe Technique & Comité Scientifique MAPERF
+              </span>
+              <h2 class="font-display text-2xl font-extrabold">Console de Vérification Contradictoire & Validation des Performances</h2>
+              <p class="text-xs text-white/80 max-w-3xl">
+                Sélectionnez un dossier entreprise ci-dessous, inspectez ses valeurs déclarées et ses pièces justificatives, puis validez chaque indicateur (passage de <strong>Déclarée 50%</strong> à <strong>Vérifiée 80%</strong> ou <strong>Auditée 100%</strong>) pour incrémenter le taux de performance certifié de l'organisation.
+              </p>
+            </div>
+            <div class="flex flex-wrap gap-2.5 shrink-0">
+              <button type="button" id="btn-batch-verify" class="btn bg-blue-600 hover:bg-blue-500 text-white border border-blue-400 text-xs py-2.5 px-4">
+                <i data-lucide="check-circle" class="w-4 h-4"></i>
+                <span>Valider lot -> Vérifiée (80%)</span>
+              </button>
+              <button type="button" id="btn-batch-audit" class="btn btn-teal text-xs py-2.5 px-4">
+                <i data-lucide="award" class="w-4 h-4"></i>
+                <span>Homologuer -> Auditée (100%)</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- File d'attente des dossiers entreprises -->
+        <div>
+          <h3 class="font-display font-bold text-sm uppercase tracking-wider text-slate-500 mb-3">Portefeuille des Entreprises & Institutions en Cours d'Évaluation</h3>
+          <div id="validation-dossiers-queue" class="grid md:grid-cols-3 gap-4"></div>
+        </div>
+
+        <!-- Table de revue et d'incrémentation ligne par ligne -->
+        <div class="card space-y-4">
+          <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-4">
+            <div>
+              <h3 class="font-display text-lg font-extrabold text-[#00236D]">Grille de Revue Analyste & Incrémentation du Score par Indicateur</h3>
+              <p class="text-xs text-slate-500">Cliquez sur le niveau de vérification à droite de chaque ligne pour mettre à jour instantanément le taux de performance validé.</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <button type="button" data-val-filter="ALL" class="tab active text-xs py-1.5 px-3">Toutes les données</button>
+              <button type="button" data-val-filter="Déclarée" class="tab text-xs py-1.5 px-3">À vérifier (Déclarées)</button>
+              <button type="button" data-val-filter="Vérifiée" class="tab text-xs py-1.5 px-3">Vérifiées (80%)</button>
+              <button type="button" data-val-filter="Auditée" class="tab text-xs py-1.5 px-3">Auditées (100%)</button>
+            </div>
+          </div>
+
+          <div class="overflow-x-auto rounded-xl border border-slate-200">
+            <table class="w-full text-left barometre-table">
+              <thead>
+                <tr>
+                  <th class="p-3">Code</th>
+                  <th class="p-3">Indicateur & Commentaire de l'entreprise</th>
+                  <th class="p-3 text-right">Valeur 2025 (N)</th>
+                  <th class="p-3 text-center">Pièce Probante</th>
+                  <th class="p-3 text-center">Score Brut</th>
+                  <th class="p-3 text-center">Score Pondéré Validé</th>
+                  <th class="p-3 text-right">Décision de Validation Équipe MAPERF</th>
+                </tr>
+              </thead>
+              <tbody id="validation-fields-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Demandes de précisions contradictoires & Journal d'Audit (Audit Trail) -->
+        <div class="grid lg:grid-cols-12 gap-6">
+          <div class="lg:col-span-6 card space-y-4">
+            <h3 class="panel-title text-base"><i data-lucide="message-square-plus" class="w-5 h-5 text-[#F39A1E]"></i> Demandes de Précisions Contradictoires</h3>
+            <div class="flex gap-2">
+              <input id="clarif-code-input" type="text" placeholder="Code (ex: OPE.006)" class="barometre-input w-36 text-xs" value="OPE.006" />
+              <input id="clarif-msg-input" type="text" placeholder="Saisir une demande de clarification pour le Point Focal..." class="barometre-input text-xs flex-1" />
+              <button type="button" id="btn-add-clarification" class="btn btn-primary text-xs py-2 px-4 shrink-0">Envoyer</button>
+            </div>
+            <div id="validation-clarifications-list" class="space-y-3"></div>
+          </div>
+
+          <div class="lg:col-span-6 card space-y-4">
+            <h3 class="panel-title text-base"><i data-lucide="history" class="w-5 h-5 text-[#00236D]"></i> Journal d'Audit & Traçabilité des Validations (Audit Trail)</h3>
+            <div id="validation-audit-trail" class="divide-y divide-slate-100 max-h-80 overflow-y-auto"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =======================================================================
+         ONGLET 4 : TABLEAU DE BORD INDIVIDUEL 0–100 & FICHE DE RESTITUTION PDF/A
+         ======================================================================= -->
+    <section id="panel-tableau-de-bord" class="py-10 hidden">
+      <div class="container mx-auto px-4 space-y-8">
+        <!-- En-tête de la Fiche de Restitution Individuelle -->
+        <div class="card border-t-4 border-t-[#00236D] flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <span class="chip">10_Tableau_de_bord · Fiche Individuelle Confidentielle</span>
+            <h2 id="dash-org-title" class="font-display text-2xl font-extrabold text-[#00236D] mt-1">SNER-Congo (PUB-2027-001)</h2>
+            <p id="dash-org-subtitle" class="text-xs text-slate-500">PUBLIC · Énergie, Eau & Utilités × GE 250+ · Siège : Brazzaville</p>
+          </div>
+          <div class="flex items-center gap-3 no-print">
+            <button type="button" onclick="window.print()" class="btn btn-primary text-xs py-2.5 px-5">
+              <i data-lucide="printer" class="w-4 h-4"></i>
+              <span>Imprimer / Exporter Fiche PDF</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Synthèse Exécutive des Scores -->
+        <div class="grid md:grid-cols-2 lg:grid-cols-5 gap-4">
+          <div class="card bg-[#00236D] text-white text-center flex flex-col justify-center">
+            <span class="text-xs text-[#2CC3A0] font-bold uppercase">Taux de Performance Validé</span>
+            <div class="font-display text-4xl font-extrabold my-1"><span id="dash-score-valide">0.0</span><span class="text-lg text-white/60">/100</span></div>
+            <span class="text-[11px] text-white/75">Certifié après revue Équipe MAPERF</span>
+          </div>
+          <div class="card text-center flex flex-col justify-center">
+            <span class="text-xs text-slate-500 font-bold uppercase">Score Brut Déclaré</span>
+            <div class="font-display text-3xl font-extrabold text-[#00236D] my-1"><span id="dash-score-brut">0.0</span><span class="text-sm text-slate-400">/100</span></div>
+            <span class="text-[11px] text-slate-500">Avant pondération de fiabilité</span>
+          </div>
+          <div class="card text-center flex flex-col justify-center">
+            <span class="text-xs text-slate-500 font-bold uppercase">Sous-Score Pratiques</span>
+            <div id="dash-score-pratiques" class="font-display text-2xl font-extrabold text-[#00236D] my-1">0.0 / 100</div>
+            <span class="text-[11px] text-slate-500">Maturité des dispositifs (0–4)</span>
+          </div>
+          <div class="card text-center flex flex-col justify-center">
+            <span class="text-xs text-slate-500 font-bold uppercase">Sous-Score Résultats</span>
+            <div id="dash-score-resultats" class="font-display text-2xl font-extrabold text-[#2CC3A0] my-1">0.0 / 100</div>
+            <span class="text-[11px] text-slate-500">Performance opérationnelle & fin.</span>
+          </div>
+          <div class="card text-center flex flex-col justify-center">
+            <span class="text-xs text-slate-500 font-bold uppercase">Sous-Score Impacts</span>
+            <div id="dash-score-impacts" class="font-display text-2xl font-extrabold text-[#F39A1E] my-1">0.0 / 100</div>
+            <span class="text-[11px] text-slate-500">Économie locale, emploi & usagers</span>
+          </div>
+        </div>
+
+        <!-- Analyse de l'Écart Pratiques - Résultats -->
+        <div class="card p-4">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <span class="font-display font-bold text-sm text-[#00236D]">Contrôle Méthodologique de Cohérence Pratiques / Résultats :</span>
+            <span class="text-xs font-bold text-slate-700">Écart absolu |Pratiques − Résultats| : <strong id="dash-ecart-pr" class="text-[#00236D]">0.0 pts</strong> (Seuil d'alerte : 25 pts)</span>
+          </div>
+          <div id="dash-ecart-pr-alert"></div>
+        </div>
+
+        <!-- Graphiques Radar 6 Dimensions & Comparatif Brut vs Validé -->
+        <div class="grid lg:grid-cols-12 gap-6">
+          <div class="lg:col-span-6 card">
+            <h3 class="panel-title text-base mb-4">
+              <i data-lucide="radar" class="w-5 h-5 text-[#00236D]"></i>
+              Profil Multidimensionnel (Dimensions A à F vs Groupe Homogène)
+            </h3>
+            <div class="chart-wrap h-80">
+              <canvas id="chart-barometre-radar"></canvas>
+            </div>
+          </div>
+
+          <div class="lg:col-span-6 card">
+            <h3 class="panel-title text-base mb-4">
+              <i data-lucide="bar-chart-3" class="w-5 h-5 text-[#2CC3A0]"></i>
+              Progression par Dimension : Score Déclaré vs Taux Validé MAPERF
+            </h3>
+            <div class="chart-wrap h-80">
+              <canvas id="chart-barometre-dimensions"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Détail des 6 Dimensions -->
+        <div>
+          <h3 class="font-display font-bold text-lg text-[#00236D] mb-4">Détail des Scores, Pondérations et Complétudes par Dimension</h3>
+          <div id="dash-dimensions-cards" class="grid md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+        </div>
+
+        <!-- Synthèse Exécutive Personnalisée (Forces / Priorités) & Sceau d'Archivage ISO 19005 (PDF/A) -->
+        <div class="grid lg:grid-cols-12 gap-6">
+          <div class="lg:col-span-4 card border-t-4 border-t-emerald-500 space-y-3">
+            <h3 class="panel-title text-base mb-1">
+              <i data-lucide="trending-up" class="w-5 h-5 text-emerald-600"></i>
+              Points Forts Majeurs Validés
+            </h3>
+            <p class="text-xs text-slate-500">Dimensions et indicateurs surperformant le référentiel sectoriel après vérification.</p>
+            <ul id="dash-exec-strengths" class="space-y-2 text-xs text-slate-700"></ul>
+          </div>
+
+          <div class="lg:col-span-4 card border-t-4 border-t-[#F39A1E] space-y-3">
+            <h3 class="panel-title text-base mb-1">
+              <i data-lucide="target" class="w-5 h-5 text-[#F39A1E]"></i>
+              Leviers Prioritaires de Progression 2027
+            </h3>
+            <p class="text-xs text-slate-500">Actions à fort impact sur l'incrémentation du Taux de Performance Validé MAPERF.</p>
+            <ul id="dash-exec-priorities" class="space-y-2 text-xs text-slate-700"></ul>
+          </div>
+
+          <div class="lg:col-span-4 card bg-slate-900 text-white space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-bold uppercase tracking-wider text-[#2CC3A0]">Conformité ISO 19005 (PDF/A-2b)</span>
+              <span id="dash-cert-status" class="px-2 py-0.5 rounded bg-[#2CC3A0]/20 text-[#2CC3A0] text-[10px] font-extrabold">SCEAU ACTIF</span>
+            </div>
+            <h3 class="font-display font-bold text-base text-white flex items-center gap-2">
+              <i data-lucide="file-check-2" class="w-5 h-5 text-[#F6C332]"></i>
+              Certificat de Traçabilité & Empreinte
+            </h3>
+            <p class="text-xs text-slate-300 leading-relaxed">
+              Ce rapport individuel confidentiel est horodaté et signé par empreinte cryptographique déterministe (SHA-256) garantissant l'intégrité des scores validés par le Secrétariat Technique.
+            </p>
+            <div class="p-2.5 rounded-xl bg-black/40 border border-white/10 font-mono text-[10px] text-[#F6C332] break-all">
+              <div class="text-white/60 mb-0.5">Empreinte d'intégrité du dossier :</div>
+              <span id="dash-cert-hash">SHA256: --</span>
+            </div>
+            <div class="flex items-center justify-between text-[11px] text-slate-400 pt-1">
+              <span>Horodatage : <strong id="dash-cert-timestamp" class="text-white">--</strong></span>
+              <span>Édition : <strong class="text-[#F6C332]">MAPERF 2027</strong></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =======================================================================
+         ONGLET 5 : CONSOLIDATION MULTIDIMENSIONNELLE & COMITÉ SCIENTIFIQUE
+         ======================================================================= -->
+    <section id="panel-consolidation" class="py-10 hidden">
+      <div class="container mx-auto px-4 space-y-8">
+        <!-- En-tête Comité Scientifique & Règle de Confidentialité -->
+        <div class="card bg-[#00236D] text-white border-none">
+          <div class="flex flex-wrap items-center justify-between gap-4">
+            <div class="max-w-3xl">
+              <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-[#F6C332] text-xs font-bold mb-2">
+                <i data-lucide="lock" class="w-3.5 h-3.5"></i>
+                MATRICE ANONYMISÉE — COMITÉ SCIENTIFIQUE & TECHNIQUE MAPERF 2027
+              </div>
+              <h2 class="font-display font-extrabold text-xl md:text-2xl text-white">Consolidation Nationale, Quotas d'Échantillon & Éligibilité Trophées</h2>
+              <p class="text-xs text-slate-300 mt-1 leading-relaxed">
+                Conformément au Cahier des Charges (§3.6 & §10.2), aucune publication individuelle nominative ni aucun classement public (« palmarès ») n'est autorisé. Le Comité Scientifique analyse uniquement les <strong>codes anonymisés</strong> (<code>PUB-2027-XXX</code> / <code>PRI-2027-XXX</code>) regroupés par <em>Groupe Homogène de Comparaison</em>. Cliquez sur une ligne pour basculer sur l'audit ou la restitution du dossier.
+              </p>
+            </div>
+            <div class="flex flex-wrap items-center gap-2">
+              <button type="button" id="btn-export-csv-matrix" class="btn btn-primary text-xs">
+                <i data-lucide="file-spreadsheet" class="w-4 h-4"></i>
+                <span>Exporter Matrice CSV / Excel</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quotas d'échantillon & Moyennes Sectorielles -->
+        <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div class="card border-t-4 border-t-[#00236D]">
+            <div class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">Échantillon Secteur Public</div>
+            <div class="flex items-baseline justify-between">
+              <span id="conso-kpi-pub-count" class="font-display font-extrabold text-2xl text-[#00236D]">2 / 20</span>
+              <span class="text-xs font-semibold text-slate-500">Seuil min : 15</span>
+            </div>
+            <p class="text-[11px] text-slate-500 mt-2">Entreprises & établissements publics à caractère industriel, commercial ou de service.</p>
+          </div>
+
+          <div class="card border-t-4 border-t-[#F39A1E]">
+            <div class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">Échantillon Secteur Privé</div>
+            <div class="flex items-baseline justify-between">
+              <span id="conso-kpi-pri-count" class="font-display font-extrabold text-2xl text-[#F39A1E]">2 / 50</span>
+              <span class="text-xs font-semibold text-slate-500">Seuil min : 30</span>
+            </div>
+            <p class="text-[11px] text-slate-500 mt-2">Entreprises privées formelles employant au moins 10 salariés permanents au Congo.</p>
+          </div>
+
+          <div class="card border-t-4 border-t-[#2CC3A0]">
+            <div class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">Moyenne Validée — Public</div>
+            <div class="flex items-baseline justify-between">
+              <span id="conso-kpi-pub-avg" class="font-display font-extrabold text-2xl text-[#059669]">-- / 100</span>
+              <span class="badge-status badge-verified">Indice Pondéré</span>
+            </div>
+            <p class="text-[11px] text-slate-500 mt-2">Moyenne des Taux de Performance Validés MAPERF sur le portefeuille Public.</p>
+          </div>
+
+          <div class="card border-t-4 border-t-[#F6C332]">
+            <div class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">Moyenne Validée — Privé</div>
+            <div class="flex items-baseline justify-between">
+              <span id="conso-kpi-pri-avg" class="font-display font-extrabold text-2xl text-[#00236D]">-- / 100</span>
+              <span class="badge-status badge-audited">Indice Pondéré</span>
+            </div>
+            <p class="text-[11px] text-slate-500 mt-2">Moyenne des Taux de Performance Validés MAPERF sur le portefeuille Privé.</p>
+          </div>
+        </div>
+
+        <!-- Table de Consolidation Multidimensionnelle (Codes Anonymisés) -->
+        <div class="card">
+          <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+            <div>
+              <h3 class="panel-title text-lg mb-0.5">
+                <i data-lucide="table-2" class="w-5 h-5 text-[#F39A1E]"></i>
+                Matrice de Consolidation Anonymisée (Dimensions A à F, Fiabilité & Publiabilité)
+              </h3>
+              <p class="text-xs text-slate-500">Les raisons sociales sont masquées dans les exports destinés au Comité Scientifique et au Rapport Annuel.</p>
+            </div>
+            <div class="flex items-center gap-2 text-xs text-slate-600">
+              <span class="inline-flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> Publiable (Complétude ≥75% & Dim ≥70%)</span>
+              <span class="inline-flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span> En cours d'instruction</span>
+            </div>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Code Anonymisé</th>
+                  <th>Volet</th>
+                  <th>Groupe Homogène de Comparaison</th>
+                  <th>Dim A</th>
+                  <th>Dim B</th>
+                  <th>Dim C</th>
+                  <th>Dim D</th>
+                  <th>Dim E</th>
+                  <th>Dim F</th>
+                  <th>Score Brut</th>
+                  <th>Taux Validé MAPERF</th>
+                  <th>Complétude</th>
+                  <th>Fiabilité Preuves</th>
+                  <th>Statut & Comité</th>
+                </tr>
+              </thead>
+              <tbody id="consolidation-matrix-tbody">
+                <!-- Injecté dynamiquement par barometre-engine.js -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer unifié injecté par maperf-layout.js -->
+  <footer></footer>
+
+  <script src="assets/js/maperf-layout.js"></script>
+  <script src="assets/js/barometre-data.js"></script>
+  <script src="assets/js/barometre-engine.js"></script>
+</body>
+</html>

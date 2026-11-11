@@ -1,0 +1,320 @@
+/* ==========================================================================
+   MAPERF 2027 — DESIGN SYSTEM UNIFIÉ (Charte Graphique Officielle)
+   Bleu nuit: #00236D | Orange: #F39A1E | Jaune: #F6C332 | Vert d'eau: #2CC3A0
+   Polices: Sora (Titres & KPIs) & Manrope (Corps & Tableaux)
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@500;600;700;800&display=swap');
+
+:root {
+  --maperf-navy: #00236D;
+  --maperf-navy-dark: #00184D;
+  --maperf-navy-light: #183877;
+  --maperf-orange: #F39A1E;
+  --maperf-orange-hover: #E0860B;
+  --maperf-yellow: #F6C332;
+  --maperf-teal: #2CC3A0;
+  --maperf-teal-dark: #00A6A6;
+  --maperf-bg: #F4F7FB;
+  --maperf-surface: #FFFFFF;
+  --maperf-text: #0F172A;
+  --maperf-muted: #475569;
+  --maperf-border: rgba(0, 35, 109, 0.10);
+  /* Co-initiateurs */
+  --owando-navy: #0A2240;
+  --owando-gold: #D6A64F;
+  --ace-navy: #0B1F3A;
+  --ace-blue: #2A6FDB;
+  --ambition-blue: #003C8F;
+  --ambition-orange: #FF8A00;
+}
+
+html {
+  scroll-behavior: smooth;
+  font-family: 'Manrope', system-ui, -apple-system, sans-serif;
+  color: var(--maperf-text);
+  background-color: var(--maperf-bg);
+}
+
+body {
+  font-family: 'Manrope', system-ui, -apple-system, sans-serif;
+  color: var(--maperf-text);
+  background-color: var(--maperf-bg);
+  overflow-x: hidden;
+}
+
+h1, h2, h3, h4, .font-display, .kpi-value {
+  font-family: 'Sora', system-ui, -apple-system, sans-serif;
+}
+
+.container {
+  max-width: 1240px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Remplacement propre des anciennes classes @apply cassées */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-radius: 9999px;
+  background-color: rgba(0, 35, 109, 0.07);
+  color: var(--maperf-navy);
+  padding: 0.35rem 0.85rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.card {
+  background-color: #FFFFFF;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: 0 8px 24px rgba(0, 35, 109, 0.05);
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.card:hover {
+  box-shadow: 0 12px 32px rgba(0, 35, 109, 0.09);
+}
+
+.shadow-soft {
+  box-shadow: 0 8px 24px rgba(0, 35, 109, 0.06);
+}
+
+/* Boutons CTA institutionnels unifiés */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 9999px;
+  padding: 0.7rem 1.5rem;
+  font-family: 'Sora', sans-serif;
+  font-weight: 600;
+  font-size: 0.875rem;
+  line-height: 1.25;
+  transition: all 0.25s ease;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.btn-primary {
+  background-color: var(--maperf-orange);
+  color: #FFFFFF !important;
+  border: 2px solid var(--maperf-orange);
+  box-shadow: 0 4px 14px rgba(243, 154, 30, 0.28);
+}
+
+.btn-primary:hover {
+  background-color: var(--maperf-orange-hover);
+  border-color: var(--maperf-orange-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(243, 154, 30, 0.38);
+}
+
+.btn-teal {
+  background-color: var(--maperf-teal);
+  color: #00236D !important;
+  border: 2px solid var(--maperf-teal);
+  font-weight: 700;
+}
+
+.btn-teal:hover {
+  background-color: #22ad8c;
+  border-color: #22ad8c;
+  color: #FFFFFF !important;
+  transform: translateY(-1px);
+}
+
+.btn-ghost {
+  background-color: var(--maperf-navy);
+  color: #FFFFFF !important;
+  border: 2px solid var(--maperf-navy);
+}
+
+.btn-ghost:hover {
+  background-color: var(--maperf-orange);
+  border-color: var(--maperf-orange);
+  color: #FFFFFF !important;
+  transform: translateY(-1px);
+}
+
+.btn-outline {
+  background-color: transparent;
+  color: var(--maperf-navy);
+  border: 1.5px solid rgba(0, 35, 109, 0.25);
+}
+
+.btn-outline:hover {
+  border-color: var(--maperf-navy);
+  background-color: rgba(0, 35, 109, 0.04);
+}
+
+/* Onglets de navigation (Tabs) */
+.tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.25rem;
+  font-family: 'Sora', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border-radius: 9999px;
+  border: 1.5px solid rgba(0, 35, 109, 0.18);
+  color: var(--maperf-navy);
+  background-color: #FFFFFF;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.tab:hover {
+  border-color: var(--maperf-orange);
+  color: var(--maperf-orange);
+}
+
+.tab.active {
+  background-color: var(--maperf-navy);
+  border-color: var(--maperf-navy);
+  color: #FFFFFF;
+  box-shadow: 0 4px 12px rgba(0, 35, 109, 0.2);
+}
+
+/* KPI Cards */
+.kpi {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.35rem;
+}
+
+.kpi .value {
+  font-family: 'Sora', sans-serif;
+  font-size: 2rem;
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.panel-title {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-family: 'Sora', sans-serif;
+  font-weight: 700;
+  color: var(--maperf-navy);
+}
+
+.chart-wrap {
+  min-height: 280px;
+  position: relative;
+}
+
+/* Utilitaires de marque */
+.bg-brand {
+  background-color: var(--maperf-navy) !important;
+}
+
+.text-brand {
+  color: var(--maperf-navy) !important;
+}
+
+.text-brand-light {
+  color: var(--maperf-teal-dark) !important;
+}
+
+/* Badges de statut Baromètre */
+.badge-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.7rem;
+  border-radius: 9999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.badge-declared {
+  background-color: rgba(246, 195, 50, 0.2);
+  color: #9A6700;
+  border: 1px solid rgba(246, 195, 50, 0.5);
+}
+
+.badge-verified {
+  background-color: rgba(42, 111, 219, 0.14);
+  color: #1D4ED8;
+  border: 1px solid rgba(42, 111, 219, 0.35);
+}
+
+.badge-audited {
+  background-color: rgba(44, 195, 160, 0.18);
+  color: #047857;
+  border: 1px solid rgba(44, 195, 160, 0.45);
+}
+
+.badge-alert {
+  background-color: rgba(239, 68, 68, 0.12);
+  color: #B91C1C;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+/* Tableaux Baromètre */
+.barometre-table th {
+  font-family: 'Sora', sans-serif;
+  font-size: 0.73rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #475569;
+  background-color: #F8FAFC;
+  border-bottom: 2px solid rgba(0, 35, 109, 0.1);
+}
+
+.barometre-table td {
+  vertical-align: middle;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+}
+
+.barometre-input {
+  width: 100%;
+  border: 1.5px solid #CBD5E1;
+  border-radius: 0.5rem;
+  padding: 0.45rem 0.65rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #0F172A;
+  background-color: #FFFFFF;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.barometre-input:focus {
+  outline: none;
+  border-color: var(--maperf-navy);
+  box-shadow: 0 0 0 3px rgba(0, 35, 109, 0.12);
+}
+
+.barometre-input:disabled {
+  background-color: #F1F5F9;
+  color: #94A3B8;
+  cursor: not-allowed;
+}
+
+/* Impression Fiche Individuelle de Restitution (PDF/A Ready) */
+@media print {
+  header, footer, .no-print, #maperf-top-banner {
+    display: none !important;
+  }
+  body {
+    background: #FFFFFF !important;
+    color: #000000 !important;
+  }
+  .card {
+    box-shadow: none !important;
+    border: 1px solid #CBD5E1 !important;
+    break-inside: avoid;
+  }
+}
