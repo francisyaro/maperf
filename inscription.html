@@ -162,15 +162,15 @@
           localStorage.setItem("maperf_inscriptions_2027", JSON.stringify(list));
         } catch (err) {}
 
-        // Si exécuté sur hébergement statique (GitHub Pages / local file://), affichage immédiat sans erreur 405
-        if (window.location.protocol === "file:" || window.location.hostname.indexOf("github.io") !== -1) {
-          e.preventDefault();
-          feedback.className = "p-5 rounded-xl text-xs bg-emerald-50 text-emerald-900 border border-emerald-200 space-y-2";
-          feedback.innerHTML =
-            '<div class="font-display font-bold text-sm text-emerald-800">Inscription & pré-enrôlement enregistrés avec succès ✅</div>' +
-            '<p>Organisation : <strong>' + (record.organisation || "") + '</strong> (' + (record.volet || "") + ') — Point Focal : <strong>' + (record.prenom || "") + ' ' + (record.nom || "") + '</strong>.</p>' +
-            '<div class="pt-2"><a href="barometre.html#espace-collecte" class="btn btn-primary text-xs py-2 px-4">Ouvrir mon Espace Entreprise dans le Baromètre 2027 →</a></div>';
-        }
+        // Envoi asynchrone avec fallback gracieux sur Vercel / GitHub Pages / hébergement statique
+        e.preventDefault();
+        fetch("send_inscription.php", { method: "POST", body: fd }).catch(function () {});
+        feedback.className = "p-5 rounded-xl text-xs bg-emerald-50 text-emerald-900 border border-emerald-200 space-y-2";
+        feedback.innerHTML =
+          '<div class="font-display font-bold text-sm text-emerald-800">Inscription & pré-enrôlement enregistrés avec succès ✅</div>' +
+          '<p>Organisation : <strong>' + (record.organisation || "") + '</strong> (' + (record.volet || "") + ') — Point Focal : <strong>' + (record.prenom || "") + ' ' + (record.nom || "") + '</strong>.</p>' +
+          '<div class="pt-2"><a href="barometre.html#espace-collecte" class="btn btn-primary text-xs py-2 px-4">Ouvrir mon Espace Entreprise dans le Baromètre 2027 →</a></div>';
+        form.reset();
       });
     })();
   </script>
