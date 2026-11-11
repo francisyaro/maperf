@@ -259,6 +259,12 @@ test("Présence des kits officiels Excel (Public/Privé), TDR PDF, Migration Sup
   });
 });
 
+test("Architecture UX/UI du Header : Logo épuré sans doublon texte et navigation sans retour à la ligne", () => {
+  const layoutJs = fs.readFileSync(path.join(ROOT_DIR, "assets/js/maperf-layout.js"), "utf8");
+  assert.ok(!layoutJs.includes("Les Journées de la Performance · Congo"), "Le doublon texte à côté du logo doit être supprimé");
+  assert.ok(layoutJs.includes("whitespace-nowrap"), "La barre de navigation doit empêcher le retour à la ligne des intitulés");
+});
+
 test("send_inscription.php applique les protections OWASP (hash_equals, anti-CRLF, htmlspecialchars)", () => {
   const phpContent = fs.readFileSync(path.join(ROOT_DIR, "send_inscription.php"), "utf8");
   assert.ok(phpContent.includes("hash_equals"), "send_inscription.php doit utiliser hash_equals contre les timing attacks");

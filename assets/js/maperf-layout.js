@@ -34,42 +34,29 @@
 
     var headerHTML =
       '<header class="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-sm no-print">' +
-      '  <div class="container mx-auto px-4 py-3 flex items-center justify-between gap-4">' +
-      '    <a href="index.html" class="flex items-center gap-3 group shrink-0">' +
-      '      <img src="logo-maperf.PNG" alt="Logo MAPERF 2027" class="h-12 sm:h-14 w-auto transition-transform group-hover:scale-105" />' +
-      '      <div class="hidden sm:flex flex-col">' +
-      '        <div class="flex items-center gap-1.5">' +
-      '          <span class="font-display text-lg font-extrabold tracking-tight text-[#00236D]">MAPERF</span>' +
-      '          <span class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-[#00236D]/10 text-[#00236D]">2027</span>' +
-      '        </div>' +
-      '        <span class="text-[11px] text-slate-500 font-medium">Les Journées de la Performance · Congo</span>' +
-      '      </div>' +
+      '  <div class="container mx-auto px-4 py-2.5 flex items-center justify-between gap-6">' +
+      '    <a href="index.html" class="flex items-center group shrink-0" aria-label="Accueil MAPERF 2027">' +
+      '      <img src="logo-maperf.PNG" alt="Logo MAPERF — Les Matinées de la Performance" class="h-11 sm:h-12 w-auto transition-transform group-hover:scale-105" />' +
       '    </a>' +
       '' +
-      '    <!-- Navigation Desktop -->' +
-      '    <nav class="hidden xl:flex items-center gap-5 text-sm font-semibold text-slate-700" aria-label="Navigation principale">' +
+      '    <!-- Navigation Desktop Épurée (Architecture UX/UI — 6 entrées max, zéro retour à la ligne) -->' +
+      '    <nav class="hidden lg:flex items-center gap-6 text-[13.5px] font-semibold text-slate-700 whitespace-nowrap" aria-label="Navigation principale">' +
       '      <a href="index.html" class="py-2 transition hover:text-[#F39A1E] ' + (page === 'index.html' ? 'text-[#00236D] font-bold border-b-2 border-[#F39A1E]' : '') + '">Accueil</a>' +
-      '      <a href="index.html#evenements" class="py-2 transition hover:text-[#F39A1E]">Matinées</a>' +
-      '      <a href="index.html#trophees" class="py-2 transition hover:text-[#F39A1E]">Trophées</a>' +
-      '      <a href="agenda.html" class="py-2 transition hover:text-[#F39A1E] ' + (page === 'agenda.html' ? 'text-[#00236D] font-bold border-b-2 border-[#F39A1E]' : '') + '">Agenda</a>' +
-      '      <a href="actualites.html" class="py-2 transition hover:text-[#F39A1E] ' + (page === 'actualites.html' ? 'text-[#00236D] font-bold border-b-2 border-[#F39A1E]' : '') + '">Actualités</a>' +
-      '      <a href="forum.html" class="py-2 transition hover:text-[#F39A1E] ' + (page === 'forum.html' ? 'text-[#00236D] font-bold border-b-2 border-[#F39A1E]' : '') + '">Forum</a>' +
       '' +
-      '      <!-- Méga-Menu Baromètre 2027 (Mis en avant) -->' +
+      '      <!-- 1. Pilier Central : Méga-Menu Baromètre 2027 -->' +
       '      <div class="relative group">' +
-      '        <a href="barometre.html" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full transition ' +
+      '        <a href="barometre.html" class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full whitespace-nowrap transition ' +
       (isBarometrePage(page)
         ? 'bg-[#00236D] text-white shadow-sm'
         : 'bg-[#00236D]/8 text-[#00236D] hover:bg-[#00236D] hover:text-white') +
       '">' +
-      '          <i data-lucide="bar-chart-big" class="w-4 h-4 text-[#F39A1E]"></i>' +
-      '          <span>Baromètre 2027</span>' +
-      '          <span class="px-1.5 py-0.2 text-[10px] font-extrabold uppercase rounded bg-[#F39A1E] text-white">Portail</span>' +
-      '          <i data-lucide="chevron-down" class="w-3.5 h-3.5 opacity-80"></i>' +
+      '          <i data-lucide="bar-chart-big" class="w-4 h-4 text-[#F39A1E] shrink-0"></i>' +
+      '          <span class="font-bold">Baromètre 2027</span>' +
+      '          <i data-lucide="chevron-down" class="w-3.5 h-3.5 opacity-75 shrink-0"></i>' +
       '        </a>' +
       '' +
-      '        <!-- Dropdown Panel -->' +
-      '        <div class="absolute left-1/2 -translate-x-1/2 top-full pt-2 hidden group-hover:block z-50 w-[560px]">' +
+      '        <!-- Dropdown Panel Baromètre -->' +
+      '        <div class="absolute left-0 top-full pt-2 hidden group-hover:block z-50 w-[560px] whitespace-normal">' +
       '          <div class="bg-white rounded-2xl shadow-2xl border border-slate-200/90 p-5 grid grid-cols-12 gap-4 text-left">' +
       '            <div class="col-span-7 space-y-2 border-r border-slate-100 pr-4">' +
       '              <p class="text-[11px] font-bold uppercase tracking-wider text-[#00236D]/60 px-2">Portail Baromètre MAPERF 2027</p>' +
@@ -130,30 +117,59 @@
       '        </div>' +
       '      </div>' +
       '' +
-      '      <a href="index.html#medias" class="py-2 transition hover:text-[#F39A1E]">Médias</a>' +
+      '      <!-- 2. Menu déroulant Événement 2027 (regroupe Matinées, Trophées, Agenda & Médias) -->' +
+      '      <div class="relative group">' +
+      '        <a href="agenda.html" class="inline-flex items-center gap-1 py-2 transition hover:text-[#F39A1E] ' + (page === 'agenda.html' ? 'text-[#00236D] font-bold border-b-2 border-[#F39A1E]' : '') + '">' +
+      '          <span>Édition 2027</span>' +
+      '          <i data-lucide="chevron-down" class="w-3.5 h-3.5 opacity-70"></i>' +
+      '        </a>' +
+      '        <div class="absolute left-0 top-full pt-2 hidden group-hover:block z-50 w-64 whitespace-normal">' +
+      '          <div class="bg-white rounded-2xl shadow-xl border border-slate-200/90 p-2.5 space-y-1 text-left text-xs">' +
+      '            <a href="agenda.html" class="flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-slate-50 text-slate-800 font-semibold">' +
+      '              <i data-lucide="calendar" class="w-4 h-4 text-[#00236D]"></i>' +
+      '              <span>Agenda du 17 Juin 2027</span>' +
+      '            </a>' +
+      '            <a href="index.html#evenements" class="flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-slate-50 text-slate-700">' +
+      '              <i data-lucide="presentation" class="w-4 h-4 text-[#2CC3A0]"></i>' +
+      '              <span>Les Matinées & Panels</span>' +
+      '            </a>' +
+      '            <a href="index.html#trophees" class="flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-slate-50 text-slate-700">' +
+      '              <i data-lucide="trophy" class="w-4 h-4 text-[#F39A1E]"></i>' +
+      '              <span>Les Trophées MAPERF</span>' +
+      '            </a>' +
+      '            <a href="index.html#medias" class="flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-slate-50 text-slate-700">' +
+      '              <i data-lucide="image" class="w-4 h-4 text-slate-500"></i>' +
+      '              <span>Médias & Rétrospective</span>' +
+      '            </a>' +
+      '          </div>' +
+      '        </div>' +
+      '      </div>' +
+      '' +
+      '      <a href="actualites.html" class="py-2 transition hover:text-[#F39A1E] ' + (page === 'actualites.html' ? 'text-[#00236D] font-bold border-b-2 border-[#F39A1E]' : '') + '">Actualités</a>' +
+      '      <a href="forum.html" class="py-2 transition hover:text-[#F39A1E] ' + (page === 'forum.html' ? 'text-[#00236D] font-bold border-b-2 border-[#F39A1E]' : '') + '">Forum</a>' +
       '      <a href="index.html#inscription" class="py-2 transition hover:text-[#F39A1E]">Contact</a>' +
       '    </nav>' +
       '' +
-      '    <!-- Actions Droite Desktop -->' +
-      '    <div class="hidden md:flex items-center gap-2.5 shrink-0">' +
-      '      <a href="barometre.html#espace-collecte" class="btn btn-ghost text-xs px-4 py-2.5">' +
-      '        <i data-lucide="clipboard-check" class="w-4 h-4 text-[#2CC3A0]"></i>' +
-      '        <span>Participer au Baromètre</span>' +
+      '    <!-- Actions Droite Desktop (Compactes & Sans débordement) -->' +
+      '    <div class="hidden lg:flex items-center gap-2.5 shrink-0 whitespace-nowrap">' +
+      '      <a href="barometre.html#espace-collecte" class="btn btn-outline text-xs px-3.5 py-2">' +
+      '        <i data-lucide="building-2" class="w-3.5 h-3.5 text-[#00236D]"></i>' +
+      '        <span>Espace Entreprise</span>' +
       '      </a>' +
-      '      <a href="inscription.html" class="btn btn-primary text-xs px-4 py-2.5">' +
-      '        <i data-lucide="user-plus" class="w-4 h-4"></i>' +
+      '      <a href="inscription.html" class="btn btn-primary text-xs px-4 py-2">' +
+      '        <i data-lucide="user-plus" class="w-3.5 h-3.5"></i>' +
       '        <span>S\'inscrire</span>' +
       '      </a>' +
       '    </div>' +
       '' +
       '    <!-- Bouton Hamburger Mobile -->' +
-      '    <button id="maperf-mobile-menu-btn" type="button" class="xl:hidden inline-flex items-center justify-center p-2.5 rounded-xl border border-slate-200 text-[#00236D] hover:bg-slate-100 focus:outline-none" aria-label="Ouvrir le menu">' +
+      '    <button id="maperf-mobile-menu-btn" type="button" class="lg:hidden inline-flex items-center justify-center p-2.5 rounded-xl border border-slate-200 text-[#00236D] hover:bg-slate-100 focus:outline-none" aria-label="Ouvrir le menu">' +
       '      <i data-lucide="menu" class="w-6 h-6"></i>' +
       '    </button>' +
       '  </div>' +
       '' +
       '  <!-- Menu Mobile Déroulant -->' +
-      '  <div id="maperf-mobile-menu" class="hidden xl:hidden bg-white border-t border-slate-200 px-4 pt-3 pb-6 shadow-xl">' +
+      '  <div id="maperf-mobile-menu" class="hidden lg:hidden bg-white border-t border-slate-200 px-4 pt-3 pb-6 shadow-xl">' +
       '    <div class="grid gap-1 text-sm font-semibold text-slate-800">' +
       '      <a href="index.html" class="px-3 py-2.5 rounded-lg hover:bg-slate-50">Accueil</a>' +
       '      <a href="barometre.html" class="px-3 py-2.5 rounded-lg bg-[#00236D]/8 text-[#00236D] font-bold flex items-center justify-between">' +
