@@ -23,7 +23,7 @@
       '  <div class="container mx-auto px-4 py-2 flex flex-wrap items-center justify-between gap-2">' +
       '    <div class="flex items-center gap-2 mx-auto sm:mx-0 text-center sm:text-left">' +
       '      <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-bold bg-[#F39A1E] text-white uppercase tracking-wider">2e Édition</span>' +
-      '      <span><strong>MAPERF 2027</strong> — 17 Juin 2027 · Hilton Brazzaville Les Tours Jumelles</span>' +
+      '      <span><strong>MAPERF 2027</strong> — 17 Juin 2027 · Hilton Brazzaville Les Tours Jumelles (République du Congo)</span>' +
       '    </div>' +
       '    <div class="hidden lg:flex items-center gap-4 text-xs text-white/85">' +
       '      <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-[#2CC3A0] animate-pulse"></span> Collecte Baromètre : <strong>21 Janv. – 19 Mars 2027</strong> (Exercices 2023–2025)</span>' +

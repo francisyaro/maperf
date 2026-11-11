@@ -5,17 +5,34 @@
 (function () {
   var STORAGE_KEY = "maperf_2027_barometre_dossiers_v1";
   var AUDIT_KEY = "maperf_2027_barometre_audit_v1";
+  var AUTH_KEY = "maperf_2027_barometre_auth_v1";
+
+  var STANDARD_PASSWORDS = {
+    ENTREPRISE: ["entreprise2027", "entreprise2027!", "congo2027", "maperf2027"],
+    MAPERF: ["maperf2027", "maperfaudit2027!", "admin2027", "audit2027"]
+  };
 
   var state = {
     dossiers: [],
     activeDossierId: "PUB-2027-001",
-    activeTab: "espace-collecte", // presentation | espace-collecte | espace-validation | tableau-de-bord
+    activeTab: "espace-collecte", // presentation | espace-collecte | espace-validation | tableau-de-bord | consolidation
     activeRubrique: "FIN",
     validationFilter: "ALL",
+    auth: {
+      entrepriseUnlocked: false,
+      equipeUnlocked: false,
+      maperfRole: "Analyste Principal OHADA — Secrétariat Technique (Brazzaville)"
+    },
     auditLogs: [],
     radarChart: null,
     barChart: null
   };
+
+  function validateStandardPassword(role, rawPwd) {
+    var clean = String(rawPwd || "").trim().toLowerCase();
+    var allowed = STANDARD_PASSWORDS[role] || [];
+    return allowed.indexOf(clean) !== -1;
+  }
 
   function loadState() {
     try {
@@ -30,9 +47,16 @@
         state.auditLogs = JSON.parse(savedAudit);
       } else {
         state.auditLogs = [
-          { ts: "2027-02-15 11:20", acteur: "Point Focal (CAILK SA)", action: "Soumission des données 2023–2025 et dépôt de 11 pièces justificatives", code: "PRI-2027-001", impact: "Complétude 100%" },
-          { ts: "2027-02-14 16:40", acteur: "Analyste Financier MAPERF", action: "Validation des États Financiers OHADA (DOC.01) -> Statut 'Auditée' sur FIN.001..FIN.014", code: "PUB-2027-001", impact: "+14,2 pts Taux Validé" }
+          { ts: "2027-02-15 11:20", acteur: "Point Focal (CAILK SA — Pointe-Noire)", action: "Soumission des données 2023–2025 et dépôt de 11 pièces justificatives", code: "PRI-2027-001", impact: "Complétude 100%" },
+          { ts: "2027-02-14 16:40", acteur: "Analyste Financier MAPERF (Brazzaville)", action: "Validation des États Financiers OHADA (DOC.01) -> Statut 'Auditée' sur FIN.001..FIN.014", code: "PUB-2027-001", impact: "+14,2 pts Taux Validé" }
         ];
+      }
+      var savedAuth = localStorage.getItem(AUTH_KEY);
+      if (savedAuth) {
+        var parsedAuth = JSON.parse(savedAuth);
+        state.auth.entrepriseUnlocked = !!parsedAuth.entrepriseUnlocked;
+        state.auth.equipeUnlocked = !!parsedAuth.equipeUnlocked;
+        if (parsedAuth.maperfRole) state.auth.maperfRole = parsedAuth.maperfRole;
       }
     } catch (e) {
       state.dossiers = JSON.parse(JSON.stringify(window.MAPERF_BAROMETRE_DATA.initialDossiers));
@@ -43,6 +67,7 @@
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state.dossiers));
       localStorage.setItem(AUDIT_KEY, JSON.stringify(state.auditLogs.slice(0, 50)));
+      localStorage.setItem(AUTH_KEY, JSON.stringify(state.auth));
     } catch (e) {
       console.warn("Sauvegarde locale impossible:", e);
     }
@@ -709,6 +734,44 @@
         );
       }).join("");
     }
+
+    // Étape 4 : Demandes de précisions contradictoires reçues par l'entreprise (avec formulaire de réponse directe)
+    var entClrList = document.getElementById("collecte-clarifications-list");
+    if (entClrList) {
+      var clrs = dossier.clarifications || [];
+      if (clrs.length === 0) {
+        entClrList.innerHTML = '<div class="text-xs text-slate-500 italic p-4 bg-slate-50 rounded-xl">Aucune demande de précision en attente de la part de l\'Équipe MAPERF pour ce dossier.</div>';
+      } else {
+        entClrList.innerHTML = clrs.map(function (c, idx) {
+          return (
+            '<div class="p-4 rounded-xl bg-slate-50 border border-slate-200/80 space-y-2">' +
+            '  <div class="flex flex-wrap items-center justify-between gap-2 text-xs">' +
+            '    <span class="font-mono font-bold text-[#00236D]">' + c.id + ' · Indicateur ' + c.code + ' (' + c.date + ')</span>' +
+            '    <span class="badge-status ' + (c.statut === "Résolu" ? "badge-audited" : "badge-declared") + '">' + c.statut + '</span>' +
+            '  </div>' +
+            '  <p class="text-xs font-semibold text-slate-800">Demande de l\'Équipe MAPERF : ' + c.message + '</p>' +
+            '  <div class="flex flex-wrap gap-2 pt-1">' +
+            '    <input type="text" data-clr-idx="' + idx + '" value="' + (c.reponse || "").replace(/"/g, "&quot;") + '" placeholder="Saisir la réponse justificative du Point Focal Entreprise..." class="js-ent-clr-input barometre-input text-xs flex-1" />' +
+            '    <button type="button" data-clr-idx="' + idx + '" class="js-ent-clr-send btn btn-primary text-xs py-1.5 px-3.5 shrink-0">Envoyer la réponse à MAPERF</button>' +
+            '  </div>' +
+            '</div>'
+          );
+        }).join("");
+
+        entClrList.querySelectorAll(".js-ent-clr-send").forEach(function (btn) {
+          btn.addEventListener("click", function () {
+            var idx = Number(btn.getAttribute("data-clr-idx"));
+            var input = entClrList.querySelector('.js-ent-clr-input[data-clr-idx="' + idx + '"]');
+            if (!input || !input.value.trim() || !dossier.clarifications[idx]) return;
+            dossier.clarifications[idx].reponse = input.value.trim();
+            dossier.clarifications[idx].statut = "Répondu par Entreprise — À valider";
+            dossier.workflowStatut = "Réponse transmise à l'Équipe MAPERF";
+            addAuditLog("Point Focal (" + dossier.sigle + ")", "Réponse contradictoire envoyée sur " + dossier.clarifications[idx].code, dossier.codeAnonyme, "Contradictoire");
+            refreshAllViews();
+          });
+        });
+      }
+    }
   }
 
   function setInputValue(id, val) {
@@ -737,7 +800,11 @@
           '    <span class="text-[11px] font-bold px-2 py-0.5 rounded-full ' + (d.volet === "PUBLIC" ? "bg-blue-100 text-blue-900" : "bg-amber-100 text-amber-900") + '">' + d.volet + '</span>' +
           '  </div>' +
           '  <h4 class="font-display font-bold text-sm text-slate-900 line-clamp-1">' + d.raisonSociale + '</h4>' +
-          '  <p class="text-[11px] text-slate-500 mb-3">' + d.macroSecteur + ' · ' + d.villeSiege + '</p>' +
+          '  <p class="text-[11px] text-slate-500 mb-2">' + d.macroSecteur + ' · ' + d.villeSiege + ' (République du Congo)</p>' +
+          '  <div class="mb-2.5 flex items-center justify-between text-[11px]">' +
+          '    <span class="px-2 py-0.5 rounded bg-slate-100 text-slate-700 font-semibold">' + (d.workflowStatut || "En instruction") + '</span>' +
+          '    <span class="font-bold text-amber-700">' + ev.countDeclared + ' à vérifier</span>' +
+          '  </div>' +
           '  <div class="grid grid-cols-3 gap-2 text-center bg-slate-50 rounded-xl p-2 border border-slate-100">' +
           '    <div><div class="text-[10px] text-slate-500">Score Déclaré</div><div class="font-display font-bold text-xs text-slate-800">' + ev.globalRawScore.toFixed(1) + '</div></div>' +
           '    <div><div class="text-[10px] text-slate-500">Taux Validé</div><div class="font-display font-extrabold text-xs text-emerald-700">' + ev.globalVerifiedScore.toFixed(1) + '</div></div>' +
@@ -819,18 +886,38 @@
       if (clrs.length === 0) {
         clrList.innerHTML = '<div class="text-xs text-slate-500 italic p-4 bg-slate-50 rounded-xl">Aucune demande de précision ouverte pour ce dossier.</div>';
       } else {
-        clrList.innerHTML = clrs.map(function (c) {
+        clrList.innerHTML = clrs.map(function (c, idx) {
+          var resolveBtn = c.statut !== "Résolu"
+            ? '<button type="button" data-clr-resolve="' + idx + '" class="js-resolve-clarif text-[11px] font-bold px-2.5 py-1 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition">Valider & Clôturer</button>'
+            : '';
           return (
             '<div class="p-4 rounded-xl bg-slate-50 border border-slate-200/80 space-y-1.5">' +
             '  <div class="flex items-center justify-between text-xs">' +
             '    <span class="font-mono font-bold text-[#00236D]">' + c.id + ' · Donnée ' + c.code + '</span>' +
-            '    <span class="badge-status ' + (c.statut === "Résolu" ? "badge-audited" : "badge-declared") + '">' + c.statut + '</span>' +
+            '    <div class="flex items-center gap-2">' +
+            '      <span class="badge-status ' + (c.statut === "Résolu" ? "badge-audited" : "badge-declared") + '">' + c.statut + '</span>' +
+            resolveBtn +
+            '    </div>' +
             '  </div>' +
             '  <p class="text-xs font-semibold text-slate-800">Question Analyste (' + c.date + ') : ' + c.message + '</p>' +
             '  <p class="text-xs text-emerald-800 bg-emerald-50/80 p-2 rounded-lg border border-emerald-200/60"><strong>Réponse Entreprise :</strong> ' + (c.reponse || "En attente de réponse du Point Focal") + '</p>' +
             '</div>'
           );
         }).join("");
+
+        clrList.querySelectorAll(".js-resolve-clarif").forEach(function (btn) {
+          btn.addEventListener("click", function () {
+            var idx = Number(btn.getAttribute("data-clr-resolve"));
+            if (!dossier.clarifications || !dossier.clarifications[idx]) return;
+            var clr = dossier.clarifications[idx];
+            clr.statut = "Résolu";
+            if (dossier.data[clr.code] && dossier.data[clr.code].verif === "Déclarée") {
+              dossier.data[clr.code].verif = "Vérifiée";
+            }
+            addAuditLog("Équipe Vérification MAPERF", "Clôture contradictoire & validation de " + clr.code, dossier.codeAnonyme, "Statut: Vérifiée (80%)");
+            refreshAllViews();
+          });
+        });
       }
     }
 
@@ -1141,8 +1228,139 @@
     if (window.lucide) window.lucide.createIcons();
   }
 
+  /**
+   * Gestion des portes d'authentification (Mots de passe standards : Entreprise2027 & Maperf2027)
+   */
+  function renderAuthGates() {
+    var dossier = getActiveDossier();
+
+    // Sélecteur de dossier sur la porte de connexion Entreprise
+    var loginSelect = document.getElementById("login-ent-dossier-select");
+    if (loginSelect) {
+      loginSelect.innerHTML = state.dossiers.map(function (d) {
+        var sel = d.id === state.activeDossierId ? ' selected="selected"' : '';
+        return '<option value="' + d.id + '"' + sel + '>' + d.codeAnonyme + ' — ' + d.raisonSociale + ' (' + d.villeSiege + ', République du Congo)</option>';
+      }).join("");
+    }
+
+    // Porte Entreprise vs Contenu Entreprise
+    var gateEnt = document.getElementById("auth-gate-entreprise");
+    var workEnt = document.getElementById("workspace-entreprise-content");
+    if (gateEnt && workEnt) {
+      if (state.auth.entrepriseUnlocked) {
+        gateEnt.classList.add("hidden");
+        workEnt.classList.remove("hidden");
+      } else {
+        gateEnt.classList.remove("hidden");
+        workEnt.classList.add("hidden");
+      }
+    }
+
+    // Porte Équipe MAPERF vs Contenu Équipe MAPERF
+    var gateEq = document.getElementById("auth-gate-equipe");
+    var workEq = document.getElementById("workspace-equipe-content");
+    if (gateEq && workEq) {
+      if (state.auth.equipeUnlocked) {
+        gateEq.classList.add("hidden");
+        workEq.classList.remove("hidden");
+      } else {
+        gateEq.classList.remove("hidden");
+        workEq.classList.add("hidden");
+      }
+    }
+
+    setText("session-ent-name", dossier.raisonSociale + " (" + dossier.codeAnonyme + " · " + dossier.villeSiege + ")");
+    setText("session-maperf-role-label", state.auth.maperfRole || "Analyste Principal OHADA — Brazzaville (République du Congo)");
+  }
+
+  /**
+   * Crée et enrôle une nouvelle entreprise de la République du Congo (avec pré-remplissage optionnel en statut Déclarée 50%)
+   */
+  function createNewCongoDossier(opts) {
+    var volet = (opts && opts.volet === "PUBLIC") ? "PUBLIC" : "PRIVE";
+    var nom = (opts && opts.raisonSociale) ? opts.raisonSociale.trim() : "Nouvelle Entreprise du Congo SA";
+    var sigle = (opts && opts.sigle) ? opts.sigle.trim() : nom.split(" ").map(function (w) { return w[0]; }).join("").toUpperCase().slice(0, 6);
+    var ville = (opts && opts.villeSiege) ? opts.villeSiege : "Brazzaville";
+    var secteur = (opts && opts.macroSecteur) ? opts.macroSecteur : "Industrie, Logistique & Services";
+    var eff = Number(opts && opts.effectif2025) || 120;
+    var pfNom = (opts && opts.pointFocalNom) ? opts.pointFocalNom : "Point Focal Entreprise";
+    var pfEmail = (opts && opts.pointFocalEmail) ? opts.pointFocalEmail : "direction@entreprise-congo.cg";
+    var prefill = opts && opts.prefill !== undefined ? !!opts.prefill : true;
+
+    var countVolet = state.dossiers.filter(function (d) { return d.volet === volet; }).length + 1;
+    var prefix = volet === "PUBLIC" ? "PUB-2027-" : "PRI-2027-";
+    var newId = prefix + String(countVolet).padStart(3, "0");
+
+    // Clonage d'un jeu de données cohérent de référence en République du Congo (en statut Déclarée 50%) si prefill = true
+    var refDossier = window.MAPERF_BAROMETRE_DATA.initialDossiers.find(function (d) { return d.volet === volet; }) || window.MAPERF_BAROMETRE_DATA.initialDossiers[0];
+    var templateData = {};
+    window.MAPERF_BAROMETRE_DATA.fields[volet].forEach(function (f) {
+      if (prefill && refDossier.data[f.code]) {
+        var src = refDossier.data[f.code];
+        templateData[f.code] = {
+          v2023: src.v2023,
+          v2024: src.v2024,
+          v2025: src.v2025,
+          app: "Applicable",
+          verif: "Déclarée",
+          source: src.source || "DOC.01",
+          comment: "Saisie initiale Point Focal (" + sigle + " — République du Congo)"
+        };
+      } else {
+        templateData[f.code] = { v2023: "", v2024: "", v2025: "", app: "Applicable", verif: "Déclarée", source: "", comment: "" };
+      }
+    });
+
+    if (prefill) {
+      var hom = Math.round(eff * 0.62);
+      var fem = eff - hom;
+      templateData["RHD.001"] = { v2023: Math.max(10, eff - 12), v2024: Math.max(10, eff - 5), v2025: eff, app: "Applicable", verif: "Déclarée", source: "DOC.10", comment: "Effectif permanent CNSS Congo" };
+      templateData["RHD.002"] = { v2023: hom - 6, v2024: hom - 3, v2025: hom, app: "Applicable", verif: "Déclarée", source: "DOC.10", comment: "Effectif Hommes" };
+      templateData["RHD.003"] = { v2023: fem - 6, v2024: fem - 2, v2025: fem, app: "Applicable", verif: "Déclarée", source: "DOC.10", comment: "Effectif Femmes" };
+    }
+
+    var classeTaille = eff >= 250 ? "GE 250+" : (eff >= 50 ? "PME 50–249" : "PME 10–49");
+    var newDossier = {
+      id: newId,
+      codeAnonyme: newId,
+      volet: volet,
+      raisonSociale: nom,
+      sigle: sigle,
+      statutJuridique: volet === "PUBLIC" ? "Entreprise publique / EPIC (République du Congo)" : "Société Anonyme (SA) OHADA — RCCM Congo",
+      ministereTutelle: volet === "PUBLIC" ? "Ministère de Tutelle (République du Congo)" : "N/A (Secteur Privé)",
+      macroSecteur: secteur,
+      villeSiege: ville,
+      departement: ville,
+      effectif2025: eff,
+      classeTaille: classeTaille,
+      groupeHomogene: volet + " · " + secteur + " × " + classeTaille,
+      soumisOSP: volet === "PUBLIC" ? "Oui" : "Non",
+      contratPlanEtat: "Non",
+      pointFocalNom: pfNom,
+      pointFocalFonction: "Directeur Général / Point Focal MAPERF",
+      pointFocalEmail: pfEmail,
+      pointFocalTel: "+242 06 600 00 00",
+      engagementConfidentialite: true,
+      declarationExactitude: true,
+      workflowStatut: "En saisie par l'Entreprise (À soumettre)",
+      derniereMaj: new Date().toISOString().slice(0, 16).replace("T", " "),
+      data: templateData,
+      evidences: {
+        "DOC.01": { statut: "Transmis", fichier: sigle + "_Etats_Financiers_OHADA_2025.pdf", commentaireAnalyste: "En attente de revue par l'Équipe MAPERF" }
+      },
+      clarifications: []
+    };
+
+    state.dossiers.push(newDossier);
+    state.activeDossierId = newId;
+    addAuditLog("Point Focal (" + sigle + ")", "Enrôlement nouvelle entreprise en République du Congo : " + nom + " (" + ville + ")", newId, "Statut: Déclarée (50%)");
+    saveState();
+    return newDossier;
+  }
+
   function refreshAllViews() {
     saveState();
+    renderAuthGates();
     renderTopSummary();
     renderCollecteView();
     renderValidationView();
@@ -1157,6 +1375,200 @@
     if (elSelect) {
       elSelect.addEventListener("change", function () {
         state.activeDossierId = elSelect.value;
+        refreshAllViews();
+      });
+    }
+
+    // AUTHENTIFICATION ESPACE ENTREPRISE (Mot de passe standard : Entreprise2027)
+    var btnFillPwdEnt = document.getElementById("btn-fill-pwd-entreprise");
+    if (btnFillPwdEnt) {
+      btnFillPwdEnt.addEventListener("click", function () {
+        var inp = document.getElementById("login-ent-password");
+        if (inp) inp.value = "Entreprise2027";
+      });
+    }
+
+    var btnLoginEnt = document.getElementById("btn-login-entreprise");
+    if (btnLoginEnt) {
+      btnLoginEnt.addEventListener("click", function () {
+        var inp = document.getElementById("login-ent-password");
+        var sel = document.getElementById("login-ent-dossier-select");
+        var err = document.getElementById("login-ent-error");
+        var pwd = inp ? inp.value : "";
+
+        if (!validateStandardPassword("ENTREPRISE", pwd)) {
+          if (err) {
+            err.classList.remove("hidden");
+            err.textContent = "Mot de passe incorrect. Utilisez le mot de passe standard : Entreprise2027";
+          }
+          return;
+        }
+        if (err) err.classList.add("hidden");
+        if (sel && sel.value) state.activeDossierId = sel.value;
+        state.auth.entrepriseUnlocked = true;
+        var d = getActiveDossier();
+        addAuditLog("Point Focal (" + d.sigle + ")", "Connexion authentifiée à l'Espace Entreprise (République du Congo)", d.codeAnonyme, "Accès autorisé");
+        refreshAllViews();
+      });
+    }
+
+    var btnLogoutEnt = document.getElementById("btn-logout-entreprise");
+    if (btnLogoutEnt) {
+      btnLogoutEnt.addEventListener("click", function () {
+        state.auth.entrepriseUnlocked = false;
+        refreshAllViews();
+      });
+    }
+
+    // AUTHENTIFICATION ÉQUIPE MAPERF (Mot de passe standard : Maperf2027)
+    var btnFillPwdMaperf = document.getElementById("btn-fill-pwd-maperf");
+    if (btnFillPwdMaperf) {
+      btnFillPwdMaperf.addEventListener("click", function () {
+        var inp = document.getElementById("login-maperf-password");
+        if (inp) inp.value = "Maperf2027";
+      });
+    }
+
+    var btnLoginMaperf = document.getElementById("btn-login-maperf");
+    if (btnLoginMaperf) {
+      btnLoginMaperf.addEventListener("click", function () {
+        var inp = document.getElementById("login-maperf-password");
+        var roleSel = document.getElementById("login-maperf-role");
+        var err = document.getElementById("login-maperf-error");
+        var pwd = inp ? inp.value : "";
+
+        if (!validateStandardPassword("MAPERF", pwd)) {
+          if (err) {
+            err.classList.remove("hidden");
+            err.textContent = "Mot de passe incorrect. Utilisez le mot de passe standard Équipe MAPERF : Maperf2027";
+          }
+          return;
+        }
+        if (err) err.classList.add("hidden");
+        state.auth.equipeUnlocked = true;
+        if (roleSel && roleSel.value) state.auth.maperfRole = roleSel.value;
+        var d = getActiveDossier();
+        addAuditLog("Équipe MAPERF (Brazzaville)", "Connexion authentifiée à la Console de Vérification & Validation", d.codeAnonyme, "Session Auditeur");
+        refreshAllViews();
+      });
+    }
+
+    var btnLogoutMaperf = document.getElementById("btn-logout-maperf");
+    if (btnLogoutMaperf) {
+      btnLogoutMaperf.addEventListener("click", function () {
+        state.auth.equipeUnlocked = false;
+        refreshAllViews();
+      });
+    }
+
+    // SOUMISSION DU DOSSIER ENTREPRISE À L'ÉQUIPE MAPERF POUR VÉRIFICATION & SUIVI
+    var btnSubmitToMaperf = document.getElementById("btn-submit-to-maperf");
+    if (btnSubmitToMaperf) {
+      btnSubmitToMaperf.addEventListener("click", function () {
+        var dossier = getActiveDossier();
+        var ev = evaluateDossier(dossier);
+        dossier.workflowStatut = "Soumis par l'Entreprise — À vérifier par MAPERF";
+        dossier.derniereMaj = new Date().toISOString().slice(0, 16).replace("T", " ");
+        addAuditLog(
+          "Point Focal (" + dossier.sigle + " — " + dossier.villeSiege + ")",
+          "Transmission officielle des données 2023–2025 à l'Équipe MAPERF pour vérification",
+          dossier.codeAnonyme,
+          "Potentiel brut : " + ev.globalRawScore.toFixed(1) + "/100 (" + ev.countDeclared + " données à vérifier)"
+        );
+        refreshAllViews();
+
+        var fb = document.getElementById("submit-ent-feedback");
+        if (fb) {
+          fb.classList.remove("hidden");
+          fb.innerHTML =
+            '<div class="flex flex-wrap items-center justify-between gap-3">' +
+            '  <div>' +
+            '    <strong class="text-[#2CC3A0] block">✓ Dossier ' + dossier.codeAnonyme + ' (' + dossier.raisonSociale + ') transmis avec succès à l\'Équipe MAPERF !</strong>' +
+            '    <span>Score Brut Déclaré : <strong>' + ev.globalRawScore.toFixed(1) + '/100</strong> · Score Validé actuel : <strong>' + ev.globalVerifiedScore.toFixed(1) + '/100</strong> (' + ev.countDeclared + ' indicateurs en attente de validation).</span>' +
+            '  </div>' +
+            '  <button type="button" id="btn-jump-maperf-after-submit" class="btn btn-teal text-xs py-1.5 px-3.5 shrink-0">Ouvrir la Console Équipe MAPERF pour vérifier →</button>' +
+            '</div>';
+          var jumpBtn = document.getElementById("btn-jump-maperf-after-submit");
+          if (jumpBtn) {
+            jumpBtn.addEventListener("click", function () {
+              switchMainTab("espace-validation");
+            });
+          }
+        }
+      });
+    }
+
+    // BASCULE RAPIDE ENTRE ESPACE ENTREPRISE ET CONSOLE ÉQUIPE MAPERF
+    var btnSwitchToMaperf = document.getElementById("btn-switch-to-maperf");
+    if (btnSwitchToMaperf) {
+      btnSwitchToMaperf.addEventListener("click", function () {
+        switchMainTab("espace-validation");
+      });
+    }
+
+    var btnSwitchToEnt = document.getElementById("btn-switch-to-entreprise");
+    if (btnSwitchToEnt) {
+      btnSwitchToEnt.addEventListener("click", function () {
+        switchMainTab("espace-collecte");
+      });
+    }
+
+    // PANNEAU DE CRÉATION D'UNE NOUVELLE ENTREPRISE DE LA RÉPUBLIQUE DU CONGO
+    function openNewOrgPanel() {
+      state.auth.entrepriseUnlocked = true;
+      switchMainTab("espace-collecte");
+      var panel = document.getElementById("new-org-panel");
+      if (panel) {
+        panel.classList.remove("hidden");
+        panel.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+    }
+
+    var btnNewOrg = document.getElementById("btn-new-entreprise");
+    if (btnNewOrg) {
+      btnNewOrg.addEventListener("click", openNewOrgPanel);
+    }
+
+    var btnOpenNewOrg = document.getElementById("btn-open-new-org-panel");
+    if (btnOpenNewOrg) {
+      btnOpenNewOrg.addEventListener("click", openNewOrgPanel);
+    }
+
+    var btnCloseNewOrg = document.getElementById("btn-close-new-org-panel");
+    if (btnCloseNewOrg) {
+      btnCloseNewOrg.addEventListener("click", function () {
+        var panel = document.getElementById("new-org-panel");
+        if (panel) panel.classList.add("hidden");
+      });
+    }
+
+    var btnConfirmNewOrg = document.getElementById("btn-Confirm-new-org");
+    if (btnConfirmNewOrg) {
+      btnConfirmNewOrg.addEventListener("click", function () {
+        var volet = (document.getElementById("new-org-volet") || {}).value || "PRIVE";
+        var raison = (document.getElementById("new-org-raison") || {}).value || "Congo Logistique & Services SA";
+        var sigle = (document.getElementById("new-org-sigle") || {}).value || "CLSSA";
+        var ville = (document.getElementById("new-org-ville") || {}).value || "Pointe-Noire";
+        var secteur = (document.getElementById("new-org-secteur") || {}).value || "Industrie, Logistique & Services";
+        var eff = Number((document.getElementById("new-org-effectif") || {}).value) || 120;
+        var pfNom = (document.getElementById("new-org-pf-nom") || {}).value || "Point Focal Entreprise";
+        var pfEmail = (document.getElementById("new-org-pf-email") || {}).value || "direction@entreprise-congo.cg";
+        var prefill = document.getElementById("new-org-prefill") ? document.getElementById("new-org-prefill").checked : true;
+
+        createNewCongoDossier({
+          volet: volet,
+          raisonSociale: raison,
+          sigle: sigle,
+          villeSiege: ville,
+          macroSecteur: secteur,
+          effectif2025: eff,
+          pointFocalNom: pfNom,
+          pointFocalEmail: pfEmail,
+          prefill: prefill
+        });
+
+        var panel = document.getElementById("new-org-panel");
+        if (panel) panel.classList.add("hidden");
         refreshAllViews();
       });
     }
@@ -1199,59 +1611,6 @@
 
         addAuditLog("Point Focal (" + dossier.sigle + ")", "Mise à jour de la fiche d'identification et du groupe homogène", dossier.codeAnonyme, dossier.classeTaille);
         refreshAllViews();
-      });
-    }
-
-    // Création d'un nouveau dossier Entreprise (Public ou Privé)
-    var btnNewOrg = document.getElementById("btn-new-entreprise");
-    if (btnNewOrg) {
-      btnNewOrg.addEventListener("click", function () {
-        var volet = prompt("Choisissez le volet de l'organisation (PUBLIC ou PRIVE) :", "PRIVE");
-        if (!volet) return;
-        volet = volet.toUpperCase().indexOf("PUB") === 0 ? "PUBLIC" : "PRIVE";
-        var nom = prompt("Raison sociale de l'entreprise ou institution :", "Nouvelle Entreprise Congolaise SA");
-        if (!nom) return;
-
-        var prefix = volet === "PUBLIC" ? "PUB-2027-00" : "PRI-2027-00";
-        var newId = prefix + (state.dossiers.length + 1);
-        var templateData = {};
-        window.MAPERF_BAROMETRE_DATA.fields[volet].forEach(function (f) {
-          templateData[f.code] = { v2023: "", v2024: "", v2025: "", app: "Applicable", verif: "Déclarée", source: "", comment: "" };
-        });
-
-        var newDossier = {
-          id: newId,
-          codeAnonyme: newId,
-          volet: volet,
-          raisonSociale: nom,
-          sigle: nom.split(" ").map(function (w) { return w[0]; }).join("").toUpperCase().slice(0, 6),
-          statutJuridique: volet === "PUBLIC" ? "Entreprise publique / EPIC" : "Société Anonyme (SA) OHADA",
-          ministereTutelle: volet === "PUBLIC" ? "Ministère de Tutelle" : "N/A (Secteur Privé)",
-          macroSecteur: "Services, Industrie & Infrastructures",
-          villeSiege: "Brazzaville",
-          departement: "Brazzaville",
-          effectif2025: 50,
-          classeTaille: "PME 50–249",
-          groupeHomogene: volet + " · Services, Industrie & Infrastructures × PME 50–249",
-          soumisOSP: volet === "PUBLIC" ? "Oui" : "Non",
-          contratPlanEtat: "Non",
-          pointFocalNom: "Responsable Point Focal",
-          pointFocalFonction: "Directeur Général / DAF",
-          pointFocalEmail: "contact@entreprise.cg",
-          pointFocalTel: "+242 06 000 00 00",
-          engagementConfidentialite: true,
-          declarationExactitude: true,
-          workflowStatut: "Nouveau dossier en saisie",
-          derniereMaj: new Date().toISOString().slice(0, 16).replace("T", " "),
-          data: templateData,
-          evidences: {},
-          clarifications: []
-        };
-
-        state.dossiers.push(newDossier);
-        state.activeDossierId = newId;
-        addAuditLog("Secrétariat Technique MAPERF", "Enrôlement nouvelle organisation : " + nom, newId, "Code attribué");
-        switchMainTab("espace-collecte");
       });
     }
 
@@ -1439,6 +1798,7 @@
       btnResetDemo.addEventListener("click", function () {
         localStorage.removeItem(STORAGE_KEY);
         localStorage.removeItem(AUDIT_KEY);
+        localStorage.removeItem(AUTH_KEY);
         loadState();
         refreshAllViews();
       });
@@ -1468,6 +1828,8 @@
     evaluateDossier: evaluateDossier,
     computeFieldIndicatorScore: computeFieldIndicatorScore,
     runCoherenceChecks: runCoherenceChecks,
+    validateStandardPassword: validateStandardPassword,
+    createNewCongoDossier: createNewCongoDossier,
     getState: function () { return state; },
     loadState: loadState
   };

@@ -289,26 +289,186 @@
          ONGLET 2 : ESPACE ENTREPRISE / POINT FOCAL (COLLECTE 2023-2025 & PREUVES)
          ======================================================================= -->
     <section id="panel-espace-collecte" class="py-10">
-      <div class="container mx-auto px-4 space-y-10">
-        <!-- Étape 1 : Identification de l'organisation et calcul du groupe homogène -->
-        <div class="card space-y-5">
-          <div class="flex flex-wrap items-center justify-between gap-4 border-b border-slate-100 pb-4">
-            <div>
-              <span class="chip">Volet 01_Identification</span>
-              <h2 class="font-display text-xl font-extrabold text-[#00236D] mt-1">Fiche d'Identification, Éligibilité & Groupe Homogène</h2>
-              <p class="text-xs text-slate-500">Les informations ci-dessous déterminent automatiquement le groupe homogène de comparaison de l'organisation.</p>
+      <div class="container mx-auto px-4 space-y-8">
+
+        <!-- PORTE D'AUTHENTIFICATION : ESPACE ENTREPRISE (MOT DE PASSE STANDARD) -->
+        <div id="auth-gate-entreprise" class="max-w-3xl mx-auto card border-t-4 border-t-[#F39A1E] p-6 sm:p-8 space-y-6">
+          <div class="flex flex-wrap items-start justify-between gap-4 border-b border-slate-100 pb-4">
+            <div class="space-y-1">
+              <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-extrabold bg-amber-100 text-amber-900">
+                <i data-lucide="lock" class="w-3.5 h-3.5"></i> Accès Sécurisé Point Focal Entreprise · République du Congo
+              </span>
+              <h2 class="font-display text-2xl font-extrabold text-[#00236D]">Connexion à l'Espace Entreprise — Collecte & Preuves</h2>
+              <p class="text-xs text-slate-600">
+                Authentifiez-vous avec le <strong>mot de passe standard Entreprise</strong> pour renseigner vos données pluriannuelles (2023–2025 en FCFA), déposer vos pièces justificatives et soumettre votre dossier à l'Équipe MAPERF à Brazzaville.
+              </p>
             </div>
-            <div class="flex items-center gap-3">
-              <div class="text-right">
-                <span class="text-[11px] text-slate-400 block">Code Anonyme Attribué</span>
-                <span id="ident-code-anonyme" class="font-mono font-extrabold text-sm text-[#00236D]">PUB-2027-001</span>
+          </div>
+
+          <div class="grid md:grid-cols-2 gap-5 text-xs">
+            <div>
+              <label for="login-ent-dossier-select" class="font-bold text-slate-700 block mb-1.5">1. Sélectionner l'entreprise (République du Congo) :</label>
+              <select id="login-ent-dossier-select" class="barometre-input font-semibold"></select>
+              <p class="text-[11px] text-slate-500 mt-1">Vous pourrez aussi créer une nouvelle entreprise dès votre connexion.</p>
+            </div>
+
+            <div>
+              <label for="login-ent-password" class="font-bold text-slate-700 block mb-1.5">2. Mot de passe standard Entreprise * :</label>
+              <div class="flex gap-2">
+                <input id="login-ent-password" type="password" value="Entreprise2027" placeholder="Mot de passe standard : Entreprise2027" class="barometre-input font-mono" />
+                <button type="button" id="btn-fill-pwd-entreprise" class="btn btn-outline text-xs py-2 px-3 shrink-0" title="Pré-remplir le mot de passe standard">
+                  <i data-lucide="key" class="w-3.5 h-3.5"></i>
+                  <span>Standard</span>
+                </button>
               </div>
-              <button type="button" id="btn-save-identification" class="btn btn-primary text-xs py-2 px-4">
-                <i data-lucide="save" class="w-4 h-4"></i>
-                <span>Enregistrer le profil</span>
+              <p class="text-[11px] text-emerald-700 font-semibold mt-1">
+                Mot de passe standard de test : <code class="px-1.5 py-0.5 rounded bg-emerald-50 border border-emerald-200 font-mono font-bold">Entreprise2027</code>
+              </p>
+            </div>
+          </div>
+
+          <div id="login-ent-error" class="hidden p-3 rounded-xl bg-rose-50 border border-rose-200 text-xs font-semibold text-rose-800"></div>
+
+          <div class="flex flex-wrap items-center justify-between gap-4 pt-2 border-t border-slate-100">
+            <div class="text-[11px] text-slate-500 flex items-center gap-1.5">
+              <i data-lucide="map-pin" class="w-3.5 h-3.5 text-[#00236D]"></i>
+              <span>Juridiction : <strong>République du Congo</strong> (Brazzaville, Pointe-Noire & 12 départements · Normes OHADA / CEMAC)</span>
+            </div>
+            <button type="button" id="btn-login-entreprise" class="btn btn-primary text-xs py-2.5 px-6">
+              <i data-lucide="unlock" class="w-4 h-4"></i>
+              <span>Accéder à l'Espace Entreprise</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- CONTENU DÉVERROUILLÉ : ESPACE ENTREPRISE -->
+        <div id="workspace-entreprise-content" class="hidden space-y-8">
+          <!-- Barre de Session Entreprise Active & Actions de Soumission à l'Équipe MAPERF -->
+          <div class="card bg-gradient-to-r from-[#00236D] to-[#0A2240] text-white p-5 border-l-4 border-l-[#F39A1E]">
+            <div class="flex flex-wrap items-center justify-between gap-4">
+              <div class="space-y-1">
+                <div class="flex flex-wrap items-center gap-2">
+                  <span class="px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-[#2CC3A0] text-[#00236D]">SESSION ENTREPRISE ACTIVE</span>
+                  <span class="text-xs text-[#F6C332] font-semibold">République du Congo (Brazzaville / Pointe-Noire)</span>
+                </div>
+                <h3 class="font-display text-lg font-extrabold">
+                  Point Focal connecté : <span id="session-ent-name" class="text-[#F6C332]">SNER-Congo (PUB-2027-001)</span>
+                </h3>
+                <p class="text-xs text-white/80">
+                  Modifiez vos données 2023–2025 ci-dessous ou créez une nouvelle entreprise, puis cliquez sur <strong>« Transmettre à l'Équipe MAPERF »</strong> pour lancer la vérification et l'incrémentation de votre score.
+                </p>
+              </div>
+              <div class="flex flex-wrap items-center gap-2.5">
+                <button type="button" id="btn-open-new-org-panel" class="btn bg-white/10 hover:bg-white/20 text-white border border-white/25 text-xs py-2 px-3.5">
+                  <i data-lucide="plus-circle" class="w-4 h-4 text-[#F6C332]"></i>
+                  <span>+ Nouvelle Entreprise (Congo)</span>
+                </button>
+                <button type="button" id="btn-submit-to-maperf" class="btn btn-primary text-xs py-2 px-4">
+                  <i data-lucide="send" class="w-4 h-4"></i>
+                  <span>Transmettre à l'Équipe MAPERF</span>
+                </button>
+                <button type="button" id="btn-switch-to-maperf" class="btn btn-teal text-xs py-2 px-3.5" title="Passer côté Équipe MAPERF pour vérifier et valider ce dossier">
+                  <i data-lucide="shield-check" class="w-4 h-4"></i>
+                  <span>Suivi Équipe MAPERF →</span>
+                </button>
+                <button type="button" id="btn-logout-entreprise" class="btn bg-rose-500/20 hover:bg-rose-500/30 text-rose-200 border border-rose-400/30 text-xs py-2 px-3" title="Verrouiller la session Entreprise">
+                  <i data-lucide="lock" class="w-3.5 h-3.5"></i>
+                </button>
+              </div>
+            </div>
+            <div id="submit-ent-feedback" class="hidden mt-4 p-3.5 rounded-xl bg-emerald-950/90 border border-[#2CC3A0] text-xs text-white"></div>
+          </div>
+
+          <!-- Panneau Intégré : Créer / Enrôler une Nouvelle Entreprise de la République du Congo -->
+          <div id="new-org-panel" class="hidden card border-2 border-[#F39A1E] bg-amber-50/30 space-y-4">
+            <div class="flex items-center justify-between border-b border-amber-200/70 pb-3">
+              <div>
+                <span class="chip">Enrôlement Direct · République du Congo</span>
+                <h3 class="font-display text-lg font-extrabold text-[#00236D] mt-0.5">Créer un Nouveau Dossier Entreprise / Institution</h3>
+              </div>
+              <button type="button" id="btn-close-new-org-panel" class="text-xs font-bold text-slate-500 hover:text-slate-800">Fermer ✕</button>
+            </div>
+            <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
+              <div>
+                <label class="font-bold text-slate-700 block mb-1">Volet du Baromètre *</label>
+                <select id="new-org-volet" class="barometre-input font-bold">
+                  <option value="PRIVE">PRIVE (Entreprise privée ≥ 10 salariés)</option>
+                  <option value="PUBLIC">PUBLIC (Entreprise / Établissement public)</option>
+                </select>
+              </div>
+              <div>
+                <label class="font-bold text-slate-700 block mb-1">Raison sociale officielle *</label>
+                <input id="new-org-raison" type="text" placeholder="Ex: Congo Logistique & Portuaire SA" class="barometre-input" />
+              </div>
+              <div>
+                <label class="font-bold text-slate-700 block mb-1">Sigle usuel *</label>
+                <input id="new-org-sigle" type="text" placeholder="Ex: CLPSA" class="barometre-input" />
+              </div>
+              <div>
+                <label class="font-bold text-slate-700 block mb-1">Ville / Département (République du Congo) *</label>
+                <select id="new-org-ville" class="barometre-input">
+                  <option value="Brazzaville">Brazzaville (Département de Brazzaville)</option>
+                  <option value="Pointe-Noire">Pointe-Noire (Département de Pointe-Noire)</option>
+                  <option value="Dolisie (Niari)">Dolisie (Département du Niari)</option>
+                  <option value="Nkayi (Bouenza)">Nkayi (Département de la Bouenza)</option>
+                  <option value="Oyo / Owando (Cuvette)">Oyo / Owando (Département de la Cuvette)</option>
+                  <option value="Ouesso (Sangha)">Ouesso (Département de la Sangha)</option>
+                  <option value="Kinkala (Pool)">Kinkala (Département du Pool)</option>
+                  <option value="Djambala (Plateaux)">Djambala (Département des Plateaux)</option>
+                  <option value="Loango (Kouilou)">Loango (Département du Kouilou)</option>
+                  <option value="Sibiti (Lékoumou)">Sibiti (Département de la Lékoumou)</option>
+                  <option value="Ewo (Cuvette-Ouest)">Ewo (Département de la Cuvette-Ouest)</option>
+                  <option value="Impfondo (Likouala)">Impfondo (Département de la Likouala)</option>
+                </select>
+              </div>
+              <div>
+                <label class="font-bold text-slate-700 block mb-1">Macro-secteur d'activité *</label>
+                <input id="new-org-secteur" type="text" value="Industrie, BTP, Logistique & Services" class="barometre-input" />
+              </div>
+              <div>
+                <label class="font-bold text-slate-700 block mb-1">Effectif permanent fin 2025 *</label>
+                <input id="new-org-effectif" type="number" min="10" value="120" class="barometre-input" />
+              </div>
+              <div>
+                <label class="font-bold text-slate-700 block mb-1">Nom du Point Focal *</label>
+                <input id="new-org-pf-nom" type="text" value="Point Focal Entreprise" class="barometre-input" />
+              </div>
+              <div>
+                <label class="font-bold text-slate-700 block mb-1">E-mail professionnel (.cg / pro) *</label>
+                <input id="new-org-pf-email" type="email" value="direction@entreprise-congo.cg" class="barometre-input" />
+              </div>
+            </div>
+            <div class="flex flex-wrap items-center justify-between gap-4 pt-2">
+              <label class="inline-flex items-center gap-2 text-xs font-semibold text-slate-700">
+                <input id="new-org-prefill" type="checkbox" checked class="rounded border-slate-300" />
+                <span>Pré-remplir avec des données financières (FCFA) et opérationnelles 2023–2025 (statut <em>Déclarée 50%</em>) pour tester immédiatement le suivi Équipe MAPERF</span>
+              </label>
+              <button type="button" id="btn-Confirm-new-org" class="btn btn-primary text-xs py-2 px-5">
+                <i data-lucide="check-circle-2" class="w-4 h-4"></i>
+                <span>Créer et ouvrir ce dossier Entreprise</span>
               </button>
             </div>
           </div>
+
+          <!-- Étape 1 : Identification de l'organisation et calcul du groupe homogène -->
+          <div class="card space-y-5">
+            <div class="flex flex-wrap items-center justify-between gap-4 border-b border-slate-100 pb-4">
+              <div>
+                <span class="chip">Volet 01_Identification · République du Congo</span>
+                <h2 class="font-display text-xl font-extrabold text-[#00236D] mt-1">Fiche d'Identification, Éligibilité & Groupe Homogène</h2>
+                <p class="text-xs text-slate-500">Les informations ci-dessous déterminent automatiquement le groupe homogène de comparaison de l'organisation en République du Congo.</p>
+              </div>
+              <div class="flex items-center gap-3">
+                <div class="text-right">
+                  <span class="text-[11px] text-slate-400 block">Code Anonyme Attribué</span>
+                  <span id="ident-code-anonyme" class="font-mono font-extrabold text-sm text-[#00236D]">PUB-2027-001</span>
+                </div>
+                <button type="button" id="btn-save-identification" class="btn btn-primary text-xs py-2 px-4">
+                  <i data-lucide="save" class="w-4 h-4"></i>
+                  <span>Enregistrer le profil</span>
+                </button>
+              </div>
+            </div>
 
           <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
             <div>
@@ -462,6 +622,19 @@
             </div>
           </div>
         </div>
+
+        <!-- Étape 4 : Échanges Contradictoires avec l'Équipe MAPERF (Réponses du Point Focal) -->
+        <div class="card space-y-4 border-l-4 border-l-[#00236D]">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <span class="chip">Suivi Contradictoire Entreprise ↔ Équipe MAPERF</span>
+              <h3 class="font-display text-lg font-extrabold text-[#00236D] mt-1">Demandes de Précisions Reçues de l'Équipe de Vérification MAPERF</h3>
+              <p class="text-xs text-slate-500">Répondez ci-dessous aux demandes de clarification des analystes MAPERF pour débloquer la validation de vos indicateurs.</p>
+            </div>
+          </div>
+          <div id="collecte-clarifications-list" class="space-y-3"></div>
+        </div>
+        </div>
       </div>
     </section>
 
@@ -470,30 +643,96 @@
          ======================================================================= -->
     <section id="panel-espace-validation" class="py-10 hidden">
       <div class="container mx-auto px-4 space-y-8">
-        <!-- En-tête de la Console Analyste MAPERF -->
-        <div class="card bg-gradient-to-r from-[#00236D] to-[#0A2240] text-white p-6">
-          <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+
+        <!-- PORTE D'AUTHENTIFICATION : ÉQUIPE MAPERF (MOT DE PASSE STANDARD) -->
+        <div id="auth-gate-equipe" class="max-w-3xl mx-auto card border-t-4 border-t-[#2CC3A0] p-6 sm:p-8 space-y-6">
+          <div class="flex flex-wrap items-start justify-between gap-4 border-b border-slate-100 pb-4">
             <div class="space-y-1">
-              <span class="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-xs font-bold bg-[#2CC3A0] text-[#00236D]">
-                <i data-lucide="shield-check" class="w-3.5 h-3.5"></i> Back-Office Équipe Technique & Comité Scientifique MAPERF
+              <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-extrabold bg-emerald-100 text-emerald-900">
+                <i data-lucide="shield-check" class="w-3.5 h-3.5"></i> Accès Réservé Secrétariat Technique & Comité Scientifique · République du Congo
               </span>
-              <h2 class="font-display text-2xl font-extrabold">Console de Vérification Contradictoire & Validation des Performances</h2>
-              <p class="text-xs text-white/80 max-w-3xl">
-                Sélectionnez un dossier entreprise ci-dessous, inspectez ses valeurs déclarées et ses pièces justificatives, puis validez chaque indicateur (passage de <strong>Déclarée 50%</strong> à <strong>Vérifiée 80%</strong> ou <strong>Auditée 100%</strong>) pour incrémenter le taux de performance certifié de l'organisation.
+              <h2 class="font-display text-2xl font-extrabold text-[#00236D]">Connexion Équipe MAPERF — Vérification & Validation</h2>
+              <p class="text-xs text-slate-600">
+                Authentifiez-vous avec le <strong>mot de passe standard Équipe MAPERF</strong> pour auditer les dossiers soumis par les entreprises publiques et privées de la République du Congo, vérifier leurs preuves et incrémenter leur Taux de Performance Validé (/100).
               </p>
             </div>
-            <div class="flex flex-wrap gap-2.5 shrink-0">
-              <button type="button" id="btn-batch-verify" class="btn bg-blue-600 hover:bg-blue-500 text-white border border-blue-400 text-xs py-2.5 px-4">
-                <i data-lucide="check-circle" class="w-4 h-4"></i>
-                <span>Valider lot -> Vérifiée (80%)</span>
-              </button>
-              <button type="button" id="btn-batch-audit" class="btn btn-teal text-xs py-2.5 px-4">
-                <i data-lucide="award" class="w-4 h-4"></i>
-                <span>Homologuer -> Auditée (100%)</span>
-              </button>
+          </div>
+
+          <div class="grid md:grid-cols-2 gap-5 text-xs">
+            <div>
+              <label for="login-maperf-role" class="font-bold text-slate-700 block mb-1.5">1. Profil Auditeur / Évaluateur MAPERF :</label>
+              <select id="login-maperf-role" class="barometre-input font-semibold">
+                <option value="Analyste Principal OHADA — Secrétariat Technique (Brazzaville)">Analyste Principal OHADA — Secrétariat Technique (Brazzaville)</option>
+                <option value="Auditeur Sectoriel Public / Privé — Owando Consulting & ACE">Auditeur Sectoriel Public / Privé — Owando Consulting & ACE</option>
+                <option value="Superviseur Comité Scientifique Indépendant MAPERF 2027">Superviseur Comité Scientifique Indépendant MAPERF 2027</option>
+              </select>
+            </div>
+
+            <div>
+              <label for="login-maperf-password" class="font-bold text-slate-700 block mb-1.5">2. Mot de passe standard Équipe MAPERF * :</label>
+              <div class="flex gap-2">
+                <input id="login-maperf-password" type="password" value="Maperf2027" placeholder="Mot de passe standard : Maperf2027" class="barometre-input font-mono" />
+                <button type="button" id="btn-fill-pwd-maperf" class="btn btn-outline text-xs py-2 px-3 shrink-0" title="Pré-remplir le mot de passe standard">
+                  <i data-lucide="key" class="w-3.5 h-3.5"></i>
+                  <span>Standard</span>
+                </button>
+              </div>
+              <p class="text-[11px] text-emerald-700 font-semibold mt-1">
+                Mot de passe standard de test : <code class="px-1.5 py-0.5 rounded bg-emerald-50 border border-emerald-200 font-mono font-bold">Maperf2027</code>
+              </p>
             </div>
           </div>
+
+          <div id="login-maperf-error" class="hidden p-3 rounded-xl bg-rose-50 border border-rose-200 text-xs font-semibold text-rose-800"></div>
+
+          <div class="flex flex-wrap items-center justify-between gap-4 pt-2 border-t border-slate-100">
+            <div class="text-[11px] text-slate-500 flex items-center gap-1.5">
+              <i data-lucide="check-check" class="w-3.5 h-3.5 text-emerald-600"></i>
+              <span>Traçabilité complète dans le Journal d'Audit (Audit Trail) · République du Congo</span>
+            </div>
+            <button type="button" id="btn-login-maperf" class="btn btn-teal text-xs py-2.5 px-6">
+              <i data-lucide="unlock" class="w-4 h-4"></i>
+              <span>Déverrouiller la Console Équipe MAPERF</span>
+            </button>
+          </div>
         </div>
+
+        <!-- CONTENU DÉVERROUILLÉ : CONSOLE ÉQUIPE MAPERF -->
+        <div id="workspace-equipe-content" class="hidden space-y-8">
+          <!-- En-tête de la Console Analyste MAPERF -->
+          <div class="card bg-gradient-to-r from-[#00236D] to-[#0A2240] text-white p-6">
+            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+              <div class="space-y-1">
+                <div class="flex flex-wrap items-center gap-2">
+                  <span class="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-xs font-bold bg-[#2CC3A0] text-[#00236D]">
+                    <i data-lucide="shield-check" class="w-3.5 h-3.5"></i> SESSION AUDITEUR ACTIVE
+                  </span>
+                  <span id="session-maperf-role-label" class="text-xs text-[#F6C332] font-semibold">Analyste Principal OHADA — Brazzaville (République du Congo)</span>
+                </div>
+                <h2 class="font-display text-2xl font-extrabold">Console de Vérification Contradictoire & Validation des Performances</h2>
+                <p class="text-xs text-white/80 max-w-3xl">
+                  Inspectez les données saisies par les entreprises publiques et privées de la République du Congo, vérifiez les preuves déposées et cliquez sur <strong>Vérifiée (80%)</strong> ou <strong>Auditée (100%)</strong> pour incrémenter leur taux de performance certifié.
+                </p>
+              </div>
+              <div class="flex flex-wrap gap-2.5 shrink-0">
+                <button type="button" id="btn-switch-to-entreprise" class="btn bg-white/10 hover:bg-white/20 text-white border border-white/25 text-xs py-2.5 px-3.5" title="Revenir dans l'Espace Entreprise pour saisir des données">
+                  <i data-lucide="building-2" class="w-4 h-4 text-[#F6C332]"></i>
+                  <span>← Vue Entreprise</span>
+                </button>
+                <button type="button" id="btn-batch-verify" class="btn bg-blue-600 hover:bg-blue-500 text-white border border-blue-400 text-xs py-2.5 px-4">
+                  <i data-lucide="check-circle" class="w-4 h-4"></i>
+                  <span>Valider lot -> Vérifiée (80%)</span>
+                </button>
+                <button type="button" id="btn-batch-audit" class="btn btn-teal text-xs py-2.5 px-4">
+                  <i data-lucide="award" class="w-4 h-4"></i>
+                  <span>Homologuer -> Auditée (100%)</span>
+                </button>
+                <button type="button" id="btn-logout-maperf" class="btn bg-rose-500/20 hover:bg-rose-500/30 text-rose-200 border border-rose-400/30 text-xs py-2.5 px-3" title="Verrouiller la session Équipe MAPERF">
+                  <i data-lucide="lock" class="w-3.5 h-3.5"></i>
+                </button>
+              </div>
+            </div>
+          </div>
 
         <!-- File d'attente des dossiers entreprises -->
         <div>
@@ -550,6 +789,7 @@
             <h3 class="panel-title text-base"><i data-lucide="history" class="w-5 h-5 text-[#00236D]"></i> Journal d'Audit & Traçabilité des Validations (Audit Trail)</h3>
             <div id="validation-audit-trail" class="divide-y divide-slate-100 max-h-80 overflow-y-auto"></div>
           </div>
+        </div>
         </div>
       </div>
     </section>

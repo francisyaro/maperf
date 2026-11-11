@@ -263,6 +263,39 @@ test("Architecture UX/UI du Header : Logo épuré sans doublon texte et navigati
   const layoutJs = fs.readFileSync(path.join(ROOT_DIR, "assets/js/maperf-layout.js"), "utf8");
   assert.ok(!layoutJs.includes("Les Journées de la Performance · Congo"), "Le doublon texte à côté du logo doit être supprimé");
   assert.ok(layoutJs.includes("whitespace-nowrap"), "La barre de navigation doit empêcher le retour à la ligne des intitulés");
+  assert.ok(layoutJs.includes("République du Congo"), "Le bandeau doit mentionner explicitement la République du Congo");
+});
+
+test("Authentification par Mots de Passe Standards (Espace Entreprise : Entreprise2027 & Équipe MAPERF : Maperf2027)", () => {
+  assert.strictEqual(ENGINE.validateStandardPassword("ENTREPRISE", "Entreprise2027"), true);
+  assert.strictEqual(ENGINE.validateStandardPassword("ENTREPRISE", "wrong_password"), false);
+  assert.strictEqual(ENGINE.validateStandardPassword("MAPERF", "Maperf2027"), true);
+  assert.strictEqual(ENGINE.validateStandardPassword("MAPERF", "bad_pwd"), false);
+});
+
+test("Cycle Complet Entreprise (République du Congo) -> Suivi & Validation par l'Équipe MAPERF", () => {
+  const newDossier = ENGINE.createNewCongoDossier({
+    volet: "PRIVE",
+    raisonSociale: "Congo Logistique & Services Portuaires SA",
+    sigle: "CLSP",
+    villeSiege: "Pointe-Noire",
+    macroSecteur: "Transport, Logistique & Services Portuaires",
+    effectif2025: 140,
+    prefill: true
+  });
+
+  assert.ok(newDossier.codeAnonyme.startsWith("PRI-2027-"), "Code anonyme PRI-2027- attribué");
+  const evInitial = ENGINE.evaluateDossier(newDossier);
+  assert.strictEqual(Math.round(evInitial.globalFiabilite), 50, "À la saisie par l'entreprise, toutes les données sont Déclarées (Fiabilité = 50%)");
+  assert.ok(Math.abs(evInitial.globalVerifiedScore - evInitial.globalRawScore * 0.5) < 0.1, "Le score validé initial vaut 50% du potentiel brut déclaré");
+
+  // L'équipe MAPERF vérifie et valide les données de l'entreprise
+  Object.keys(newDossier.data).forEach(code => {
+    newDossier.data[code].verif = "Auditée";
+  });
+  const evAfterMaperfAudit = ENGINE.evaluateDossier(newDossier);
+  assert.strictEqual(Math.round(evAfterMaperfAudit.globalFiabilite), 100, "Après homologation par l'équipe MAPERF, la fiabilité passe à 100%");
+  assert.ok(evAfterMaperfAudit.globalVerifiedScore > evInitial.globalVerifiedScore + 25, "Le Taux de Performance Validé augmente fortement après le suivi de l'Équipe MAPERF");
 });
 
 test("send_inscription.php applique les protections OWASP (hash_equals, anti-CRLF, htmlspecialchars)", () => {
