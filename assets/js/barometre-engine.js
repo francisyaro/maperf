@@ -96,6 +96,94 @@
     return Math.max(min, Math.min(max, val));
   }
 
+  /**
+   * Synchronisation stricte entre la Décision de Validation Équipe MAPERF ("Déclarée" | "Vérifiée" | "Auditée")
+   * et le Statut de la Pièce Probante ("Déclaré" | "Vérifié" | "Audité"), répercutée dans l'Espace Entreprise.
+   */
+  function getPieceProbanteInfo(verifStatus) {
+    if (verifStatus === "Auditée" || verifStatus === "Audité") {
+      return {
+        verif: "Auditée",
+        pieceStatut: "Audité",
+        badgeClass: "badge-audited",
+        comment: "Statut Audité (100%) — Pièce probante certifiée et homologuée par l'Équipe MAPERF."
+      };
+    }
+    if (verifStatus === "Vérifiée" || verifStatus === "Vérifié") {
+      return {
+        verif: "Vérifiée",
+        pieceStatut: "Vérifié",
+        badgeClass: "badge-verified",
+        comment: "Statut Vérifié (80%) — Pièce probante contrôlée et validée par l'Équipe MAPERF."
+      };
+    }
+    return {
+      verif: "Déclarée",
+      pieceStatut: "Déclaré",
+      badgeClass: "badge-declared",
+      comment: "Statut Déclaré (50%) — Donnée et pièce déclarées, en attente de vérification par l'Équipe MAPERF."
+    };
+  }
+
+  function syncEvidenceForIndicator(dossier, code, newVerif) {
+    if (!dossier || !dossier.data || !dossier.data[code]) return;
+    var info = getPieceProbanteInfo(newVerif);
+    dossier.data[code].verif = info.verif;
+
+    var docRef = dossier.data[code].source;
+    if (docRef) {
+      if (!dossier.evidences) dossier.evidences = {};
+      var existing = dossier.evidences[docRef] || {
+        statut: info.pieceStatut,
+        fichier: dossier.sigle + "_" + docRef.replace(".", "_") + "_2025.pdf",
+        date: new Date().toISOString().slice(0, 10),
+        commentaireAnalyste: info.comment
+      };
+      existing.statut = info.pieceStatut;
+      existing.commentaireAnalyste = info.comment;
+      dossier.evidences[docRef] = existing;
+    }
+  }
+
+  function syncAllEvidencesFromDecisions(dossier) {
+    if (!dossier || !dossier.data) return;
+    if (!dossier.evidences) dossier.evidences = {};
+
+    // Regroupe par pièce justificative (DOC.01..DOC.11) les décisions de validation des indicateurs liés
+    var docDecisions = {};
+    Object.keys(dossier.data).forEach(function (code) {
+      var entry = dossier.data[code];
+      if (!entry || !entry.source) return;
+      var docRef = entry.source;
+      if (!docDecisions[docRef]) docDecisions[docRef] = [];
+      docDecisions[docRef].push(entry.verif || "Déclarée");
+    });
+
+    Object.keys(docDecisions).forEach(function (docRef) {
+      var list = docDecisions[docRef];
+      // Si la pièce n'a pas encore été modifiée explicitement ou portait un ancien libellé ("Validé" / "Transmis"),
+      // on aligne son statut sur "Déclaré" / "Vérifié" / "Audité"
+      var cur = dossier.evidences[docRef];
+      var derivedVerif = list[0] || "Déclarée";
+      if (list.every(function (v) { return v === "Auditée"; })) derivedVerif = "Auditée";
+      else if (list.some(function (v) { return v === "Vérifiée" || v === "Auditée"; }) && !list.every(function (v) { return v === "Déclarée"; })) derivedVerif = "Vérifiée";
+      else derivedVerif = "Déclarée";
+
+      var info = getPieceProbanteInfo(derivedVerif);
+      if (!cur) {
+        dossier.evidences[docRef] = {
+          statut: info.pieceStatut,
+          fichier: (dossier.sigle || "ENT") + "_" + docRef.replace(".", "_") + "_2025.pdf",
+          date: "2027-02-15",
+          commentaireAnalyste: info.comment
+        };
+      } else if (cur.statut !== "Déclaré" && cur.statut !== "Vérifié" && cur.statut !== "Audité") {
+        cur.statut = info.pieceStatut;
+        cur.commentaireAnalyste = info.comment;
+      }
+    });
+  }
+
   function normalizeLinear(val, low, high, invert) {
     if (val === null || val === undefined || isNaN(val)) return null;
     if (high === low) return 100;
@@ -618,7 +706,9 @@
         var entry = dossier.data[f.code] || { v2023: "", v2024: "", v2025: "", app: "Applicable", verif: "Déclarée", source: "", comment: "" };
         var res = evalRes.fieldResults[f.code];
         var isDisabled = entry.app !== "Applicable" ? "disabled" : "";
-        var badgeClass = entry.verif === "Auditée" ? "badge-audited" : (entry.verif === "Vérifiée" ? "badge-verified" : "badge-declared");
+        var pieceInfo = getPieceProbanteInfo(entry.verif || "Déclarée");
+        var badgeClass = pieceInfo.badgeClass;
+        var docRef = entry.source || "—";
 
         var stepAttr = f.type === "maturity" ? 'min="0" max="4" step="1"' : 'step="any"';
 
@@ -644,10 +734,13 @@
           '    <div class="text-[10px] text-slate-500">' + (res ? res.ratioLabel : '') + '</div>' +
           '  </td>' +
           '  <td class="p-3 text-center">' +
-          '    <span class="badge-status ' + badgeClass + '">' + (entry.verif || "Déclarée") + ' (' + ((res ? res.verifWeight : 0.5) * 100).toFixed(0) + '%)</span>' +
+          '    <span class="badge-status ' + badgeClass + '">' + pieceInfo.verif + ' (' + ((res ? res.verifWeight : 0.5) * 100).toFixed(0) + '%)</span>' +
           '  </td>' +
-          '  <td class="p-2.5 w-36">' +
-          '    <input type="text" data-code="' + f.code + '" data-field="source" value="' + (entry.source || "") + '" class="barometre-input text-xs py-1 js-data-input" placeholder="Réf. DOC.xx" />' +
+          '  <td class="p-2.5 w-44">' +
+          '    <div class="space-y-1">' +
+          '      <input type="text" data-code="' + f.code + '" data-field="source" value="' + (entry.source || "") + '" class="barometre-input text-xs py-1 js-data-input" placeholder="Réf. DOC.xx" />' +
+          (entry.source ? '      <div class="text-center"><span class="badge-status ' + badgeClass + ' text-[10px] py-0.5 px-2">' + docRef + ' : ' + pieceInfo.pieceStatut + '</span></div>' : '') +
+          '    </div>' +
           '  </td>' +
           '</tr>'
         );
@@ -662,23 +755,27 @@
           }
           if (prop === "v2023" || prop === "v2024" || prop === "v2025") {
             dossier.data[code][prop] = inp.value === "" ? "" : Number(inp.value);
-            // Toute modification par l'entreprise repasse la donnée en statut "Déclarée" jusqu'à nouvelle vérification par l'équipe MAPERF
-            dossier.data[code].verif = "Déclarée";
+            // Toute modification par l'entreprise repasse la donnée en "Déclarée" et la pièce probante en "Déclaré"
+            syncEvidenceForIndicator(dossier, code, "Déclarée");
           } else {
             dossier.data[code][prop] = inp.value;
+            syncEvidenceForIndicator(dossier, code, dossier.data[code].verif || "Déclarée");
           }
-          addAuditLog("Point Focal (" + dossier.sigle + ")", "Mise à jour donnée " + code + " (" + prop + ")", dossier.codeAnonyme, "Recalcul temps réel");
+          addAuditLog("Point Focal (" + dossier.sigle + ")", "Mise à jour donnée " + code + " (" + prop + ")", dossier.codeAnonyme, "Pièce : Déclaré");
           refreshAllViews();
         });
       });
     }
 
-    // Registre des preuves (07_Sources_et_preuves)
+    // Registre des preuves (07_Sources_et_preuves) synchronisé avec les décisions de l'Équipe MAPERF
+    syncAllEvidencesFromDecisions(dossier);
     var evGrid = document.getElementById("collecte-evidences-tbody");
     if (evGrid) {
       evGrid.innerHTML = window.MAPERF_BAROMETRE_DATA.evidenceCatalog.map(function (doc) {
-        var ev = (dossier.evidences && dossier.evidences[doc.id]) || { statut: "Non fourni", fichier: "", date: "", commentaireAnalyste: "" };
-        var stClass = ev.statut === "Validé" ? "badge-audited" : (ev.statut === "Transmis" ? "badge-verified" : "badge-declared");
+        var ev = (dossier.evidences && dossier.evidences[doc.id]) || { statut: "Déclaré", fichier: "", date: "", commentaireAnalyste: "" };
+        var stClass = (ev.statut === "Audité" || ev.statut === "Validé")
+          ? "badge-audited"
+          : ((ev.statut === "Vérifié" || ev.statut === "Transmis") ? "badge-verified" : "badge-declared");
         return (
           '<tr class="hover:bg-slate-50 transition">' +
           '  <td class="p-3 font-mono text-xs font-bold text-[#00236D]">' + doc.id + (doc.obligatoire ? ' <span class="text-red-600" title="Obligatoire">*</span>' : '') + '</td>' +
@@ -704,12 +801,12 @@
             var fileName = fileInput.files[0].name;
             if (!dossier.evidences) dossier.evidences = {};
             dossier.evidences[docId] = {
-              statut: "Transmis",
+              statut: "Déclaré",
               fichier: fileName,
               date: new Date().toISOString().slice(0, 10),
-              commentaireAnalyste: "Pièce téléversée par l'entreprise — En attente de revue Équipe MAPERF."
+              commentaireAnalyste: "Pièce déposée par l'entreprise (Statut : Déclaré) — En attente de vérification Équipe MAPERF."
             };
-            addAuditLog("Point Focal (" + dossier.sigle + ")", "Téléversement pièce justificative " + docId + " (" + fileName + ")", dossier.codeAnonyme, "Statut: Transmis");
+            addAuditLog("Point Focal (" + dossier.sigle + ")", "Téléversement pièce justificative " + docId + " (" + fileName + ")", dossier.codeAnonyme, "Statut: Déclaré");
             refreshAllViews();
           }
         });
@@ -836,10 +933,10 @@
         var entry = dossier.data[f.code] || { v2023: "", v2024: "", v2025: "", app: "Applicable", verif: "Déclarée", source: "", comment: "" };
         var res = evalRes.fieldResults[f.code];
         var docRef = entry.source || "—";
-        var docObj = dossier.evidences && dossier.evidences[docRef];
-        var docBadge = docObj
-          ? '<span class="badge-status ' + (docObj.statut === "Validé" ? "badge-audited" : "badge-verified") + '">' + docRef + ' : ' + docObj.statut + '</span>'
-          : '<span class="text-xs text-slate-400 font-mono">' + docRef + '</span>';
+        var pieceInfo = getPieceProbanteInfo(entry.verif || "Déclarée");
+        var docBadge = entry.source
+          ? '<span class="badge-status ' + pieceInfo.badgeClass + '">' + docRef + ' : ' + pieceInfo.pieceStatut + '</span>'
+          : '<span class="badge-status ' + pieceInfo.badgeClass + '">' + pieceInfo.pieceStatut + '</span>';
 
         return (
           '<tr class="hover:bg-slate-50 transition">' +
@@ -867,13 +964,14 @@
           var beforeScore = evaluateDossier(dossier).globalVerifiedScore;
 
           if (!dossier.data[code]) return;
-          dossier.data[code].verif = newVerif;
+          syncEvidenceForIndicator(dossier, code, newVerif);
+          var pInfo = getPieceProbanteInfo(newVerif);
 
           var afterScore = evaluateDossier(dossier).globalVerifiedScore;
           var diff = afterScore - beforeScore;
-          var diffStr = (diff >= 0 ? "+" : "") + diff.toFixed(2) + " pts sur Taux Validé";
+          var diffStr = (diff >= 0 ? "+" : "") + diff.toFixed(2) + " pts (Pièce : " + pInfo.pieceStatut + ")";
 
-          addAuditLog("Équipe Vérification MAPERF", "Validation de " + code + " -> Statut '" + newVerif + "'", dossier.codeAnonyme, diffStr);
+          addAuditLog("Équipe Vérification MAPERF", "Décision sur " + code + " -> '" + newVerif + "' & Pièce Probante -> '" + pInfo.pieceStatut + "'", dossier.codeAnonyme, diffStr);
           refreshAllViews();
         });
       });
@@ -1622,12 +1720,12 @@
         var before = evaluateDossier(dossier).globalVerifiedScore;
         Object.keys(dossier.data).forEach(function (code) {
           if (dossier.data[code].verif === "Déclarée" && dossier.data[code].v2025 !== "") {
-            dossier.data[code].verif = "Vérifiée";
+            syncEvidenceForIndicator(dossier, code, "Vérifiée");
           }
         });
         dossier.workflowStatut = "Vérifié par l'équipe MAPERF";
         var after = evaluateDossier(dossier).globalVerifiedScore;
-        addAuditLog("Équipe Vérification MAPERF", "Validation contradictoire de toutes les données déclarées -> 'Vérifiée (80%)'", dossier.codeAnonyme, "+" + (after - before).toFixed(1) + " pts");
+        addAuditLog("Équipe Vérification MAPERF", "Validation par lot -> Données 'Vérifiées (80%)' & Pièces 'Vérifié'", dossier.codeAnonyme, "+" + (after - before).toFixed(1) + " pts");
         refreshAllViews();
       });
     }
@@ -1639,12 +1737,12 @@
         var before = evaluateDossier(dossier).globalVerifiedScore;
         Object.keys(dossier.data).forEach(function (code) {
           if (dossier.data[code].v2025 !== "") {
-            dossier.data[code].verif = "Auditée";
+            syncEvidenceForIndicator(dossier, code, "Auditée");
           }
         });
         dossier.workflowStatut = "Validé Comité Scientifique (100% Audité)";
         var after = evaluateDossier(dossier).globalVerifiedScore;
-        addAuditLog("Comité Scientifique & Équipe MAPERF", "Homologation finale du dossier -> Toutes les données 'Auditées (100%)'", dossier.codeAnonyme, "+" + (after - before).toFixed(1) + " pts");
+        addAuditLog("Comité Scientifique & Équipe MAPERF", "Homologation finale -> Données 'Auditées (100%)' & Pièces 'Audité'", dossier.codeAnonyme, "+" + (after - before).toFixed(1) + " pts");
         refreshAllViews();
       });
     }
@@ -1830,6 +1928,9 @@
     runCoherenceChecks: runCoherenceChecks,
     validateStandardPassword: validateStandardPassword,
     createNewCongoDossier: createNewCongoDossier,
+    getPieceProbanteInfo: getPieceProbanteInfo,
+    syncEvidenceForIndicator: syncEvidenceForIndicator,
+    syncAllEvidencesFromDecisions: syncAllEvidencesFromDecisions,
     getState: function () { return state; },
     loadState: loadState
   };

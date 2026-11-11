@@ -298,6 +298,28 @@ test("Cycle Complet Entreprise (République du Congo) -> Suivi & Validation par 
   assert.ok(evAfterMaperfAudit.globalVerifiedScore > evInitial.globalVerifiedScore + 25, "Le Taux de Performance Validé augmente fortement après le suivi de l'Équipe MAPERF");
 });
 
+test("Synchronisation stricte Décision de Validation Équipe MAPERF <-> Statut Pièce Probante (Déclaré / Vérifié / Audité) & Espace Entreprise", () => {
+  const dossier = JSON.parse(JSON.stringify(DATA.initialDossiers[0]));
+
+  // 1. Décision = "Déclarée" -> Pièce Probante = "Déclaré"
+  ENGINE.syncEvidenceForIndicator(dossier, "FIN.001", "Déclarée");
+  assert.strictEqual(dossier.data["FIN.001"].verif, "Déclarée");
+  assert.strictEqual(ENGINE.getPieceProbanteInfo(dossier.data["FIN.001"].verif).pieceStatut, "Déclaré");
+  assert.strictEqual(dossier.evidences["DOC.01"].statut, "Déclaré");
+
+  // 2. Décision = "Vérifiée" -> Pièce Probante = "Vérifié"
+  ENGINE.syncEvidenceForIndicator(dossier, "FIN.001", "Vérifiée");
+  assert.strictEqual(dossier.data["FIN.001"].verif, "Vérifiée");
+  assert.strictEqual(ENGINE.getPieceProbanteInfo(dossier.data["FIN.001"].verif).pieceStatut, "Vérifié");
+  assert.strictEqual(dossier.evidences["DOC.01"].statut, "Vérifié");
+
+  // 3. Décision = "Auditée" -> Pièce Probante = "Audité"
+  ENGINE.syncEvidenceForIndicator(dossier, "FIN.001", "Auditée");
+  assert.strictEqual(dossier.data["FIN.001"].verif, "Auditée");
+  assert.strictEqual(ENGINE.getPieceProbanteInfo(dossier.data["FIN.001"].verif).pieceStatut, "Audité");
+  assert.strictEqual(dossier.evidences["DOC.01"].statut, "Audité");
+});
+
 test("send_inscription.php applique les protections OWASP (hash_equals, anti-CRLF, htmlspecialchars)", () => {
   const phpContent = fs.readFileSync(path.join(ROOT_DIR, "send_inscription.php"), "utf8");
   assert.ok(phpContent.includes("hash_equals"), "send_inscription.php doit utiliser hash_equals contre les timing attacks");
