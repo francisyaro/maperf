@@ -1964,15 +1964,15 @@
           fb.innerHTML =
             '<div class="flex flex-wrap items-center justify-between gap-3">' +
             '  <div>' +
-            '    <strong class="text-[#2CC3A0] block">✓ Dossier ' + dossier.codeAnonyme + ' (' + dossier.raisonSociale + ') transmis avec succès à l\'Équipe MAPERF !</strong>' +
-            '    <span>Score Brut Déclaré : <strong>' + ev.globalRawScore.toFixed(1) + '/100</strong> · Score Validé actuel : <strong>' + ev.globalVerifiedScore.toFixed(1) + '/100</strong> (' + ev.countDeclared + ' indicateurs en attente de validation).</span>' +
+            '    <strong class="text-emerald-800 block">✓ Dossier ' + dossier.codeAnonyme + ' (' + dossier.raisonSociale + ') enregistré et transmis pour vérification documentaire.</strong>' +
+            '    <span>Potentiel brut déclaré : <strong>' + ev.globalRawScore.toFixed(1) + '/100</strong> · Indice MAPERF provisoire : <strong>' + ev.globalVerifiedScore.toFixed(1) + '/100</strong> (' + ev.countDeclared + ' indicateurs en attente de revue).</span>' +
             '  </div>' +
-            '  <button type="button" id="btn-jump-maperf-after-submit" class="btn btn-teal text-xs py-1.5 px-3.5 shrink-0">Ouvrir la Console Équipe MAPERF pour vérifier →</button>' +
+            '  <button type="button" id="btn-jump-contradictoire-after-submit" class="btn btn-teal text-xs py-1.5 px-3.5 shrink-0">Étape 2 : Validation contradictoire →</button>' +
             '</div>';
-          var jumpBtn = document.getElementById("btn-jump-maperf-after-submit");
+          var jumpBtn = document.getElementById("btn-jump-contradictoire-after-submit");
           if (jumpBtn) {
             jumpBtn.addEventListener("click", function () {
-              switchMainTab("espace-validation");
+              switchMainTab("contradictoire");
             });
           }
         }

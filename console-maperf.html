@@ -6,7 +6,7 @@
   <meta name="robots" content="noindex, nofollow" />
   <title>Console Équipe MAPERF — Revue documentaire, vérification et consolidation COS | Baromètre 2027</title>
   <meta name="description" content="Console d'administration et d'audit réservée à l'équipe technique MAPERF et au Comité d'orientation scientifique (COS)." />
-  <link rel="icon" type="image/png" href="assets/images/favicon.png" />
+  <link rel="icon" type="image/png" href="favicon.PNG" />
 
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -67,15 +67,16 @@
           <div>
             <div class="flex flex-wrap items-center gap-2 mb-2">
               <span class="badge badge-gold"><i data-lucide="shield-check" class="w-3.5 h-3.5"></i> Console Équipe MAPERF et COS</span>
-              <span id="header-volet-badge" class="badge badge-teal">Secteur public</span>
-              <span id="header-code-anonyme" class="badge bg-white/10 text-white border border-white/15 font-mono">PUB-2027-001</span>
+              <span id="summary-code-anonyme" class="badge bg-white/10 text-white border border-white/15 font-mono">PUB-2027-001</span>
+              <span id="summary-publiabilite-badge" class="badge-status badge-audited">Dossier publiable</span>
             </div>
             <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight">
               Revue documentaire, vérification contradictoire et consolidation
             </h1>
             <p class="text-slate-300 text-xs sm:text-sm mt-1">
-              Dossier en cours d'instruction : <strong id="header-org-name" class="text-white">Entreprise publique A (EPA)</strong>
-              · Statut : <strong id="header-workflow-statut" class="text-[#2CC3A0]">Vérifié — En validation contradictoire</strong>
+              Dossier en cours d'instruction : <strong id="summary-raison-sociale" class="text-white">Entreprise publique A</strong>
+              (<span id="summary-groupe-homogene">PUBLIC · Énergie, Eau et Infrastructures × GE 250+</span>)
+              · Statut : <strong id="summary-workflow-statut" class="text-[#2CC3A0]">Vérifié — En validation contradictoire</strong>
             </p>
           </div>
 
@@ -185,16 +186,26 @@
 
       <!-- Espace de travail Équipe MAPERF déverrouillé -->
       <div id="workspace-equipe-content" class="space-y-8">
+        <!-- File d'attente des dossiers Entreprise -->
+        <div>
+          <h2 class="text-sm font-extrabold uppercase tracking-wider text-[#0B2341] mb-3">
+            File d'instruction des dossiers Entreprise (cliquez sur une carte pour inspecter le dossier)
+          </h2>
+          <div id="validation-dossiers-queue" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <!-- Injecté par barometre-engine.js -->
+          </div>
+        </div>
+
         <!-- Barre de session Auditeur & Actions rapides à intitulés courts -->
         <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm flex flex-wrap items-center justify-between gap-4">
           <div>
             <div class="text-xs text-slate-500">Session d'audit active : <strong id="session-maperf-role-label" class="text-[#0B2341]">Analyste Principal OHADA</strong></div>
-            <h2 id="val-dossier-title" class="text-lg font-extrabold text-[#0B2341] mt-0.5">
-              PUB-2027-001 — Entreprise publique A
-            </h2>
-            <p id="val-dossier-subtitle" class="text-xs text-slate-600">
-              Secteur public · Point focal
-            </p>
+            <div class="flex flex-wrap items-center gap-3 mt-1 text-xs">
+              <span>Potentiel brut : <strong id="kpi-score-brut" class="font-mono text-[#0B2341]">0.0 / 100</strong></span>
+              <span>· Indice MAPERF validé : <strong id="kpi-score-valide" class="font-mono text-emerald-700">0.0 / 100</strong></span>
+              <span>· Complétude : <strong id="kpi-completude" class="font-mono">0 %</strong></span>
+              <span>· Fiabilité : <strong id="kpi-fiabilite" class="font-mono">0 %</strong> (<span id="kpi-counts-verif"></span>)</span>
+            </div>
           </div>
 
           <!-- Boutons d'action à libellés courts conformément à la revue v2.0 -->
@@ -210,30 +221,6 @@
             <button type="button" id="btn-logout-maperf" class="btn btn-outline text-xs py-2 px-3">
               Déconnexion
             </button>
-          </div>
-        </div>
-
-        <!-- Compteurs de répartition par niveau de preuve et gain d'incrémentation -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div class="bg-white rounded-2xl p-4 border border-slate-200">
-            <div class="text-xs text-slate-500">1. Données déclarées (coeff. 50 %)</div>
-            <div id="val-count-declared" class="text-2xl font-extrabold font-mono text-amber-600 mt-1">0</div>
-            <div class="text-xs text-slate-500 mt-0.5">En attente de revue documentaire</div>
-          </div>
-          <div class="bg-white rounded-2xl p-4 border border-slate-200">
-            <div class="text-xs text-slate-500">2. Données vérifiées (coeff. 80 %)</div>
-            <div id="val-count-verified" class="text-2xl font-extrabold font-mono text-sky-700 mt-1">0</div>
-            <div class="text-xs text-slate-500 mt-0.5">Recoupées avec pièce interne signée</div>
-          </div>
-          <div class="bg-white rounded-2xl p-4 border border-slate-200">
-            <div class="text-xs text-slate-500">3. Données auditées (coeff. 100 %)</div>
-            <div id="val-count-audited" class="text-2xl font-extrabold font-mono text-emerald-700 mt-1">0</div>
-            <div class="text-xs text-slate-500 mt-0.5">Certifiées par tiers indépendant</div>
-          </div>
-          <div class="bg-[#0B2341] text-white rounded-2xl p-4">
-            <div class="text-xs text-[#2CC3A0] font-bold">Réserve d'incrémentation</div>
-            <div id="val-potential-gain" class="text-2xl font-extrabold font-mono mt-1">+0.0 pts</div>
-            <div class="text-xs text-slate-300 mt-0.5">Écart entre score validé et potentiel brut</div>
           </div>
         </div>
 
@@ -271,48 +258,42 @@
             <table class="barometre-table">
               <thead>
                 <tr>
-                  <th class="w-28">Code et dim.</th>
-                  <th>Indicateur et rubrique</th>
+                  <th class="w-24">Code et dim.</th>
+                  <th>Indicateur et commentaire</th>
                   <th class="w-28 text-right">2023</th>
                   <th class="w-28 text-right">2024</th>
                   <th class="w-28 text-right">2025</th>
-                  <th class="w-28 text-right">Variation (23→25)</th>
-                  <th class="w-56">Pièce probante et statut synchronisé</th>
-                  <th class="w-32">Score (Brut → Validé)</th>
-                  <th class="w-48">Décision Équipe MAPERF</th>
+                  <th class="w-28 text-right">Variation</th>
+                  <th class="w-40 text-center">Pièce probante</th>
+                  <th class="w-24 text-center">Score brut</th>
+                  <th class="w-24 text-center">Validé</th>
+                  <th class="w-72 text-right">Décision Équipe MAPERF</th>
                 </tr>
               </thead>
-              <tbody id="validation-table-tbody">
+              <tbody id="validation-fields-tbody">
                 <!-- Injecté par barometre-engine.js -->
               </tbody>
             </table>
           </div>
         </div>
 
-        <!-- Contrôles automatiques, demandes de précision et journal d'audit -->
+        <!-- Demandes de précision et journal d'audit -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          <div class="lg:col-span-6 bg-white rounded-2xl p-6 border border-slate-200 shadow-sm space-y-5">
-            <div>
-              <span class="badge badge-navy mb-1">Contrôles automatiques du dossier</span>
-              <h3 class="text-base font-extrabold text-[#0B2341] mb-3">
-                Résultat des tests de cohérence sur le dossier actif
-              </h3>
-              <div id="validation-coherence-box" class="space-y-2.5"></div>
+          <div class="lg:col-span-6 bg-white rounded-2xl p-6 border border-slate-200 shadow-sm space-y-4">
+            <span class="badge badge-navy mb-1">Suivi contradictoire</span>
+            <h3 class="text-base font-extrabold text-[#0B2341]">
+              Émettre une demande de précision au Point focal
+            </h3>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+              <input type="text" id="clarif-code-input" class="barometre-input mono text-xs" placeholder="Code (ex. FIN.001)" value="FIN.001" />
+              <input type="text" id="clarif-msg-input" class="barometre-input text-xs sm:col-span-2" placeholder="Précisez la pièce ou l'écart à justifier..." />
             </div>
-
-            <div class="pt-4 border-t border-slate-200">
-              <h3 class="text-base font-extrabold text-[#0B2341] mb-2">
-                Émettre une demande de précision au Point focal
-              </h3>
-              <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 mb-2.5">
-                <input type="text" id="clarif-code-input" class="barometre-input mono text-xs" placeholder="Code (ex. FIN.001)" value="FIN.001" />
-                <input type="text" id="clarif-msg-input" class="barometre-input text-xs sm:col-span-2" placeholder="Précisez la pièce ou l'écart à justifier..." />
-              </div>
-              <button type="button" id="btn-add-clarification" class="btn btn-outline text-xs py-2 px-3.5">
-                <i data-lucide="message-Square-plus" class="w-4 h-4"></i>
-                Envoyer la demande de précision
-              </button>
-              <div id="validation-clarif-list" class="space-y-2.5 mt-4"></div>
+            <button type="button" id="btn-add-clarification" class="btn btn-outline text-xs py-2 px-3.5">
+              <i data-lucide="message-square-plus" class="w-4 h-4"></i>
+              Envoyer la demande de précision
+            </button>
+            <div id="validation-clarifications-list" class="space-y-2.5 mt-4">
+              <!-- Injecté par barometre-engine.js -->
             </div>
           </div>
 
@@ -322,7 +303,7 @@
             <h3 class="text-base font-extrabold text-[#0B2341] mb-3">
               Journal d'audit horodaté des vérifications et validations
             </h3>
-            <div id="validation-audit-log" class="space-y-2.5 max-h-[460px] overflow-y-auto pr-1">
+            <div id="validation-audit-trail" class="space-y-2.5 max-h-[460px] overflow-y-auto pr-1">
               <!-- Injecté par barometre-engine.js -->
             </div>
           </div>
@@ -377,38 +358,30 @@
         <h3 class="text-base font-extrabold text-[#0B2341] mb-3">
           Matrice de consolidation anonymisée (codes pseudonymisés uniquement)
         </h3>
-        <div class="overflow-x-auto mb-8">
+        <div class="overflow-x-auto">
           <table class="barometre-table">
             <thead>
               <tr>
                 <th>Code anonyme</th>
                 <th>Volet</th>
                 <th>Groupe homogène (Secteur × Taille)</th>
-                <th>Dim. A</th>
-                <th>Dim. B</th>
-                <th>Dim. C</th>
-                <th>Dim. D</th>
-                <th>Dim. E</th>
-                <th>Dim. F</th>
-                <th>Score brut</th>
-                <th>Indice validé</th>
-                <th>Complétude et fiabilité</th>
-                <th>Écart P−R</th>
-                <th>Éligibilité</th>
+                <th class="text-center">Dim. A</th>
+                <th class="text-center">Dim. B</th>
+                <th class="text-center">Dim. C</th>
+                <th class="text-center">Dim. D</th>
+                <th class="text-center">Dim. E</th>
+                <th class="text-center">Dim. F</th>
+                <th class="text-center">Score brut</th>
+                <th class="text-center">Indice validé</th>
+                <th class="text-center">Complétude</th>
+                <th class="text-center">Fiabilité</th>
+                <th class="text-center">Éligibilité</th>
               </tr>
             </thead>
             <tbody id="consolidation-matrix-tbody">
               <!-- Injecté par barometre-engine.js -->
             </tbody>
           </table>
-        </div>
-
-        <!-- Groupes homogènes et règle de secret statistique N >= 5 -->
-        <h3 class="text-base font-extrabold text-[#0B2341] mb-3">
-          Contrôle de la règle de secret statistique par groupe homogène (seuil N ≥ 5)
-        </h3>
-        <div id="consolidation-groups-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <!-- Injecté par barometre-engine.js -->
         </div>
       </div>
     </section>

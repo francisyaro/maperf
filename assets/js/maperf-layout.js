@@ -17,7 +17,7 @@
   function renderUnifiedHeader() {
     var page = getCurrentPage();
     var topBanner = document.querySelector('body > div.w-full');
-    var header = document.querySelector('body > header');
+    var header = document.querySelector('body > header') || document.getElementById('maperf-header');
 
     var isSemaine = page === 'semaine-maperf.html' || page === 'agenda.html';
     var isBarometre = page === 'barometre.html' || page === 'espace-entreprise.html';
@@ -149,7 +149,7 @@
   }
 
   function renderUnifiedFooter() {
-    var footer = document.querySelector('body > footer');
+    var footer = document.querySelector('body > footer') || document.getElementById('maperf-footer');
     if (!footer) return;
 
     footer.outerHTML =

@@ -340,6 +340,35 @@ test("send_inscription.php applique les protections OWASP (hash_equals, anti-CRL
   assert.ok(phpContent.includes("htmlspecialchars"), "send_inscription.php doit échapper les sorties HTML");
 });
 
+test("Intégrité à 100 % des liens internes, ressources (images/docs) et identifiants DOM entre barometre-engine.js et les 3 pages du Baromètre", () => {
+  const htmlFiles = fs.readdirSync(ROOT_DIR).filter(f => f.endsWith(".html"));
+  htmlFiles.forEach(file => {
+    const content = fs.readFileSync(path.join(ROOT_DIR, file), "utf8");
+    const attrRegex = /(?:href|src)="([^"]+)"/g;
+    let m;
+    while ((m = attrRegex.exec(content)) !== null) {
+      const val = m[1];
+      if (/^(?:https?:|mailto:|tel:|javascript:|#|data:)/.test(val)) continue;
+      const cleanPath = val.split("#")[0].split("?")[0];
+      if (!cleanPath) continue;
+      assert.ok(fs.existsSync(path.join(ROOT_DIR, cleanPath)), `${file} référence une ressource introuvable : ${val}`);
+    }
+  });
+
+  const baro = fs.readFileSync(path.join(ROOT_DIR, "barometre.html"), "utf8");
+  const ent = fs.readFileSync(path.join(ROOT_DIR, "espace-entreprise.html"), "utf8");
+  const cons = fs.readFileSync(path.join(ROOT_DIR, "console-maperf.html"), "utf8");
+  const combined = baro + "\n" + ent + "\n" + cons + "\n" + engineCode;
+
+  const idRegex = /(?:getElementById|setText)\(\s*"([^"]+)"/g;
+  let idMatch;
+  while ((idMatch = idRegex.exec(engineCode)) !== null) {
+    const id = idMatch[1];
+    if (id === "panel-" || id === "btn-switch-to-maperf" || id === "btn-switch-to-entreprise") continue;
+    assert.ok(combined.includes(`id="${id}"`), `L'identifiant DOM #${id} utilisé par barometre-engine.js doit être présent dans les pages du Baromètre`);
+  }
+});
+
 console.log("\n================================================================================");
 console.log(` RÉSULTAT GLOBAL QA V2 : ${passed} réussis, ${failed} échoués`);
 console.log("================================================================================");
