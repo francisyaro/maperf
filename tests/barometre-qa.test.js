@@ -369,6 +369,119 @@ test("Intégrité à 100 % des liens internes, ressources (images/docs) et ident
   }
 });
 
+test("Simulation interactive de bout en bout (DOM) : Connexion Entreprise -> Soumission -> Validation contradictoire -> Console Équipe MAPERF -> Bascule COS", () => {
+  const elements = {};
+  function makeEl(id) {
+    return {
+      id,
+      value: "",
+      checked: true,
+      textContent: "",
+      innerHTML: "",
+      className: "",
+      style: {},
+      files: [],
+      _attrs: { "data-default-tab": "espace-collecte" },
+      _listeners: {},
+      classList: {
+        _set: new Set(),
+        add(c) { this._set.add(c); },
+        remove(c) { this._set.delete(c); },
+        toggle(c) { if (this._set.has(c)) this._set.delete(c); else this._set.add(c); },
+        contains(c) { return this._set.has(c); }
+      },
+      getAttribute(k) { return this._attrs[k] || null; },
+      setAttribute(k, v) { this._attrs[k] = String(v); },
+      addEventListener(evt, fn) {
+        if (!this._listeners[evt]) this._listeners[evt] = [];
+        this._listeners[evt].push(fn);
+      },
+      trigger(evt, eventObj) {
+        (this._listeners[evt] || []).forEach(fn => fn(eventObj || { preventDefault() {}, target: this }));
+      },
+      querySelector() { return null; },
+      querySelectorAll() { return []; },
+      scrollIntoView() {},
+      getContext() { return {}; }
+    };
+  }
+  function getEl(id) {
+    if (!elements[id]) elements[id] = makeEl(id);
+    return elements[id];
+  }
+
+  const allHtml =
+    fs.readFileSync(path.join(ROOT_DIR, "espace-entreprise.html"), "utf8") +
+    fs.readFileSync(path.join(ROOT_DIR, "console-maperf.html"), "utf8") +
+    fs.readFileSync(path.join(ROOT_DIR, "barometre.html"), "utf8");
+
+  let m;
+  const idRx = /id="([^"]+)"/g;
+  while ((m = idRx.exec(allHtml)) !== null) getEl(m[1]);
+
+  const domSandbox = {
+    window: { location: { pathname: "/espace-entreprise.html", hash: "" }, addEventListener() {} },
+    document: {
+      readyState: "complete",
+      body: { insertAdjacentHTML() {} },
+      getElementById(id) { return elements[id] || null; },
+      querySelector(sel) {
+        if (sel === "body > header") return getEl("maperf-header");
+        if (sel === "body > footer") return getEl("maperf-footer");
+        return null;
+      },
+      querySelectorAll() { return []; },
+      addEventListener() {}
+    },
+    localStorage: {
+      _store: {},
+      getItem(k) { return this._store[k] || null; },
+      setItem(k, v) { this._store[k] = String(v); },
+      removeItem(k) { delete this._store[k]; }
+    },
+    Chart: function () { return { destroy() {} }; },
+    console
+  };
+  domSandbox.window.document = domSandbox.document;
+  domSandbox.window.localStorage = domSandbox.localStorage;
+  domSandbox.window.Chart = domSandbox.Chart;
+
+  vm.createContext(domSandbox);
+  vm.runInContext(configCode, domSandbox);
+  vm.runInContext(fs.readFileSync(path.join(ROOT_DIR, "assets/js/maperf-layout.js"), "utf8"), domSandbox);
+  vm.runInContext(dataCode, domSandbox);
+  vm.runInContext(engineCode, domSandbox);
+
+  // 1. Connexion Espace Entreprise
+  getEl("login-ent-password").value = "Entreprise2027";
+  getEl("btn-login-entreprise").trigger("click");
+  assert.strictEqual(domSandbox.window.MAPERF_BAROMETRE_ENGINE.getState().auth.entrepriseUnlocked, true);
+
+  // 2. Soumission du dossier Entreprise
+  getEl("btn-submit-to-maperf").trigger("click");
+  assert.ok(getEl("submit-ent-feedback").innerHTML.includes("Validation contradictoire"));
+
+  // 3. Décision contradictoire : Observation puis Acceptation
+  getEl("contradictoire-observation-input").value = "Observation contradictoire sur le retraitement OSP 2025.";
+  getEl("btn-contradictoire-observe").trigger("click");
+  assert.ok(getEl("contradictoire-feedback").innerHTML.includes("Observation contradictoire enregistrée"));
+
+  getEl("btn-contradictoire-accept").trigger("click");
+  assert.ok(getEl("contradictoire-feedback").innerHTML.includes("Validation contradictoire enregistrée"));
+
+  // 4. Connexion Console Équipe MAPERF, validation par lot et bascule COS
+  getEl("login-maperf-password").value = "Maperf2027";
+  getEl("btn-login-maperf").trigger("click");
+  assert.strictEqual(domSandbox.window.MAPERF_BAROMETRE_ENGINE.getState().auth.equipeUnlocked, true);
+
+  getEl("btn-batch-verify").trigger("click");
+  getEl("btn-batch-audit").trigger("click");
+
+  assert.strictEqual(getEl("conso-kpi-pub-avg").textContent, "Résultats disponibles après validation du COS");
+  getEl("btn-toggle-cos-publication").trigger("click");
+  assert.ok(getEl("conso-kpi-pub-avg").textContent.includes("/ 100"));
+});
+
 console.log("\n================================================================================");
 console.log(` RÉSULTAT GLOBAL QA V2 : ${passed} réussis, ${failed} échoués`);
 console.log("================================================================================");

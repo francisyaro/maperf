@@ -5,7 +5,7 @@
 - [`assets/docs/01_TDR_Barometre_MAPERF_2027.pdf`](file:///c:/Users/franc/maperf.org/assets/docs/01_TDR_Barometre_MAPERF_2027.pdf) (*Termes de référence du Baromètre national de la performance 2027*)
 - [`assets/docs/Cahier_des_charges_Plateforme_Barometre_MAPERF_2027.docx`](file:///c:/Users/franc/maperf.org/assets/docs/Cahier_des_charges_Plateforme_Barometre_MAPERF_2027.docx)
 - [`assets/docs/MAPERF_Barometre_Collecte_Secteur_Public.xlsx`](file:///c:/Users/franc/maperf.org/assets/docs/MAPERF_Barometre_Collecte_Secteur_Public.xlsx) (103 données de référence)
-- [`assets/docs/MAPERF_Barometre_Collecte_Secteur_Prive_1.xlsx`](file:///c:/Users/franc/maperf.org/assets/docs/MAPERF_Barometre_Collecte_Secteur_Prive_1.xlsx) (104 données de référence)
+- [`assets/docs/MAPERF_Barometre_Collecte_Secteur_Prive.xlsx`](file:///c:/Users/franc/maperf.org/assets/docs/MAPERF_Barometre_Collecte_Secteur_Prive.xlsx) (104 données de référence)
 
 ---
 
