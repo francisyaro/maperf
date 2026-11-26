@@ -31,14 +31,14 @@
     <!-- ===================================================================== -->
     <!-- EN-TÊTE CONSOLE D'ADMINISTRATION ET D'AUDIT RÉSERVÉE                  -->
     <!-- ===================================================================== -->
-    <section class="hero-navy text-white pt-7 pb-8 border-b border-white/10">
+    <section class="hero-navy bg-[#00236D] bg-gradient-to-br from-[#00236D] via-[#0A2240] to-[#003C8F] text-white pt-7 pb-8 border-b-4 border-[#F39A1E]">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <!-- Mention explicite d'accès réservé hors navigation publique -->
-        <div class="mb-5 p-3.5 rounded-xl bg-amber-500/15 border border-amber-400/30 flex flex-wrap items-center justify-between gap-3 text-xs">
-          <div class="flex items-center gap-2.5 text-amber-100">
-            <span class="badge badge-gold"><i data-lucide="shield-alert" class="w-3.5 h-3.5"></i> Accès restreint — Hors navigation publique</span>
+        <div class="mb-5 p-3.5 rounded-xl bg-[#071629]/80 border border-[#F6C332]/40 flex flex-wrap items-center justify-between gap-3 text-xs">
+          <div class="flex items-center gap-2.5 text-white">
+            <span class="px-2.5 py-1 rounded-full font-extrabold bg-[#F6C332] text-[#00236D] inline-flex items-center gap-1"><i data-lucide="shield-alert" class="w-3.5 h-3.5"></i> Accès restreint — Hors navigation publique</span>
             <span>
-              Console réservée à l'équipe technique <strong>Owando Consulting</strong> et au <strong>Comité d'orientation scientifique (COS)</strong>.
+              Console réservée à l'équipe technique <strong class="text-[#F6C332]">Owando Consulting</strong> et au <strong class="text-[#2CC3A0]">Comité d'orientation scientifique (COS)</strong>.
             </span>
           </div>
           <!-- Boutons techniques réservés à l'administrateur conformément à la revue v2.0 -->
@@ -66,25 +66,25 @@
         <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
           <div>
             <div class="flex flex-wrap items-center gap-2 mb-2">
-              <span class="badge badge-gold"><i data-lucide="shield-check" class="w-3.5 h-3.5"></i> Console Équipe MAPERF et COS</span>
-              <span id="summary-code-anonyme" class="badge bg-white/10 text-white border border-white/15 font-mono">PUB-2027-001</span>
+              <span class="px-3 py-1 rounded-full text-xs font-extrabold bg-[#F6C332] text-[#00236D] inline-flex items-center gap-1.5"><i data-lucide="shield-check" class="w-3.5 h-3.5"></i> Console Équipe MAPERF et COS</span>
+              <span id="summary-code-anonyme" class="px-3 py-1 rounded-full text-xs font-bold bg-[#071629] text-white border border-white/25 font-mono">PUB-2027-001</span>
               <span id="summary-publiabilite-badge" class="badge-status badge-audited">Dossier publiable</span>
             </div>
-            <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight">
+            <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
               Revue documentaire, vérification contradictoire et consolidation
             </h1>
-            <p class="text-slate-300 text-xs sm:text-sm mt-1">
+            <p class="text-slate-200 text-xs sm:text-sm mt-1">
               Dossier en cours d'instruction : <strong id="summary-raison-sociale" class="text-white">Entreprise publique A</strong>
               (<span id="summary-groupe-homogene">PUBLIC · Énergie, Eau et Infrastructures × GE 250+</span>)
               · Statut : <strong id="summary-workflow-statut" class="text-[#2CC3A0]">Vérifié — En validation contradictoire</strong>
             </p>
           </div>
 
-          <div class="bg-white/10 border border-white/20 rounded-xl p-2.5">
-            <label for="barometre-dossier-select" class="block text-xs uppercase tracking-wider font-bold text-[#F39A1E] mb-1">
+          <div class="bg-[#071629]/80 border border-white/25 rounded-xl p-2.5">
+            <label for="barometre-dossier-select" class="block text-xs uppercase tracking-wider font-bold text-[#F6C332] mb-1">
               Sélectionner le dossier à auditer
             </label>
-            <select id="barometre-dossier-select" class="bg-[#071629] text-white text-xs font-semibold rounded-lg px-3 py-2 border border-white/15 focus:outline-none focus:border-[#2CC3A0] w-full sm:w-80">
+            <select id="barometre-dossier-select" class="bg-[#00184D] text-white text-xs font-semibold rounded-lg px-3 py-2 border border-white/25 focus:outline-none focus:border-[#2CC3A0] w-full sm:w-80">
               <!-- Injecté par barometre-engine.js -->
             </select>
           </div>
@@ -92,25 +92,25 @@
 
         <!-- Synthèse d'avancement de la collecte nationale -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mt-6">
-          <div class="p-3.5 rounded-xl bg-white/5 border border-white/10">
-            <div class="text-xs text-slate-300">Avancement volet Public</div>
-            <div id="console-kpi-pub" class="text-lg font-extrabold font-mono text-[#2CC3A0] mt-0.5">2 / 20 dossiers</div>
-            <div class="text-xs text-slate-300 mt-0.5">Cible nationale : 20 entreprises</div>
+          <div class="p-4 rounded-xl bg-[#071629]/75 border border-white/20">
+            <div class="text-xs font-semibold text-slate-200">Avancement volet Public</div>
+            <div id="console-kpi-pub" class="text-lg font-extrabold font-mono text-[#2CC3A0] mt-1">2 / 20 dossiers</div>
+            <div class="text-xs text-slate-200 mt-0.5">Cible nationale : 20 entreprises</div>
           </div>
-          <div class="p-3.5 rounded-xl bg-white/5 border border-white/10">
-            <div class="text-xs text-slate-300">Avancement volet Privé</div>
-            <div id="console-kpi-pri" class="text-lg font-extrabold font-mono text-[#F39A1E] mt-0.5">2 / 50 dossiers</div>
-            <div class="text-xs text-slate-300 mt-0.5">Cible nationale : 50 entreprises</div>
+          <div class="p-4 rounded-xl bg-[#071629]/75 border border-white/20">
+            <div class="text-xs font-semibold text-slate-200">Avancement volet Privé</div>
+            <div id="console-kpi-pri" class="text-lg font-extrabold font-mono text-[#F6C332] mt-1">2 / 50 dossiers</div>
+            <div class="text-xs text-slate-200 mt-0.5">Cible nationale : 50 entreprises</div>
           </div>
-          <div class="p-3.5 rounded-xl bg-white/5 border border-white/10">
-            <div class="text-xs text-slate-300">Validation contradictoire acceptée</div>
-            <div id="console-kpi-contra-accept" class="text-lg font-extrabold font-mono text-white mt-0.5">1</div>
-            <div class="text-xs text-slate-300 mt-0.5">Fiches acceptées sans réserve</div>
+          <div class="p-4 rounded-xl bg-[#071629]/75 border border-white/20">
+            <div class="text-xs font-semibold text-slate-200">Validation contradictoire acceptée</div>
+            <div id="console-kpi-contra-accept" class="text-lg font-extrabold font-mono text-white mt-1">1</div>
+            <div class="text-xs text-slate-200 mt-0.5">Fiches acceptées sans réserve</div>
           </div>
-          <div class="p-3.5 rounded-xl bg-white/5 border border-white/10">
-            <div class="text-xs text-slate-300">Observations contradictoires à instruire</div>
-            <div id="console-kpi-contra-obs" class="text-lg font-extrabold font-mono text-amber-300 mt-0.5">1</div>
-            <div class="text-xs text-slate-300 mt-0.5">Arbitrage technique / COS requis</div>
+          <div class="p-4 rounded-xl bg-[#071629]/75 border border-white/20">
+            <div class="text-xs font-semibold text-slate-200">Observations contradictoires à instruire</div>
+            <div id="console-kpi-contra-obs" class="text-lg font-extrabold font-mono text-amber-300 mt-1">1</div>
+            <div class="text-xs text-slate-200 mt-0.5">Arbitrage technique / COS requis</div>
           </div>
         </div>
       </div>

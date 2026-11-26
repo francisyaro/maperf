@@ -95,6 +95,122 @@ h1, h2, h3, h4, .font-display, .kpi-value {
   user-select: none;
 }
 
+/* Bandeau Hero Bleu Marine Institutionnel (contraste garanti pour texte blanc) */
+.hero-navy {
+  background-color: #00236D;
+  background-image: linear-gradient(135deg, #00236D 0%, #0A2240 55%, #003C8F 100%);
+  color: #FFFFFF;
+}
+
+.card-glass {
+  background-color: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+/* Badges institutionnels (fonds clairs et fonds sombres .hero-navy) */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.3rem 0.8rem;
+  border-radius: 9999px;
+  font-size: 0.8125rem; /* 13px minimum */
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.badge-teal {
+  background-color: rgba(44, 195, 160, 0.18);
+  color: #065F46;
+  border: 1px solid rgba(44, 195, 160, 0.45);
+}
+
+.hero-navy .badge-teal {
+  background-color: rgba(44, 195, 160, 0.22);
+  color: #5EEAD4;
+  border: 1px solid rgba(44, 195, 160, 0.55);
+}
+
+.badge-gold {
+  background-color: rgba(246, 195, 50, 0.22);
+  color: #855800;
+  border: 1px solid rgba(246, 195, 50, 0.55);
+}
+
+.hero-navy .badge-gold {
+  background-color: rgba(246, 195, 50, 0.22);
+  color: #FDE047;
+  border: 1px solid rgba(246, 195, 50, 0.55);
+}
+
+.badge-navy {
+  background-color: rgba(0, 35, 109, 0.1);
+  color: #00236D;
+  border: 1px solid rgba(0, 35, 109, 0.25);
+}
+
+.hero-navy .badge-navy {
+  background-color: rgba(255, 255, 255, 0.15);
+  color: #FFFFFF;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+}
+
+.hero-navy .badge-audited {
+  background-color: #ECFDF5;
+  color: #065F46;
+  border: 1px solid #6EE7B7;
+}
+
+.hero-navy .badge-declared {
+  background-color: #FFFBEB;
+  color: #92400E;
+  border: 1px solid #FCD34D;
+}
+
+.hero-navy .badge-verified {
+  background-color: #EFF6FF;
+  color: #1E40AF;
+  border: 1px solid #93C5FD;
+}
+
+.btn-outline-light {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #FFFFFF !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.35);
+}
+
+.btn-outline-light:hover,
+.btn-outline-light:focus-visible {
+  background-color: rgba(255, 255, 255, 0.22);
+  border-color: #FFFFFF;
+  color: #FFFFFF !important;
+  transform: translateY(-1px);
+}
+
+/* Barres de progression KPI */
+.progress-track {
+  width: 100%;
+  height: 8px;
+  border-radius: 9999px;
+  background-color: rgba(255, 255, 255, 0.16);
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: 9999px;
+  transition: width 0.4s ease;
+}
+
+.progress-fill.teal {
+  background-color: #2CC3A0;
+}
+
+.progress-fill.gold {
+  background-color: #F6C332;
+}
+
 /* Étiquettes (Chips) */
 .chip {
   display: inline-flex;
