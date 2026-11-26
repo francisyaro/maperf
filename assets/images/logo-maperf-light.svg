@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 110" width="360" height="110" role="img" aria-label="MAPERF — Les Matinées de la Performance — Outiller, anticiper, performer">
+  <defs>
+    <style>
+      .maperf-title { font-family: 'Sora', 'Montserrat', 'Arial Black', sans-serif; font-weight: 800; font-size: 38px; fill: #00236D; letter-spacing: 0.04em; }
+      .maperf-sub { font-family: 'Sora', 'Manrope', 'Arial', sans-serif; font-weight: 600; font-size: 13.5px; fill: #00236D; letter-spacing: 0.09em; }
+      .maperf-motto { font-family: 'Manrope', 'Arial', sans-serif; font-weight: 700; font-size: 10.5px; fill: #00A688; letter-spacing: 0.08em; }
+      .chev { fill: none; stroke-width: 2.3; stroke-linecap: round; stroke-linejoin: round; }
+    </style>
+  </defs>
+  <!-- Motif vectoriel des chevrons MAPERF (Dégradé Orange -> Jaune -> Vert -> Turquoise) -->
+  <g transform="translate(8, 6)">
+    <!-- Rangées Orange (#F39A1E) -->
+    <path class="chev" stroke="#F39A1E" d="M44 4 L49 8 L44 12 M54 4 L59 8 L54 12 M64 4 L69 8 L64 12 M74 4 L79 8 L74 12" />
+    <path class="chev" stroke="#F39A1E" d="M44 14 L49 18 L44 22 M54 14 L59 18 L54 22 M64 14 L69 18 L64 22" />
+    <path class="chev" stroke="#F4A724" d="M24 24 L29 28 L24 32 M34 24 L39 28 L34 32 M44 24 L49 28 L44 32 M54 24 L59 28 L54 32 M64 24 L69 28 L64 32" />
+    <!-- Rangées Jaune-Or (#F6C332) -->
+    <path class="chev" stroke="#F6C332" d="M24 34 L29 38 L24 42 M34 34 L39 38 L34 42 M44 34 L49 38 L44 42 M54 34 L59 38 L54 42 M64 34 L69 38 L64 42" />
+    <path class="chev" stroke="#E5C93B" d="M34 44 L39 48 L34 52 M44 44 L49 48 L44 52 M54 44 L59 48 L54 52 M64 44 L69 48 L64 52" />
+    <path class="chev" stroke="#B8CE4E" d="M34 54 L39 58 L34 62 M44 54 L49 58 L44 62 M54 54 L59 58 L54 62 M64 54 L69 58 L64 62" />
+    <!-- Rangées Vert-Turquoise (#5EC77D -> #2CC3A0) -->
+    <path class="chev" stroke="#6AC77B" d="M14 64 L19 68 L14 72 M24 64 L29 68 L24 72 M34 64 L39 68 L34 72 M44 64 L49 68 L44 72 M54 64 L59 68 L54 72" />
+    <path class="chev" stroke="#3DC492" d="M14 74 L19 78 L14 82 M24 74 L29 78 L24 82 M34 74 L39 78 L34 82 M44 74 L49 78 L44 82" />
+    <path class="chev" stroke="#2CC3A0" d="M14 84 L19 88 L14 92 M24 84 L29 88 L24 92 M34 84 L39 88 L34 92" />
+  </g>
+  <!-- Typographie vectorielle sur fond clair -->
+  <text x="104" y="45" class="maperf-title">MAPERF</text>
+  <text x="105" y="66" class="maperf-sub">LES MATINÉES</text>
+  <text x="105" y="83" class="maperf-sub">DE LA PERFORMANCE</text>
+  <text x="105" y="100" class="maperf-motto">OUTILLER, ANTICIPER, PERFORMER</text>
+</svg>

@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Console Équipe MAPERF — Revue documentaire, vérification et consolidation COS | Baromètre 2027</title>
+  <meta name="description" content="Console d'administration et d'audit réservée à l'équipe technique MAPERF et au Comité d'orientation scientifique (COS)." />
+  <link rel="icon" type="image/png" href="assets/images/favicon.png" />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400..700;1,9..40,400..700&family=JetBrains+Mono:wght@400;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Design System MAPERF -->
+  <link rel="stylesheet" href="assets/css/maperf-design.css" />
+</head>
+<body class="bg-[#F4F7FA] text-[#0F1E33] antialiased selection:bg-[#2CC3A0] selection:text-[#0B2341]">
+
+  <!-- En-tête injecté par maperf-layout.js -->
+  <div id="maperf-header"></div>
+
+  <main id="barometre-app-root" class="portal-scope" data-default-tab="espace-validation">
+    <!-- ===================================================================== -->
+    <!-- EN-TÊTE CONSOLE D'ADMINISTRATION ET D'AUDIT RÉSERVÉE                  -->
+    <!-- ===================================================================== -->
+    <section class="hero-navy text-white pt-7 pb-8 border-b border-white/10">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Mention explicite d'accès réservé hors navigation publique -->
+        <div class="mb-5 p-3.5 rounded-xl bg-amber-500/15 border border-amber-400/30 flex flex-wrap items-center justify-between gap-3 text-xs">
+          <div class="flex items-center gap-2.5 text-amber-100">
+            <span class="badge badge-gold"><i data-lucide="shield-alert" class="w-3.5 h-3.5"></i> Accès restreint — Hors navigation publique</span>
+            <span>
+              Console réservée à l'équipe technique <strong>Owando Consulting</strong> et au <strong>Comité d'orientation scientifique (COS)</strong>.
+            </span>
+          </div>
+          <!-- Boutons techniques réservés à l'administrateur conformément à la revue v2.0 -->
+          <div class="flex flex-wrap items-center gap-2">
+            <input type="file" id="input-import-dossier-file" accept=".json" class="hidden" />
+            <button type="button" id="btn-import-dossier" class="btn btn-outline-light text-xs py-1.5 px-3">
+              <i data-lucide="upload" class="w-3.5 h-3.5"></i>
+              Importer
+            </button>
+            <button type="button" id="btn-export-dossier" class="btn btn-outline-light text-xs py-1.5 px-3">
+              <i data-lucide="download" class="w-3.5 h-3.5"></i>
+              Exporter
+            </button>
+            <button type="button" id="btn-export-csv-matrix" class="btn btn-outline-light text-xs py-1.5 px-3">
+              <i data-lucide="file-spreadsheet" class="w-3.5 h-3.5"></i>
+              Matrice CSV
+            </button>
+            <button type="button" id="btn-reset-demo" class="btn btn-outline-light text-xs py-1.5 px-3">
+              <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+              Réinitialiser
+            </button>
+          </div>
+        </div>
+
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+          <div>
+            <div class="flex flex-wrap items-center gap-2 mb-2">
+              <span class="badge badge-gold"><i data-lucide="shield-check" class="w-3.5 h-3.5"></i> Console Équipe MAPERF et COS</span>
+              <span id="header-volet-badge" class="badge badge-teal">Secteur public</span>
+              <span id="header-code-anonyme" class="badge bg-white/10 text-white border border-white/15 font-mono">PUB-2027-001</span>
+            </div>
+            <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight">
+              Revue documentaire, vérification contradictoire et consolidation
+            </h1>
+            <p class="text-slate-300 text-xs sm:text-sm mt-1">
+              Dossier en cours d'instruction : <strong id="header-org-name" class="text-white">Entreprise publique A (EPA)</strong>
+              · Statut : <strong id="header-workflow-statut" class="text-[#2CC3A0]">Vérifié — En validation contradictoire</strong>
+            </p>
+          </div>
+
+          <div class="bg-white/10 border border-white/20 rounded-xl p-2.5">
+            <label for="barometre-dossier-select" class="block text-xs uppercase tracking-wider font-bold text-[#F39A1E] mb-1">
+              Sélectionner le dossier à auditer
+            </label>
+            <select id="barometre-dossier-select" class="bg-[#071629] text-white text-xs font-semibold rounded-lg px-3 py-2 border border-white/15 focus:outline-none focus:border-[#2CC3A0] w-full sm:w-80">
+              <!-- Injecté par barometre-engine.js -->
+            </select>
+          </div>
+        </div>
+
+        <!-- Synthèse d'avancement de la collecte nationale -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mt-6">
+          <div class="p-3.5 rounded-xl bg-white/5 border border-white/10">
+            <div class="text-xs text-slate-300">Avancement volet Public</div>
+            <div id="console-kpi-pub" class="text-lg font-extrabold font-mono text-[#2CC3A0] mt-0.5">2 / 20 dossiers</div>
+            <div class="text-xs text-slate-300 mt-0.5">Cible nationale : 20 entreprises</div>
+          </div>
+          <div class="p-3.5 rounded-xl bg-white/5 border border-white/10">
+            <div class="text-xs text-slate-300">Avancement volet Privé</div>
+            <div id="console-kpi-pri" class="text-lg font-extrabold font-mono text-[#F39A1E] mt-0.5">2 / 50 dossiers</div>
+            <div class="text-xs text-slate-300 mt-0.5">Cible nationale : 50 entreprises</div>
+          </div>
+          <div class="p-3.5 rounded-xl bg-white/5 border border-white/10">
+            <div class="text-xs text-slate-300">Validation contradictoire acceptée</div>
+            <div id="console-kpi-contra-accept" class="text-lg font-extrabold font-mono text-white mt-0.5">1</div>
+            <div class="text-xs text-slate-300 mt-0.5">Fiches acceptées sans réserve</div>
+          </div>
+          <div class="p-3.5 rounded-xl bg-white/5 border border-white/10">
+            <div class="text-xs text-slate-300">Observations contradictoires à instruire</div>
+            <div id="console-kpi-contra-obs" class="text-lg font-extrabold font-mono text-amber-300 mt-0.5">1</div>
+            <div class="text-xs text-slate-300 mt-0.5">Arbitrage technique / COS requis</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- NAVIGATION PAR ONGLETS DE LA CONSOLE ÉQUIPE MAPERF                    -->
+    <!-- ===================================================================== -->
+    <div class="bg-white border-b border-slate-200 sticky top-[112px] z-30 shadow-sm">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5 flex flex-wrap items-center justify-between gap-3">
+        <div class="flex flex-wrap items-center gap-2">
+          <button type="button" data-main-tab="espace-validation" class="tab active text-xs">
+            <i data-lucide="file-check-2" class="w-4 h-4"></i>
+            1. Revue documentaire et vérification du dossier
+          </button>
+          <button type="button" data-main-tab="consolidation" class="tab text-xs">
+            <i data-lucide="layers" class="w-4 h-4"></i>
+            2. Consolidation nationale et validation du COS
+          </button>
+        </div>
+        <div id="save-status-indicator" class="text-xs">
+          <span class="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-700">● Enregistré dans le navigateur</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- ONGLET 1 : REVUE DOCUMENTAIRE ET VÉRIFICATION DU DOSSIER              -->
+    <!-- ===================================================================== -->
+    <section id="panel-espace-validation" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <!-- Porte d'authentification Console Équipe MAPERF -->
+      <div id="auth-gate-equipe" class="max-w-xl mx-auto bg-white rounded-2xl p-8 border border-slate-200 shadow-sm my-6">
+        <div class="flex items-center gap-2.5 mb-3">
+          <span class="badge badge-gold"><i data-lucide="shield" class="w-3.5 h-3.5"></i> Accès Auditeur / Équipe MAPERF</span>
+          <span class="badge badge-navy">Console réservée</span>
+        </div>
+        <h2 class="text-xl font-extrabold text-[#0B2341] mb-2">
+          Authentification de l'équipe de vérification
+        </h2>
+        <p class="text-xs text-slate-600 leading-relaxed mb-5">
+          Renseignez le code d'accès standard de la console d'instruction (<code class="font-mono font-bold text-[#0B2341] bg-slate-100 px-1.5 py-0.5 rounded">Maperf2027</code>) pour accéder au tableau de revue pluriannuelle (2023, 2024, 2025 et variation), à la validation des pièces probantes et à la consolidation COS.
+        </p>
+
+        <div class="space-y-4">
+          <div>
+            <label for="login-maperf-role" class="block text-xs font-bold text-slate-700 mb-1">
+              1. Profil d'instruction
+            </label>
+            <select id="login-maperf-role" class="barometre-input">
+              <option value="Analyste Principal OHADA — Owando Consulting (Brazzaville)">Analyste Principal OHADA — Owando Consulting (Brazzaville)</option>
+              <option value="Réviseur Senior RH et Gouvernance — Équipe MAPERF">Réviseur Senior RH et Gouvernance — Équipe MAPERF</option>
+              <option value="Rapporteur du Comité d'orientation scientifique (COS)">Rapporteur du Comité d'orientation scientifique (COS)</option>
+            </select>
+          </div>
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <label for="login-maperf-password" class="block text-xs font-bold text-slate-700">
+                2. Code d'accès Équipe MAPERF
+              </label>
+              <button type="button" id="btn-fill-pwd-maperf" class="text-xs font-bold text-[#1B6B93] hover:underline">
+                Remplir « Maperf2027 »
+              </button>
+            </div>
+            <input type="password" id="login-maperf-password" value="Maperf2027" class="barometre-input mono" placeholder="Maperf2027" />
+          </div>
+          <div id="login-maperf-error" class="hidden p-3 rounded-lg bg-red-50 border border-red-200 text-xs text-red-700 font-semibold"></div>
+          <button type="button" id="btn-login-maperf" class="btn btn-primary w-full text-sm">
+            <i data-lucide="unlock" class="w-4 h-4"></i>
+            Ouvrir la console de vérification
+          </button>
+        </div>
+      </div>
+
+      <!-- Espace de travail Équipe MAPERF déverrouillé -->
+      <div id="workspace-equipe-content" class="space-y-8">
+        <!-- Barre de session Auditeur & Actions rapides à intitulés courts -->
+        <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <div class="text-xs text-slate-500">Session d'audit active : <strong id="session-maperf-role-label" class="text-[#0B2341]">Analyste Principal OHADA</strong></div>
+            <h2 id="val-dossier-title" class="text-lg font-extrabold text-[#0B2341] mt-0.5">
+              PUB-2027-001 — Entreprise publique A
+            </h2>
+            <p id="val-dossier-subtitle" class="text-xs text-slate-600">
+              Secteur public · Point focal
+            </p>
+          </div>
+
+          <!-- Boutons d'action à libellés courts conformément à la revue v2.0 -->
+          <div class="flex flex-wrap items-center gap-2.5">
+            <button type="button" id="btn-batch-verify" class="btn btn-teal text-xs py-2 px-3.5" title="Passer les données déclarées renseignées au statut Vérifiée (80 %)">
+              <i data-lucide="check-check" class="w-4 h-4"></i>
+              Valider le lot
+            </button>
+            <button type="button" id="btn-batch-audit" class="btn btn-primary text-xs py-2 px-3.5" title="Homologuer le dossier au statut Auditée (100 %)">
+              <i data-lucide="award" class="w-4 h-4"></i>
+              Homologuer le dossier
+            </button>
+            <button type="button" id="btn-logout-maperf" class="btn btn-outline text-xs py-2 px-3">
+              Déconnexion
+            </button>
+          </div>
+        </div>
+
+        <!-- Compteurs de répartition par niveau de preuve et gain d'incrémentation -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div class="bg-white rounded-2xl p-4 border border-slate-200">
+            <div class="text-xs text-slate-500">1. Données déclarées (coeff. 50 %)</div>
+            <div id="val-count-declared" class="text-2xl font-extrabold font-mono text-amber-600 mt-1">0</div>
+            <div class="text-xs text-slate-500 mt-0.5">En attente de revue documentaire</div>
+          </div>
+          <div class="bg-white rounded-2xl p-4 border border-slate-200">
+            <div class="text-xs text-slate-500">2. Données vérifiées (coeff. 80 %)</div>
+            <div id="val-count-verified" class="text-2xl font-extrabold font-mono text-sky-700 mt-1">0</div>
+            <div class="text-xs text-slate-500 mt-0.5">Recoupées avec pièce interne signée</div>
+          </div>
+          <div class="bg-white rounded-2xl p-4 border border-slate-200">
+            <div class="text-xs text-slate-500">3. Données auditées (coeff. 100 %)</div>
+            <div id="val-count-audited" class="text-2xl font-extrabold font-mono text-emerald-700 mt-1">0</div>
+            <div class="text-xs text-slate-500 mt-0.5">Certifiées par tiers indépendant</div>
+          </div>
+          <div class="bg-[#0B2341] text-white rounded-2xl p-4">
+            <div class="text-xs text-[#2CC3A0] font-bold">Réserve d'incrémentation</div>
+            <div id="val-potential-gain" class="text-2xl font-extrabold font-mono mt-1">+0.0 pts</div>
+            <div class="text-xs text-slate-300 mt-0.5">Écart entre score validé et potentiel brut</div>
+          </div>
+        </div>
+
+        <!-- TABLEAU DE REVUE DOCUMENTAIRE AVEC LES 3 EXERCICES (2023, 2024, 2025) ET LA VARIATION -->
+        <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
+          <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-5">
+            <div>
+              <span class="badge badge-navy mb-1">Revue contradictoire ligne à ligne</span>
+              <h3 class="text-lg font-extrabold text-[#0B2341]">
+                Tableau de vérification des 3 exercices (2023, 2024, 2025), variation et pièces probantes
+              </h3>
+              <p class="text-xs text-slate-600 mt-0.5">
+                La modification de la décision de validation met automatiquement à jour le statut de la pièce probante associée (Déclaré ↔ Vérifié ↔ Audité) et recalcule l'Indice MAPERF.
+              </p>
+            </div>
+
+            <!-- Filtres et Tri -->
+            <div class="flex flex-wrap items-center gap-2">
+              <div class="flex flex-wrap items-center gap-1 bg-slate-100 p-1 rounded-xl border border-slate-200">
+                <button type="button" data-val-filter="ALL" class="tab active text-xs py-1.5 px-2.5">Tous</button>
+                <button type="button" data-val-filter="Déclarée" class="tab text-xs py-1.5 px-2.5">Déclarées</button>
+                <button type="button" data-val-filter="Vérifiée" class="tab text-xs py-1.5 px-2.5">Vérifiées</button>
+                <button type="button" data-val-filter="Auditée" class="tab text-xs py-1.5 px-2.5">Auditées</button>
+              </div>
+              <select id="validation-sort-select" class="barometre-input text-xs w-auto">
+                <option value="CODE">Trier par code indicateur</option>
+                <option value="VAR_DESC">Trier par amplitude de variation</option>
+                <option value="SCORE_DESC">Trier par score validé décroissant</option>
+                <option value="SCORE_ASC">Trier par score validé croissant</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="barometre-table">
+              <thead>
+                <tr>
+                  <th class="w-28">Code et dim.</th>
+                  <th>Indicateur et rubrique</th>
+                  <th class="w-28 text-right">2023</th>
+                  <th class="w-28 text-right">2024</th>
+                  <th class="w-28 text-right">2025</th>
+                  <th class="w-28 text-right">Variation (23→25)</th>
+                  <th class="w-56">Pièce probante et statut synchronisé</th>
+                  <th class="w-32">Score (Brut → Validé)</th>
+                  <th class="w-48">Décision Équipe MAPERF</th>
+                </tr>
+              </thead>
+              <tbody id="validation-table-tbody">
+                <!-- Injecté par barometre-engine.js -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Contrôles automatiques, demandes de précision et journal d'audit -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          <div class="lg:col-span-6 bg-white rounded-2xl p-6 border border-slate-200 shadow-sm space-y-5">
+            <div>
+              <span class="badge badge-navy mb-1">Contrôles automatiques du dossier</span>
+              <h3 class="text-base font-extrabold text-[#0B2341] mb-3">
+                Résultat des tests de cohérence sur le dossier actif
+              </h3>
+              <div id="validation-coherence-box" class="space-y-2.5"></div>
+            </div>
+
+            <div class="pt-4 border-t border-slate-200">
+              <h3 class="text-base font-extrabold text-[#0B2341] mb-2">
+                Émettre une demande de précision au Point focal
+              </h3>
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 mb-2.5">
+                <input type="text" id="clarif-code-input" class="barometre-input mono text-xs" placeholder="Code (ex. FIN.001)" value="FIN.001" />
+                <input type="text" id="clarif-msg-input" class="barometre-input text-xs sm:col-span-2" placeholder="Précisez la pièce ou l'écart à justifier..." />
+              </div>
+              <button type="button" id="btn-add-clarification" class="btn btn-outline text-xs py-2 px-3.5">
+                <i data-lucide="message-Square-plus" class="w-4 h-4"></i>
+                Envoyer la demande de précision
+              </button>
+              <div id="validation-clarif-list" class="space-y-2.5 mt-4"></div>
+            </div>
+          </div>
+
+          <!-- Journal d'audit horodaté -->
+          <div class="lg:col-span-6 bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
+            <span class="badge badge-teal mb-1">Traçabilité des opérations</span>
+            <h3 class="text-base font-extrabold text-[#0B2341] mb-3">
+              Journal d'audit horodaté des vérifications et validations
+            </h3>
+            <div id="validation-audit-log" class="space-y-2.5 max-h-[460px] overflow-y-auto pr-1">
+              <!-- Injecté par barometre-engine.js -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- ONGLET 2 : CONSOLIDATION NATIONALE ET VALIDATION DU COS               -->
+    <!-- ===================================================================== -->
+    <section id="panel-consolidation" class="hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+      <div class="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200 shadow-sm">
+        <div class="flex flex-wrap items-center justify-between gap-4 mb-6 pb-4 border-b border-slate-200">
+          <div>
+            <span class="badge badge-gold mb-2"><i data-lucide="award" class="w-3.5 h-3.5"></i> Comité d'orientation scientifique (COS)</span>
+            <h2 class="text-xl sm:text-2xl font-extrabold text-[#0B2341]">
+              Consolidation nationale anonymisée et contrôle du seuil de publication (N ≥ 5)
+            </h2>
+            <p class="text-xs sm:text-sm text-slate-600 mt-1">
+              Conformément aux exigences méthodologiques, les agrégats et résultats consolidés portent la mention <strong>« Résultats disponibles après validation du COS »</strong> tant que l'homologation officielle du 17 juin 2027 n'est pas activée.
+            </p>
+          </div>
+          <div class="flex flex-col items-end gap-2">
+            <span id="conso-cos-status-banner" class="badge badge-gold">Résultats disponibles après validation du COS</span>
+            <button type="button" id="btn-toggle-cos-publication" class="btn btn-outline text-xs py-2 px-3.5">
+              Simuler la validation du COS (après le 17 juin 2027)
+            </button>
+          </div>
+        </div>
+
+        <!-- Indicateurs agrégés nationaux -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+            <div class="text-xs text-slate-500">Échantillon Entreprises publiques</div>
+            <div id="conso-kpi-pub-count" class="text-xl font-extrabold font-mono text-[#0B2341] mt-1">2 / 20</div>
+          </div>
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+            <div class="text-xs text-slate-500">Indice moyen Secteur public</div>
+            <div id="conso-kpi-pub-avg" class="text-sm font-extrabold font-mono text-[#1B6B93] mt-1">Résultats disponibles après validation du COS</div>
+          </div>
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+            <div class="text-xs text-slate-500">Échantillon Entreprises privées</div>
+            <div id="conso-kpi-pri-count" class="text-xl font-extrabold font-mono text-[#0B2341] mt-1">2 / 50</div>
+          </div>
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+            <div class="text-xs text-slate-500">Indice moyen Secteur privé</div>
+            <div id="conso-kpi-pri-avg" class="text-sm font-extrabold font-mono text-[#1B6B93] mt-1">Résultats disponibles après validation du COS</div>
+          </div>
+        </div>
+
+        <!-- Matrice de consolidation anonymisée -->
+        <h3 class="text-base font-extrabold text-[#0B2341] mb-3">
+          Matrice de consolidation anonymisée (codes pseudonymisés uniquement)
+        </h3>
+        <div class="overflow-x-auto mb-8">
+          <table class="barometre-table">
+            <thead>
+              <tr>
+                <th>Code anonyme</th>
+                <th>Volet</th>
+                <th>Groupe homogène (Secteur × Taille)</th>
+                <th>Dim. A</th>
+                <th>Dim. B</th>
+                <th>Dim. C</th>
+                <th>Dim. D</th>
+                <th>Dim. E</th>
+                <th>Dim. F</th>
+                <th>Score brut</th>
+                <th>Indice validé</th>
+                <th>Complétude et fiabilité</th>
+                <th>Écart P−R</th>
+                <th>Éligibilité</th>
+              </tr>
+            </thead>
+            <tbody id="consolidation-matrix-tbody">
+              <!-- Injecté par barometre-engine.js -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Groupes homogènes et règle de secret statistique N >= 5 -->
+        <h3 class="text-base font-extrabold text-[#0B2341] mb-3">
+          Contrôle de la règle de secret statistique par groupe homogène (seuil N ≥ 5)
+        </h3>
+        <div id="consolidation-groups-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Injecté par barometre-engine.js -->
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Pied de page injecté par maperf-layout.js -->
+  <div id="maperf-footer"></div>
+
+  <!-- Scripts -->
+  <script src="assets/js/maperf-config.js"></script>
+  <script src="assets/js/maperf-layout.js"></script>
+  <script src="assets/js/barometre-data.js"></script>
+  <script src="assets/js/barometre-engine.js"></script>
+</body>
+</html>

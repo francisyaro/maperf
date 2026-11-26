@@ -3,9 +3,9 @@
  * Implémente intégralement les règles du TDR et des classeurs Excel (Secteur Public & Secteur Privé)
  */
 (function () {
-  var STORAGE_KEY = "maperf_2027_barometre_dossiers_v1";
-  var AUDIT_KEY = "maperf_2027_barometre_audit_v1";
-  var AUTH_KEY = "maperf_2027_barometre_auth_v1";
+  var STORAGE_KEY = "maperf_2027_barometre_dossiers_v2";
+  var AUDIT_KEY = "maperf_2027_barometre_audit_v2";
+  var AUTH_KEY = "maperf_2027_barometre_auth_v2";
 
   var STANDARD_PASSWORDS = {
     ENTREPRISE: ["entreprise2027", "entreprise2027!", "congo2027", "maperf2027"],
@@ -15,13 +15,17 @@
   var state = {
     dossiers: [],
     activeDossierId: "PUB-2027-001",
-    activeTab: "espace-collecte", // presentation | espace-collecte | espace-validation | tableau-de-bord | consolidation
+    activeTab: "espace-collecte", // presentation | espace-collecte | contradictoire | espace-validation | tableau-de-bord | consolidation
     activeRubrique: "FIN",
     validationFilter: "ALL",
+    validationSort: "CODE", // CODE | SCORE_ASC | SCORE_DESC | VAR_DESC
+    publicationCOS: false, // Par défaut false : résultats comparatifs et moyennes masqués jusqu'à validation du COS
+    lastSaveOk: true,
+    lastSaveTime: "",
     auth: {
       entrepriseUnlocked: false,
       equipeUnlocked: false,
-      maperfRole: "Analyste Principal OHADA — Secrétariat Technique (Brazzaville)"
+      maperfRole: "Analyste principal OHADA — Secrétariat technique (Brazzaville)"
     },
     auditLogs: [],
     radarChart: null,
@@ -47,8 +51,8 @@
         state.auditLogs = JSON.parse(savedAudit);
       } else {
         state.auditLogs = [
-          { ts: "2027-02-15 11:20", acteur: "Point Focal (CAILK SA — Pointe-Noire)", action: "Soumission des données 2023–2025 et dépôt de 11 pièces justificatives", code: "PRI-2027-001", impact: "Complétude 100%" },
-          { ts: "2027-02-14 16:40", acteur: "Analyste Financier MAPERF (Brazzaville)", action: "Validation des États Financiers OHADA (DOC.01) -> Statut 'Auditée' sur FIN.001..FIN.014", code: "PUB-2027-001", impact: "+14,2 pts Taux Validé" }
+          { ts: "2027-04-15 11:20", acteur: "Point focal (Entreprise privée A)", action: "Soumission des données 2023–2025 et dépôt de 11 pièces justificatives", code: "PRI-2027-001", impact: "Complétude 100 %" },
+          { ts: "2027-04-14 16:40", acteur: "Analyste financier MAPERF (Brazzaville)", action: "Vérification des états financiers OHADA (DOC.01) -> Statut 'Auditée' sur FIN.001..FIN.014", code: "PUB-2027-001", impact: "+14,2 pts Indice MAPERF" }
         ];
       }
       var savedAuth = localStorage.getItem(AUTH_KEY);
@@ -68,8 +72,30 @@
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state.dossiers));
       localStorage.setItem(AUDIT_KEY, JSON.stringify(state.auditLogs.slice(0, 50)));
       localStorage.setItem(AUTH_KEY, JSON.stringify(state.auth));
+      state.lastSaveOk = true;
+      var now = new Date();
+      state.lastSaveTime =
+        String(now.getHours()).padStart(2, "0") + ":" +
+        String(now.getMinutes()).padStart(2, "0") + ":" +
+        String(now.getSeconds()).padStart(2, "0");
+      updateSaveStatusUI();
+      return true;
     } catch (e) {
-      console.warn("Sauvegarde locale impossible:", e);
+      state.lastSaveOk = false;
+      updateSaveStatusUI(e && e.message ? e.message : "Stockage local indisponible");
+      return false;
+    }
+  }
+
+  function updateSaveStatusUI(errMsg) {
+    var el = document.getElementById("save-status-indicator");
+    if (!el) return;
+    if (state.lastSaveOk) {
+      el.className = "inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-800 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200";
+      el.innerHTML = '<span>✓ Enregistré localement (navigateur — démonstration) à ' + (state.lastSaveTime || "l\'instant") + '</span>';
+    } else {
+      el.className = "inline-flex items-center gap-1.5 text-xs font-bold text-rose-800 bg-rose-50 px-3 py-1 rounded-full border border-rose-200";
+      el.innerHTML = '<span>⚠️ Échec de sauvegarde locale : ' + (errMsg || "vérifiez votre navigateur") + '</span>';
     }
   }
 
@@ -97,32 +123,154 @@
   }
 
   /**
-   * Synchronisation stricte entre la Décision de Validation Équipe MAPERF ("Déclarée" | "Vérifiée" | "Auditée")
-   * et le Statut de la Pièce Probante ("Déclaré" | "Vérifié" | "Audité"), répercutée dans l'Espace Entreprise.
+   * Synchronisation stricte entre la décision de validation de l'équipe MAPERF ("Déclarée" | "Vérifiée" | "Auditée")
+   * et le statut de la pièce probante ("Déclaré" | "Vérifié" | "Audité" + "Reçue" | "Acceptée" | "À compléter").
    */
   function getPieceProbanteInfo(verifStatus) {
     if (verifStatus === "Auditée" || verifStatus === "Audité") {
       return {
         verif: "Auditée",
         pieceStatut: "Audité",
+        revueStatut: "Acceptée",
         badgeClass: "badge-audited",
-        comment: "Statut Audité (100%) — Pièce probante certifiée et homologuée par l'Équipe MAPERF."
+        comment: "Pièce acceptée et auditée (100 %) — Pièce probante certifiée et homologuée par l'équipe MAPERF."
       };
     }
     if (verifStatus === "Vérifiée" || verifStatus === "Vérifié") {
       return {
         verif: "Vérifiée",
         pieceStatut: "Vérifié",
+        revueStatut: "Acceptée",
         badgeClass: "badge-verified",
-        comment: "Statut Vérifié (80%) — Pièce probante contrôlée et validée par l'Équipe MAPERF."
+        comment: "Pièce acceptée et vérifiée (80 %) — Pièce probante contrôlée et validée par l'équipe MAPERF."
       };
     }
     return {
       verif: "Déclarée",
       pieceStatut: "Déclaré",
+      revueStatut: "Reçue",
       badgeClass: "badge-declared",
-      comment: "Statut Déclaré (50%) — Donnée et pièce déclarées, en attente de vérification par l'Équipe MAPERF."
+      comment: "Pièce reçue / déclarée (50 %) — Donnée et pièce en attente de vérification par l'équipe MAPERF."
     };
+  }
+
+  /**
+   * Calcule dynamiquement l'avancement d'une rubrique à partir du schéma réel de collecte (§8 de la revue)
+   */
+  function computeRubriqueProgress(dossier, rubriqueId) {
+    if (!dossier) return { filledCount: 0, totalCount: 0, label: "0/0", pct: 0 };
+    var volet = dossier.volet || "PUBLIC";
+    var allFields = (window.MAPERF_BAROMETRE_DATA.fields[volet] || []).filter(function (f) {
+      return !rubriqueId || f.rubrique === rubriqueId;
+    });
+    var total = 0;
+    var filled = 0;
+    allFields.forEach(function (f) {
+      var entry = dossier.data && dossier.data[f.code];
+      if (entry && entry.app === "Non applicable") return;
+      total++;
+      if (entry && entry.app === "Applicable" && entry.v2025 !== "" && entry.v2025 !== null && entry.v2025 !== undefined && !isNaN(Number(entry.v2025))) {
+        filled++;
+      }
+    });
+    return {
+      filledCount: filled,
+      totalCount: total,
+      filled: filled,
+      total: total,
+      label: filled + "/" + total,
+      pct: total > 0 ? Math.round((filled / total) * 100) : 100
+    };
+  }
+
+  /**
+   * Fournit l'aide contextuelle (définition, unité, source attendue) pour un indicateur donné
+   */
+  function getFieldContextualHelp(field) {
+    var docMatch = (window.MAPERF_BAROMETRE_DATA.evidenceCatalog || []).find(function (doc) {
+      return doc.codes && doc.codes.indexOf(field.code) !== -1;
+    });
+    var sourceAttendue = docMatch ? (docMatch.id + " (" + docMatch.titre + ")") : "Pièce justificative interne ou déclarative";
+    var def = "";
+    if (field.type === "maturity") {
+      def = "Échelle de maturité de 0 à 4 (0 = inexistant, 1 = ad hoc, 2 = formalisé, 3 = déployé et mesuré, 4 = optimisé et audité).";
+    } else if (field.dir === "growth") {
+      def = "Variation annuelle mesurée sur la série 2023–2025 (cible haute : +" + Math.round(field.high * 100) + " %).";
+    } else if (field.dir === "margin_ca") {
+      def = "Ratio rapporté au chiffre d'affaires 2025 (borne basse : " + Math.round(field.low * 100) + " %, cible haute : " + Math.round(field.high * 100) + " %).";
+    } else if (field.dir === "cost_va") {
+      def = "Part dans la valeur ajoutée brute (maîtrise des coûts : cible entre " + Math.round(field.low * 100) + " % et " + Math.round(field.high * 100) + " %).";
+    } else if (field.dir === "info") {
+      def = "Grandeur structurelle du bilan ou de l'effectif utilisée pour les contrôles automatiques de cohérence OHADA.";
+    } else {
+      def = "Indicateur évalué entre le seuil minimal (" + field.low + " " + field.unite + ") et la cible de performance (" + field.high + " " + field.unite + ").";
+    }
+    return {
+      definition: def,
+      unite: field.unite,
+      sourceCode: docMatch ? docMatch.id : "DOC.03",
+      sourceAttendue: sourceAttendue,
+      sourceDoc: sourceAttendue
+    };
+  }
+
+  /**
+   * Calcule la variation entre 2024 (ou 2023) et 2025 pour la grille de revue de l'équipe MAPERF
+   */
+  function computeVariationInfo(entry, field) {
+    if (!entry || (entry.app && entry.app !== "Applicable") || entry.v2025 === "" || entry.v2025 === null || isNaN(Number(entry.v2025))) {
+      return { rawVar: 0, label: "—", colorClass: "text-slate-400", alert: false };
+    }
+    var v25 = Number(entry.v2025);
+    var v24 = (entry.v2024 !== "" && entry.v2024 !== null && !isNaN(Number(entry.v2024))) ? Number(entry.v2024) : null;
+    var v23 = (entry.v2023 !== "" && entry.v2023 !== null && !isNaN(Number(entry.v2023))) ? Number(entry.v2023) : null;
+    var base = v23 !== null ? v23 : v24;
+    if (base === null) return { rawVar: 0, label: "N/D", colorClass: "text-slate-400", alert: false };
+
+    if (field && (field.type === "maturity" || field.unite === "%")) {
+      var diff = v25 - base;
+      var sign = diff > 0 ? "+" : "";
+      var unitSuffix = field.type === "maturity" ? " pt" : " pt%";
+      var col = diff > 0 ? "text-emerald-700" : (diff < 0 ? "text-rose-700" : "text-slate-600");
+      return { rawVar: diff, label: sign + Number(diff.toFixed(1)) + unitSuffix, colorClass: col, alert: Math.abs(diff) > 25 };
+    }
+    if (base === 0) return { rawVar: 0, label: "Stable", colorClass: "text-slate-600", alert: false };
+    var pct = ((v25 - base) / Math.abs(base)) * 100;
+    var s = pct > 0 ? "+" : "";
+    var c = pct > 0 ? "text-emerald-700" : (pct < 0 ? "text-rose-700" : "text-slate-600");
+    return { rawVar: pct, label: s + pct.toFixed(1) + " %", colorClass: c, alert: Math.abs(pct) > 50 };
+  }
+
+  /**
+   * Enregistre la décision de validation contradictoire de l'organisation participante ("Accepté" | "Observation formulée")
+   */
+  function submitValidationContradictoire(dossier, decision, observation) {
+    if (!dossier) return null;
+    var cleanDecision = (decision === "Accepté" || decision === "ACCEPTER") ? "Accepté" : "Observation formulée";
+    var today = new Date().toISOString().slice(0, 10);
+    var obsClean = String(observation || "").trim() || (cleanDecision === "Accepté" ? "Acceptation sans réserve des scores provisoires." : "Observation contradictoire soumise à l'équipe MAPERF.");
+    dossier.validationContradictoire = {
+      statut: cleanDecision,
+      decisionEntreprise: cleanDecision,
+      dateDecision: today,
+      date: today,
+      observation: obsClean,
+      observationEntreprise: obsClean,
+      reponseEquipe: cleanDecision === "Accepté"
+        ? "Acceptation contradictoire prise en compte pour la présentation au comité scientifique."
+        : "Observation contradictoire reçue — En cours d'instruction par l'équipe MAPERF."
+    };
+    dossier.workflowStatut = cleanDecision === "Accepté"
+      ? "Validation contradictoire acceptée par l'entreprise"
+      : "Observation contradictoire soumise par l'entreprise";
+    addAuditLog(
+      "Point focal (" + dossier.sigle + ")",
+      "Validation contradictoire : " + (cleanDecision === "Accepté" ? "« J'accepte » les scores provisoires" : "« Je formule une observation »"),
+      dossier.codeAnonyme,
+      cleanDecision
+    );
+    saveState();
+    return dossier.validationContradictoire;
   }
 
   function syncEvidenceForIndicator(dossier, code, newVerif) {
@@ -673,15 +821,16 @@
     setText("ident-code-anonyme", dossier.codeAnonyme);
     setText("ident-groupe-homogene", dossier.groupeHomogene);
 
-    // Onglets de rubriques (FIN, OPE, GOU, TRA, RHD)
+    // Onglets de rubriques (FIN, OPE, GOU, TRA, RHD) avec indicateur dynamique d'avancement (ex. « Données financières : 16/16 »)
     var rubTabs = document.getElementById("collecte-rubriques-tabs");
     if (rubTabs) {
       rubTabs.innerHTML = window.MAPERF_BAROMETRE_DATA.rubriques.map(function (r) {
         var active = state.activeRubrique === r.id ? "active" : "";
+        var prog = computeRubriqueProgress(dossier, r.id);
         return (
           '<button type="button" data-rubrique="' + r.id + '" class="tab ' + active + ' btn-rubrique-switch">' +
           '  <i data-lucide="' + r.icone + '" class="w-4 h-4"></i>' +
-          '  <span>' + r.titre + '</span>' +
+          '  <span>' + r.titre + ' : <strong>' + prog.label + '</strong></span>' +
           '</button>'
         );
       }).join("");
@@ -695,7 +844,14 @@
       });
     }
 
-    // Table de saisie pluriannuelle 2023-2025
+    // Bandeau d'avancement de la rubrique active
+    var activeRubObj = (window.MAPERF_BAROMETRE_DATA.rubriques || []).find(function (r) { return r.id === state.activeRubrique; });
+    var activeProg = computeRubriqueProgress(dossier, state.activeRubrique);
+    setText("collecte-active-rubrique-title", activeRubObj ? (activeRubObj.titre + " : " + activeProg.label + " indicateurs renseignés (" + activeProg.pct + " %)") : "");
+    var rubBar = document.getElementById("collecte-active-rubrique-bar");
+    if (rubBar) rubBar.style.width = clamp(activeProg.pct, 0, 100) + "%";
+
+    // Table de saisie pluriannuelle 2023-2025 avec aide contextuelle (définition, unité, source attendue)
     var tbody = document.getElementById("collecte-fields-tbody");
     if (tbody) {
       var fields = window.MAPERF_BAROMETRE_DATA.fields[dossier.volet].filter(function (f) {
@@ -709,18 +865,24 @@
         var pieceInfo = getPieceProbanteInfo(entry.verif || "Déclarée");
         var badgeClass = pieceInfo.badgeClass;
         var docRef = entry.source || "—";
+        var help = getFieldContextualHelp(f);
 
         var stepAttr = f.type === "maturity" ? 'min="0" max="4" step="1"' : 'step="any"';
 
         return (
           '<tr class="hover:bg-slate-50/80 transition">' +
-          '  <td class="p-3 font-mono text-xs font-bold text-[#00236D]">' + f.code + '<div class="text-[10px] font-sans font-semibold text-slate-400">Dim. ' + f.dim + ' · ' + f.cat + '</div></td>' +
-          '  <td class="p-3 text-xs font-semibold text-slate-800 max-w-xs">' + f.label +
-          (f.ospMod && dossier.soumisOSP === "Oui" ? ' <span class="inline-block px-1.5 py-0.5 text-[10px] rounded bg-amber-100 text-amber-800 font-bold">Modulation OSP ×0,5</span>' : '') +
+          '  <td class="p-3 font-mono text-sm font-bold text-[#00236D]">' + f.code + '<div class="text-xs font-sans font-semibold text-slate-500">Dim. ' + f.dim + ' · ' + f.cat + '</div></td>' +
+          '  <td class="p-3 text-sm font-semibold text-slate-800 max-w-md">' +
+          '    <div>' + f.label +
+          (f.ospMod && dossier.soumisOSP === "Oui" ? ' <span class="inline-block px-2 py-0.5 text-xs rounded bg-amber-100 text-amber-800 font-bold">Modulation OSP ×0,5</span>' : '') +
+          '    </div>' +
+          '    <div class="text-xs font-normal text-slate-500 mt-1">' +
+          '      <strong>Aide :</strong> ' + help.definition + ' · <strong>Unité :</strong> ' + help.unite + ' · <strong>Source attendue :</strong> ' + help.sourceCode +
+          '    </div>' +
           '  </td>' +
-          '  <td class="p-3 text-xs text-slate-500 font-medium">' + f.unite + '</td>' +
+          '  <td class="p-3 text-sm text-slate-600 font-medium">' + f.unite + '</td>' +
           '  <td class="p-2.5">' +
-          '    <select data-code="' + f.code + '" data-field="app" class="barometre-input text-xs py-1.5 js-data-input">' +
+          '    <select data-code="' + f.code + '" data-field="app" class="barometre-input text-sm py-1.5 js-data-input">' +
           '      <option value="Applicable" ' + (entry.app === "Applicable" ? "selected" : "") + '>Applicable</option>' +
           '      <option value="Non applicable" ' + (entry.app === "Non applicable" ? "selected" : "") + '>Non applicable</option>' +
           '      <option value="Non disponible" ' + (entry.app === "Non disponible" ? "selected" : "") + '>Non disponible</option>' +
@@ -730,16 +892,16 @@
           '  <td class="p-2.5 w-32"><input type="number" ' + stepAttr + ' ' + isDisabled + ' data-code="' + f.code + '" data-field="v2024" value="' + (entry.v2024 !== undefined ? entry.v2024 : "") + '" class="barometre-input text-right js-data-input" placeholder="2024" /></td>' +
           '  <td class="p-2.5 w-32"><input type="number" ' + stepAttr + ' ' + isDisabled + ' data-code="' + f.code + '" data-field="v2025" value="' + (entry.v2025 !== undefined ? entry.v2025 : "") + '" class="barometre-input text-right border-[#00236D]/40 bg-blue-50/20 js-data-input" placeholder="2025" /></td>' +
           '  <td class="p-3 text-center">' +
-          '    <div class="text-xs font-extrabold text-[#00236D]">' + (res && res.rawScore !== null ? res.rawScore.toFixed(0) + ' / 100' : '—') + '</div>' +
-          '    <div class="text-[10px] text-slate-500">' + (res ? res.ratioLabel : '') + '</div>' +
+          '    <div class="text-sm font-extrabold text-[#00236D]">' + (res && res.rawScore !== null ? res.rawScore.toFixed(0) + ' / 100' : '—') + '</div>' +
+          '    <div class="text-xs text-slate-500">' + (res ? res.ratioLabel : '') + '</div>' +
           '  </td>' +
           '  <td class="p-3 text-center">' +
-          '    <span class="badge-status ' + badgeClass + '">' + pieceInfo.verif + ' (' + ((res ? res.verifWeight : 0.5) * 100).toFixed(0) + '%)</span>' +
+          '    <span class="badge-status ' + badgeClass + '">' + pieceInfo.verif + ' (' + ((res ? res.verifWeight : 0.5) * 100).toFixed(0) + ' %)</span>' +
           '  </td>' +
           '  <td class="p-2.5 w-44">' +
           '    <div class="space-y-1">' +
-          '      <input type="text" data-code="' + f.code + '" data-field="source" value="' + (entry.source || "") + '" class="barometre-input text-xs py-1 js-data-input" placeholder="Réf. DOC.xx" />' +
-          (entry.source ? '      <div class="text-center"><span class="badge-status ' + badgeClass + ' text-[10px] py-0.5 px-2">' + docRef + ' : ' + pieceInfo.pieceStatut + '</span></div>' : '') +
+          '      <input type="text" data-code="' + f.code + '" data-field="source" value="' + (entry.source || "") + '" class="barometre-input text-sm py-1 js-data-input" placeholder="Réf. DOC.xx" />' +
+          (entry.source ? '      <div class="text-center"><span class="badge-status ' + badgeClass + ' py-0.5 px-2">' + docRef + ' : ' + pieceInfo.pieceStatut + '</span></div>' : '') +
           '    </div>' +
           '  </td>' +
           '</tr>'
@@ -754,39 +916,53 @@
             dossier.data[code] = { v2023: "", v2024: "", v2025: "", app: "Applicable", verif: "Déclarée", source: "", comment: "" };
           }
           if (prop === "v2023" || prop === "v2024" || prop === "v2025") {
+            if (inp.value !== "" && isNaN(Number(inp.value))) {
+              alert("Veuillez saisir une valeur numérique valide pour l'indicateur " + code + ".");
+              return;
+            }
             dossier.data[code][prop] = inp.value === "" ? "" : Number(inp.value);
-            // Toute modification par l'entreprise repasse la donnée en "Déclarée" et la pièce probante en "Déclaré"
             syncEvidenceForIndicator(dossier, code, "Déclarée");
           } else {
             dossier.data[code][prop] = inp.value;
             syncEvidenceForIndicator(dossier, code, dossier.data[code].verif || "Déclarée");
           }
-          addAuditLog("Point Focal (" + dossier.sigle + ")", "Mise à jour donnée " + code + " (" + prop + ")", dossier.codeAnonyme, "Pièce : Déclaré");
+          addAuditLog("Point focal (" + dossier.sigle + ")", "Mise à jour donnée " + code + " (" + prop + ")", dossier.codeAnonyme, "Enregistré");
           refreshAllViews();
         });
       });
     }
 
-    // Registre des preuves (07_Sources_et_preuves) synchronisé avec les décisions de l'Équipe MAPERF
+    // Registre des pièces justificatives (07_Sources_et_preuves) avec glisser-déposer, aperçu et statuts Reçue / Acceptée / À compléter
     syncAllEvidencesFromDecisions(dossier);
     var evGrid = document.getElementById("collecte-evidences-tbody");
     if (evGrid) {
       evGrid.innerHTML = window.MAPERF_BAROMETRE_DATA.evidenceCatalog.map(function (doc) {
-        var ev = (dossier.evidences && dossier.evidences[doc.id]) || { statut: "Déclaré", fichier: "", date: "", commentaireAnalyste: "" };
-        var stClass = (ev.statut === "Audité" || ev.statut === "Validé")
-          ? "badge-audited"
-          : ((ev.statut === "Vérifié" || ev.statut === "Transmis") ? "badge-verified" : "badge-declared");
+        var ev = (dossier.evidences && dossier.evidences[doc.id]) || { statut: "À compléter", fichier: "", date: "", commentaireAnalyste: "" };
+        var hasFile = !!(ev.fichier && ev.fichier.trim());
+        var revueLabel = "À compléter";
+        var stClass = "badge-alert";
+        if (ev.statut === "Audité" || ev.statut === "Vérifié" || ev.statut === "Validé" || ev.statut === "Acceptée") {
+          revueLabel = "Acceptée (" + ev.statut + ")";
+          stClass = "badge-audited";
+        } else if (hasFile || ev.statut === "Reçue" || ev.statut === "Transmis" || ev.statut === "Déclaré") {
+          revueLabel = hasFile ? ("Reçue (" + ev.statut + ")") : "À compléter";
+          stClass = hasFile ? "badge-verified" : "badge-declared";
+        }
         return (
-          '<tr class="hover:bg-slate-50 transition">' +
-          '  <td class="p-3 font-mono text-xs font-bold text-[#00236D]">' + doc.id + (doc.obligatoire ? ' <span class="text-red-600" title="Obligatoire">*</span>' : '') + '</td>' +
-          '  <td class="p-3 text-xs font-semibold text-slate-800">' + doc.titre + '<div class="text-[11px] text-slate-400 font-normal">Codes liés : ' + doc.codes.join(", ") + '</div></td>' +
-          '  <td class="p-3 text-center"><span class="badge-status ' + stClass + '">' + ev.statut + '</span></td>' +
-          '  <td class="p-3 text-xs text-slate-600 font-mono">' + (ev.fichier || '<span class="text-slate-400 italic">Aucun fichier joint</span>') + '</td>' +
-          '  <td class="p-3 text-xs text-slate-600">' + (ev.commentaireAnalyste || "—") + '</td>' +
+          '<tr class="hover:bg-slate-50 transition js-evidence-dropzone" data-doc="' + doc.id + '">' +
+          '  <td class="p-3 font-mono text-sm font-bold text-[#00236D]">' + doc.id + (doc.obligatoire ? ' <span class="text-red-600" title="Obligatoire">*</span>' : '') + '</td>' +
+          '  <td class="p-3 text-sm font-semibold text-slate-800">' + doc.titre + '<div class="text-xs text-slate-500 font-normal">Codes liés : ' + doc.codes.join(", ") + '</div></td>' +
+          '  <td class="p-3 text-center"><span class="badge-status ' + stClass + '">' + revueLabel + '</span></td>' +
+          '  <td class="p-3 text-sm text-slate-700 font-mono">' +
+          (hasFile
+            ? '<button type="button" data-preview-doc="' + doc.id + '" class="js-evidence-preview underline text-[#00236D] hover:text-[#F39A1E] font-semibold text-left">' + ev.fichier + ' (Aperçu)</button>'
+            : '<span class="text-slate-400 italic">Glisser-déposer ou sélectionner un fichier</span>') +
+          '  </td>' +
+          '  <td class="p-3 text-sm text-slate-600">' + (ev.commentaireAnalyste || "—") + '</td>' +
           '  <td class="p-3 text-right">' +
           '    <label class="btn btn-outline text-xs py-1.5 px-3 cursor-pointer">' +
-          '      <i data-lucide="upload-cloud" class="w-3.5 h-3.5"></i>' +
-          '      <span>Joindre PDF/XLSX</span>' +
+          '      <i data-lucide="upload-cloud" class="w-4 h-4"></i>' +
+          '      <span>Déposer PDF / XLSX</span>' +
           '      <input type="file" accept=".pdf,.xlsx,.xls,.csv,.docx" data-doc="' + doc.id + '" class="hidden js-evidence-upload" />' +
           '    </label>' +
           '  </td>' +
@@ -794,24 +970,95 @@
         );
       }).join("");
 
+      function handleEvidenceFile(docId, fileObj) {
+        var fb = document.getElementById("evidence-upload-feedback");
+        if (!fileObj) return;
+        var ext = (fileObj.name.split(".").pop() || "").toLowerCase();
+        var allowedExts = ["pdf", "xlsx", "xls", "csv", "docx"];
+        if (allowedExts.indexOf(ext) === -1) {
+          if (fb) {
+            fb.className = "p-3 rounded-xl bg-rose-50 border border-rose-200 text-sm font-semibold text-rose-900";
+            fb.textContent = "Format de fichier non autorisé (" + fileObj.name + "). Formats acceptés : PDF, XLSX, XLS, CSV ou DOCX.";
+          }
+          return;
+        }
+        if (fileObj.size === 0) {
+          if (fb) {
+            fb.className = "p-3 rounded-xl bg-rose-50 border border-rose-200 text-sm font-semibold text-rose-900";
+            fb.textContent = "Le fichier sélectionné (" + fileObj.name + ") est vide (0 octet).";
+          }
+          return;
+        }
+        if (!dossier.evidences) dossier.evidences = {};
+        dossier.evidences[docId] = {
+          statut: "Déclaré",
+          revueStatut: "Reçue",
+          fichier: fileObj.name,
+          tailleOctets: fileObj.size,
+          date: new Date().toISOString().slice(0, 10),
+          commentaireAnalyste: "Pièce reçue (statut : Déclaré) — En attente de vérification par l'équipe MAPERF."
+        };
+        if (fb) {
+          fb.className = "p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-sm font-semibold text-emerald-900";
+          fb.textContent = "✓ Pièce " + docId + " (« " + fileObj.name + " ») enregistrée avec le statut Reçue.";
+        }
+        addAuditLog("Point focal (" + dossier.sigle + ")", "Dépôt de la pièce justificative " + docId + " (" + fileObj.name + ")", dossier.codeAnonyme, "Pièce : Reçue");
+        refreshAllViews();
+      }
+
       evGrid.querySelectorAll(".js-evidence-upload").forEach(function (fileInput) {
         fileInput.addEventListener("change", function () {
           var docId = fileInput.getAttribute("data-doc");
           if (fileInput.files && fileInput.files[0]) {
-            var fileName = fileInput.files[0].name;
-            if (!dossier.evidences) dossier.evidences = {};
-            dossier.evidences[docId] = {
-              statut: "Déclaré",
-              fichier: fileName,
-              date: new Date().toISOString().slice(0, 10),
-              commentaireAnalyste: "Pièce déposée par l'entreprise (Statut : Déclaré) — En attente de vérification Équipe MAPERF."
-            };
-            addAuditLog("Point Focal (" + dossier.sigle + ")", "Téléversement pièce justificative " + docId + " (" + fileName + ")", dossier.codeAnonyme, "Statut: Déclaré");
-            refreshAllViews();
+            handleEvidenceFile(docId, fileInput.files[0]);
+          }
+        });
+      });
+
+      evGrid.querySelectorAll(".js-evidence-dropzone").forEach(function (row) {
+        row.addEventListener("dragover", function (e) {
+          e.preventDefault();
+          row.classList.add("bg-amber-50/70");
+        });
+        row.addEventListener("dragleave", function () {
+          row.classList.remove("bg-amber-50/70");
+        });
+        row.addEventListener("drop", function (e) {
+          e.preventDefault();
+          row.classList.remove("bg-amber-50/70");
+          var docId = row.getAttribute("data-doc");
+          if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]) {
+            handleEvidenceFile(docId, e.dataTransfer.files[0]);
+          }
+        });
+      });
+
+      evGrid.querySelectorAll(".js-evidence-preview").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          var docId = btn.getAttribute("data-preview-doc");
+          var docCatalog = (window.MAPERF_BAROMETRE_DATA.evidenceCatalog || []).find(function (d) { return d.id === docId; });
+          var ev = (dossier.evidences && dossier.evidences[docId]) || {};
+          var previewBox = document.getElementById("evidence-preview-panel");
+          if (previewBox) {
+            previewBox.classList.remove("hidden");
+            previewBox.innerHTML =
+              '<div class="flex flex-wrap items-start justify-between gap-3">' +
+              '  <div class="space-y-1">' +
+              '    <span class="chip">Aperçu de la pièce justificative ' + docId + '</span>' +
+              '    <h4 class="font-display font-bold text-base text-[#00236D]">' + (ev.fichier || "Document") + '</h4>' +
+              '    <p class="text-sm text-slate-600"><strong>Intitulé attendu :</strong> ' + (docCatalog ? docCatalog.titre : "") + '</p>' +
+              '    <p class="text-sm text-slate-600"><strong>Indicateurs couverts :</strong> ' + (docCatalog ? docCatalog.codes.join(", ") : "") + '</p>' +
+              '    <p class="text-sm text-slate-600"><strong>Date de dépôt :</strong> ' + (ev.date || "2027") + ' · <strong>Observation de l\'analyste :</strong> ' + (ev.commentaireAnalyste || "—") + '</p>' +
+              '  </div>' +
+              '  <span class="badge-status badge-verified">' + (ev.statut || "Reçue") + '</span>' +
+              '</div>';
           }
         });
       });
     }
+
+    // Étape de validation contradictoire par l'organisation (10 au 21 mai 2027)
+    renderContradictoireSection(dossier, evalRes);
 
     // Contrôles de cohérence (09_Controles_coherence)
     var checksContainer = document.getElementById("collecte-coherence-tbody");
@@ -877,11 +1124,80 @@
   }
 
   /**
-   * MODULE 3 : Rendu de l'Espace Équipe MAPERF (Vérification contradictoire, Validation des preuves & Incrémentation du taux)
+   * Rendu de l'étape de validation contradictoire des scores provisoires par l'organisation (§4 & §8 de la revue)
+   * L'entreprise consulte ses scores provisoires et choisit « J'accepte » ou « Je formule une observation ».
+   */
+  function renderContradictoireSection(dossier, evalRes) {
+    var box = document.getElementById("contradictoire-summary-box");
+    var vc = dossier.validationContradictoire || {
+      decisionEntreprise: "En attente",
+      dateDecision: "",
+      observationEntreprise: "",
+      reponseEquipe: ""
+    };
+
+    setText("contra-indice-provisoire", evalRes.globalVerifiedScore.toFixed(1) + " / 100");
+    setText("contra-score-brut", evalRes.globalRawScore.toFixed(1) + " / 100");
+    setText("contra-statut-entreprise", vc.decisionEntreprise || "En attente");
+    setText("contra-statut-equipe", dossier.workflowStatut || "En revue par l'équipe MAPERF");
+
+    var dimsGrid = document.getElementById("contra-dimensions-grid");
+    if (dimsGrid) {
+      var dims = window.MAPERF_BAROMETRE_DATA.dimensions[dossier.volet] || [];
+      dimsGrid.innerHTML = dims.map(function (d) {
+        var ds = evalRes.dimStats[d.id];
+        return (
+          '<div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between gap-2">' +
+          '  <div>' +
+          '    <span class="text-xs font-bold text-[#00236D] block">Dimension ' + d.id + ' (' + d.poids + ' %)</span>' +
+          '    <span class="text-sm font-semibold text-slate-800">' + d.nom + '</span>' +
+          '  </div>' +
+          '  <div class="text-right shrink-0">' +
+          '    <span class="font-display font-extrabold text-base text-emerald-700 block">' + (ds ? ds.verifiedScore.toFixed(1) : "0.0") + '/100</span>' +
+          '    <span class="text-xs text-slate-500">Déclaré : ' + (ds ? ds.rawScore.toFixed(1) : "0.0") + '</span>' +
+          '  </div>' +
+          '</div>'
+        );
+      }).join("");
+    }
+
+    if (box) {
+      var badgeCls = vc.decisionEntreprise === "Accepté"
+        ? "badge-audited"
+        : (vc.decisionEntreprise === "Observation formulée" ? "badge-declared" : "badge-verified");
+      box.innerHTML =
+        '<div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2 text-sm">' +
+        '  <div class="flex flex-wrap items-center justify-between gap-2">' +
+        '    <span class="font-bold text-[#00236D]">Décision contradictoire de l\'organisation (' + dossier.raisonSociale + ') :</span>' +
+        '    <span class="badge-status ' + badgeCls + '">' + (vc.decisionEntreprise || "En attente") + (vc.dateDecision ? " (" + vc.dateDecision + ")" : "") + '</span>' +
+        '  </div>' +
+        '  <p class="text-slate-700"><strong>Observation ou accord de l\'entreprise :</strong> ' + (vc.observationEntreprise || "Aucune décision contradictoire enregistrée à ce stade.") + '</p>' +
+        '  <p class="text-emerald-900 bg-emerald-50/70 p-2.5 rounded-lg border border-emerald-200"><strong>Suivi par l\'équipe MAPERF :</strong> ' + (vc.reponseEquipe || "En attente du retour contradictoire de l\'organisation.") + '</p>' +
+        '</div>';
+    }
+  }
+
+  /**
+   * MODULE 3 : Rendu de la Console de l'équipe MAPERF (Suivi de l'avancement, trois exercices et variation, filtres, tris et journal d'audit)
    */
   function renderValidationView() {
     var dossier = getActiveDossier();
     var evalRes = evaluateDossier(dossier);
+
+    // Tableau de bord global de l'avancement de la collecte en tête de console
+    var pubDossiers = state.dossiers.filter(function (d) { return d.volet === "PUBLIC"; });
+    var priDossiers = state.dossiers.filter(function (d) { return d.volet === "PRIVE"; });
+    var acceptedCount = state.dossiers.filter(function (d) {
+      return d.validationContradictoire && d.validationContradictoire.decisionEntreprise === "Accepté";
+    }).length;
+    var observedCount = state.dossiers.filter(function (d) {
+      return d.validationContradictoire && d.validationContradictoire.decisionEntreprise === "Observation formulée";
+    }).length;
+
+    setText("console-kpi-pub", pubDossiers.length + " / 20 (seuil : 15)");
+    setText("console-kpi-pri", priDossiers.length + " / 50 (seuil : 30)");
+    setText("console-kpi-contra-accept", acceptedCount + " accepté(s)");
+    setText("console-kpi-contra-obs", observedCount + " observation(s)");
 
     // Cartes de synthèse de tous les dossiers entreprises dans la file d'attente de l'équipe MAPERF
     var queueContainer = document.getElementById("validation-dossiers-queue");
@@ -889,23 +1205,25 @@
       queueContainer.innerHTML = state.dossiers.map(function (d) {
         var ev = evaluateDossier(d);
         var isActive = d.id === dossier.id;
+        var vcDecision = (d.validationContradictoire && d.validationContradictoire.decisionEntreprise) || "En attente";
         return (
           '<div data-dossier-id="' + d.id + '" class="js-select-dossier cursor-pointer rounded-2xl p-4 border-2 transition ' +
           (isActive ? 'border-[#00236D] bg-[#00236D]/5 shadow-md' : 'border-slate-200 bg-white hover:border-[#F39A1E]') + '">' +
           '  <div class="flex items-center justify-between gap-2 mb-2">' +
-          '    <span class="font-mono text-xs font-extrabold px-2.5 py-0.5 rounded bg-[#00236D] text-white">' + d.codeAnonyme + '</span>' +
-          '    <span class="text-[11px] font-bold px-2 py-0.5 rounded-full ' + (d.volet === "PUBLIC" ? "bg-blue-100 text-blue-900" : "bg-amber-100 text-amber-900") + '">' + d.volet + '</span>' +
+          '    <span class="font-mono text-sm font-extrabold px-2.5 py-0.5 rounded bg-[#00236D] text-white">' + d.codeAnonyme + '</span>' +
+          '    <span class="text-xs font-bold px-2.5 py-0.5 rounded-full ' + (d.volet === "PUBLIC" ? "bg-blue-100 text-blue-900" : "bg-amber-100 text-amber-900") + '">' + d.volet + '</span>' +
           '  </div>' +
-          '  <h4 class="font-display font-bold text-sm text-slate-900 line-clamp-1">' + d.raisonSociale + '</h4>' +
-          '  <p class="text-[11px] text-slate-500 mb-2">' + d.macroSecteur + ' · ' + d.villeSiege + ' (République du Congo)</p>' +
-          '  <div class="mb-2.5 flex items-center justify-between text-[11px]">' +
+          '  <h4 class="font-display font-bold text-base text-slate-900 line-clamp-1">' + d.raisonSociale + '</h4>' +
+          '  <p class="text-xs text-slate-600 mb-2">' + d.macroSecteur + ' · ' + d.villeSiege + '</p>' +
+          '  <div class="mb-2.5 flex flex-wrap items-center justify-between gap-1 text-xs">' +
           '    <span class="px-2 py-0.5 rounded bg-slate-100 text-slate-700 font-semibold">' + (d.workflowStatut || "En instruction") + '</span>' +
-          '    <span class="font-bold text-amber-700">' + ev.countDeclared + ' à vérifier</span>' +
+          '    <span class="font-bold text-amber-800">' + ev.countDeclared + ' à vérifier</span>' +
           '  </div>' +
+          '  <div class="text-xs text-slate-600 mb-2">Validation contradictoire entreprise : <strong>' + vcDecision + '</strong></div>' +
           '  <div class="grid grid-cols-3 gap-2 text-center bg-slate-50 rounded-xl p-2 border border-slate-100">' +
-          '    <div><div class="text-[10px] text-slate-500">Score Déclaré</div><div class="font-display font-bold text-xs text-slate-800">' + ev.globalRawScore.toFixed(1) + '</div></div>' +
-          '    <div><div class="text-[10px] text-slate-500">Taux Validé</div><div class="font-display font-extrabold text-xs text-emerald-700">' + ev.globalVerifiedScore.toFixed(1) + '</div></div>' +
-          '    <div><div class="text-[10px] text-slate-500">Fiabilité</div><div class="font-display font-bold text-xs text-[#00236D]">' + ev.globalFiabilite.toFixed(0) + '%</div></div>' +
+          '    <div><div class="text-xs text-slate-500">Déclaré</div><div class="font-display font-bold text-sm text-slate-800">' + ev.globalRawScore.toFixed(1) + '</div></div>' +
+          '    <div><div class="text-xs text-slate-500">Indice MAPERF</div><div class="font-display font-extrabold text-sm text-emerald-700">' + ev.globalVerifiedScore.toFixed(1) + '</div></div>' +
+          '    <div><div class="text-xs text-slate-500">Fiabilité</div><div class="font-display font-bold text-sm text-[#00236D]">' + ev.globalFiabilite.toFixed(0) + ' %</div></div>' +
           '  </div>' +
           '</div>'
         );
@@ -919,7 +1237,7 @@
       });
     }
 
-    // Console de validation des données ligne par ligne pour incrémenter le taux de performance
+    // Console de validation ligne par ligne : affiche les 3 exercices (2023, 2024, 2025) et leur variation
     var valTbody = document.getElementById("validation-fields-tbody");
     if (valTbody) {
       var fields = window.MAPERF_BAROMETRE_DATA.fields[dossier.volet].filter(function (f) {
@@ -929,28 +1247,52 @@
         return st === state.validationFilter;
       });
 
+      if (state.validationSort === "SCORE_DESC") {
+        fields.sort(function (a, b) {
+          var ra = evalRes.fieldResults[a.code] ? (evalRes.fieldResults[a.code].verifiedScore || 0) : 0;
+          var rb = evalRes.fieldResults[b.code] ? (evalRes.fieldResults[b.code].verifiedScore || 0) : 0;
+          return rb - ra;
+        });
+      } else if (state.validationSort === "SCORE_ASC") {
+        fields.sort(function (a, b) {
+          var ra = evalRes.fieldResults[a.code] ? (evalRes.fieldResults[a.code].verifiedScore || 0) : 0;
+          var rb = evalRes.fieldResults[b.code] ? (evalRes.fieldResults[b.code].verifiedScore || 0) : 0;
+          return ra - rb;
+        });
+      } else if (state.validationSort === "VAR_DESC") {
+        fields.sort(function (a, b) {
+          var va = computeVariationInfo(dossier.data[a.code], a).rawVar;
+          var vb = computeVariationInfo(dossier.data[b.code], b).rawVar;
+          return vb - va;
+        });
+      }
+
       valTbody.innerHTML = fields.map(function (f) {
         var entry = dossier.data[f.code] || { v2023: "", v2024: "", v2025: "", app: "Applicable", verif: "Déclarée", source: "", comment: "" };
         var res = evalRes.fieldResults[f.code];
         var docRef = entry.source || "—";
         var pieceInfo = getPieceProbanteInfo(entry.verif || "Déclarée");
+        var varInfo = computeVariationInfo(entry, f);
         var docBadge = entry.source
           ? '<span class="badge-status ' + pieceInfo.badgeClass + '">' + docRef + ' : ' + pieceInfo.pieceStatut + '</span>'
           : '<span class="badge-status ' + pieceInfo.badgeClass + '">' + pieceInfo.pieceStatut + '</span>';
 
         return (
           '<tr class="hover:bg-slate-50 transition">' +
-          '  <td class="p-3 font-mono text-xs font-bold text-[#00236D]">' + f.code + '<div class="text-[10px] font-sans text-slate-400">Dim. ' + f.dim + '</div></td>' +
-          '  <td class="p-3 text-xs font-semibold text-slate-800">' + f.label + '<div class="text-[11px] text-slate-500 font-normal">' + (entry.comment || "") + '</div></td>' +
-          '  <td class="p-3 text-right font-mono text-xs font-bold text-slate-900">' + formatNumber(entry.v2025) + ' <span class="text-[10px] font-normal text-slate-500">' + f.unite + '</span></td>' +
+          '  <td class="p-3 font-mono text-sm font-bold text-[#00236D]">' + f.code + '<div class="text-xs font-sans text-slate-500">Dim. ' + f.dim + '</div></td>' +
+          '  <td class="p-3 text-sm font-semibold text-slate-800">' + f.label + '<div class="text-xs text-slate-500 font-normal">' + (entry.comment || "") + ' (' + f.unite + ')</div></td>' +
+          '  <td class="p-3 text-right font-mono text-sm text-slate-600">' + formatNumber(entry.v2023) + '</td>' +
+          '  <td class="p-3 text-right font-mono text-sm text-slate-700">' + formatNumber(entry.v2024) + '</td>' +
+          '  <td class="p-3 text-right font-mono text-sm font-bold text-slate-900">' + formatNumber(entry.v2025) + '</td>' +
+          '  <td class="p-3 text-right font-mono text-sm font-bold ' + varInfo.colorClass + '">' + varInfo.label + '</td>' +
           '  <td class="p-3 text-center">' + docBadge + '</td>' +
-          '  <td class="p-3 text-center font-display text-xs font-bold text-slate-700">' + (res && res.rawScore !== null ? res.rawScore.toFixed(1) : "—") + '</td>' +
+          '  <td class="p-3 text-center font-display text-sm font-bold text-slate-700">' + (res && res.rawScore !== null ? res.rawScore.toFixed(1) : "—") + '</td>' +
           '  <td class="p-3 text-center font-display text-sm font-extrabold text-emerald-700">' + (res && res.verifiedScore !== null ? res.verifiedScore.toFixed(1) : "—") + '</td>' +
           '  <td class="p-3 text-right">' +
           '    <div class="inline-flex rounded-xl border border-slate-200 bg-white p-0.5 shadow-sm">' +
-          '      <button type="button" data-code="' + f.code + '" data-verif="Déclarée" class="js-set-verif px-2.5 py-1 rounded-lg text-[11px] font-bold transition ' + (entry.verif === "Déclarée" ? "bg-amber-400 text-slate-950" : "text-slate-600 hover:bg-slate-100") + '">Déclarée (50%)</button>' +
-          '      <button type="button" data-code="' + f.code + '" data-verif="Vérifiée" class="js-set-verif px-2.5 py-1 rounded-lg text-[11px] font-bold transition ' + (entry.verif === "Vérifiée" ? "bg-blue-600 text-white" : "text-slate-600 hover:bg-slate-100") + '">Vérifiée (80%)</button>' +
-          '      <button type="button" data-code="' + f.code + '" data-verif="Auditée" class="js-set-verif px-2.5 py-1 rounded-lg text-[11px] font-bold transition ' + (entry.verif === "Auditée" ? "bg-emerald-600 text-white" : "text-slate-600 hover:bg-slate-100") + '">Auditée (100%)</button>' +
+          '      <button type="button" data-code="' + f.code + '" data-verif="Déclarée" class="js-set-verif px-2.5 py-1.5 rounded-lg text-xs font-bold transition ' + (entry.verif === "Déclarée" ? "bg-amber-400 text-slate-950" : "text-slate-600 hover:bg-slate-100") + '">Déclarée (50 %)</button>' +
+          '      <button type="button" data-code="' + f.code + '" data-verif="Vérifiée" class="js-set-verif px-2.5 py-1.5 rounded-lg text-xs font-bold transition ' + (entry.verif === "Vérifiée" ? "bg-blue-600 text-white" : "text-slate-600 hover:bg-slate-100") + '">Vérifiée (80 %)</button>' +
+          '      <button type="button" data-code="' + f.code + '" data-verif="Auditée" class="js-set-verif px-2.5 py-1.5 rounded-lg text-xs font-bold transition ' + (entry.verif === "Auditée" ? "bg-emerald-600 text-white" : "text-slate-600 hover:bg-slate-100") + '">Auditée (100 %)</button>' +
           '    </div>' +
           '  </td>' +
           '</tr>'
@@ -971,7 +1313,7 @@
           var diff = afterScore - beforeScore;
           var diffStr = (diff >= 0 ? "+" : "") + diff.toFixed(2) + " pts (Pièce : " + pInfo.pieceStatut + ")";
 
-          addAuditLog("Équipe Vérification MAPERF", "Décision sur " + code + " -> '" + newVerif + "' & Pièce Probante -> '" + pInfo.pieceStatut + "'", dossier.codeAnonyme, diffStr);
+          addAuditLog("Équipe vérification MAPERF", "Décision sur " + code + " -> '" + newVerif + "' et pièce probante -> '" + pInfo.pieceStatut + "'", dossier.codeAnonyme, diffStr);
           refreshAllViews();
         });
       });
@@ -1093,11 +1435,55 @@
     }
 
     // Graphiques Chart.js (Radar 6 dimensions & Barres Comparatives Brut vs Validé)
+    // Règle TDR / Revue v2.0 (§4 & §8) : pendant la collecte (tant que state.publicationCOS === false),
+    // n'afficher que le score provisoire de l'organisation. Le profil comparé au groupe homogène n'apparaît qu'après la publication du 17 juin.
+    var benchNotice = document.getElementById("dash-benchmark-notice");
+    if (benchNotice) {
+      if (state.publicationCOS) {
+        benchNotice.className = "p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-sm text-emerald-900 font-semibold";
+        benchNotice.textContent = "✓ Publication du 17 juin 2027 activée (validation COS) : le profil comparé au repère médian du groupe homogène est affiché.";
+      } else {
+        benchNotice.className = "p-3 rounded-xl bg-amber-50 border border-amber-200 text-sm text-amber-900 font-semibold";
+        benchNotice.textContent = "ℹ️ Phase de collecte et validation : seul le score provisoire de l'organisation est affiché. Le profil comparé au groupe homogène apparaîtra après la publication officielle prévue le 17 juin 2027 et validation du COS.";
+      }
+    }
+
     if (window.Chart) {
       var labels = dims.map(function (d) { return "Dim " + d.id; });
       var rawValues = dims.map(function (d) { return Number(evalRes.dimStats[d.id].rawScore.toFixed(1)); });
       var verifValues = dims.map(function (d) { return Number(evalRes.dimStats[d.id].verifiedScore.toFixed(1)); });
       var medianGroup = [68, 70, 65, 62, 69, 66];
+
+      var radarDatasets = [
+        {
+          label: "Indice MAPERF provisoire (organisation)",
+          data: verifValues,
+          backgroundColor: "rgba(44, 195, 160, 0.25)",
+          borderColor: "#2CC3A0",
+          pointBackgroundColor: "#00236D",
+          borderWidth: 2.5
+        },
+        {
+          label: "Score brut déclaré",
+          data: rawValues,
+          backgroundColor: "rgba(0, 35, 109, 0.10)",
+          borderColor: "#00236D",
+          borderDash: [5, 5],
+          pointBackgroundColor: "#00236D",
+          borderWidth: 2
+        }
+      ];
+
+      if (state.publicationCOS) {
+        radarDatasets.push({
+          label: "Repère médian du groupe homogène (publié le 17 juin)",
+          data: medianGroup,
+          backgroundColor: "rgba(243, 154, 30, 0.08)",
+          borderColor: "#F39A1E",
+          pointBackgroundColor: "#F39A1E",
+          borderWidth: 1.5
+        });
+      }
 
       var radarCanvas = document.getElementById("chart-barometre-radar");
       if (radarCanvas) {
@@ -1106,33 +1492,7 @@
           type: "radar",
           data: {
             labels: labels,
-            datasets: [
-              {
-                label: "Taux Validé Équipe MAPERF",
-                data: verifValues,
-                backgroundColor: "rgba(44, 195, 160, 0.25)",
-                borderColor: "#2CC3A0",
-                pointBackgroundColor: "#00236D",
-                borderWidth: 2.5
-              },
-              {
-                label: "Potentiel Brut Déclaré",
-                data: rawValues,
-                backgroundColor: "rgba(0, 35, 109, 0.10)",
-                borderColor: "#00236D",
-                borderDash: [5, 5],
-                pointBackgroundColor: "#00236D",
-                borderWidth: 2
-              },
-              {
-                label: "Repère Médian Groupe Homogène",
-                data: medianGroup,
-                backgroundColor: "rgba(243, 154, 30, 0.08)",
-                borderColor: "#F39A1E",
-                pointBackgroundColor: "#F39A1E",
-                borderWidth: 1.5
-              }
-            ]
+            datasets: radarDatasets
           },
           options: {
             responsive: true,
@@ -1151,16 +1511,16 @@
         state.barChart = new Chart(barCanvas.getContext("2d"), {
           type: "bar",
           data: {
-            labels: dims.map(function (d) { return "Dim. " + d.id + " (" + d.poids + "%)"; }),
+            labels: dims.map(function (d) { return "Dim. " + d.id + " (" + d.poids + " %)"; }),
             datasets: [
               {
-                label: "Score Brut Déclaré (/100)",
+                label: "Score brut déclaré (/100)",
                 data: rawValues,
                 backgroundColor: "#00236D",
                 borderRadius: 6
               },
               {
-                label: "Taux Validé par l'Équipe MAPERF (/100)",
+                label: "Indice MAPERF validé (/100)",
                 data: verifValues,
                 backgroundColor: "#2CC3A0",
                 borderRadius: 6
@@ -1299,8 +1659,15 @@
 
     setText("conso-kpi-pub-count", pubCount + " / 20");
     setText("conso-kpi-pri-count", priCount + " / 50");
-    setText("conso-kpi-pub-avg", avgPub.toFixed(1) + " / 100");
-    setText("conso-kpi-pri-avg", avgPri.toFixed(1) + " / 100");
+    if (state.publicationCOS) {
+      setText("conso-kpi-pub-avg", avgPub.toFixed(1) + " / 100");
+      setText("conso-kpi-pri-avg", avgPri.toFixed(1) + " / 100");
+      setText("conso-cos-status-banner", "Validation du COS activée (simulation post-17 juin 2027)");
+    } else {
+      setText("conso-kpi-pub-avg", "Résultats disponibles après validation du COS");
+      setText("conso-kpi-pri-avg", "Résultats disponibles après validation du COS");
+      setText("conso-cos-status-banner", "Résultats disponibles après validation du COS");
+    }
   }
 
   /**
@@ -1308,7 +1675,7 @@
    */
   function switchMainTab(tabId) {
     state.activeTab = tabId;
-    var panels = ["presentation", "espace-collecte", "espace-validation", "tableau-de-bord", "consolidation"];
+    var panels = ["presentation", "espace-collecte", "contradictoire", "espace-validation", "tableau-de-bord", "consolidation"];
     panels.forEach(function (id) {
       var panel = document.getElementById("panel-" + id);
       var btn = document.querySelector('[data-main-tab="' + id + '"]');
@@ -1456,10 +1823,26 @@
     return newDossier;
   }
 
+  function renderConsoleKPIs() {
+    var pubCount = state.dossiers.filter(function (d) { return d.volet === "PUBLIC"; }).length;
+    var priCount = state.dossiers.filter(function (d) { return d.volet === "PRIVE"; }).length;
+    var contraAccept = state.dossiers.filter(function (d) {
+      return d.validationContradictoire && d.validationContradictoire.statut === "Accepté";
+    }).length;
+    var contraObs = state.dossiers.filter(function (d) {
+      return d.validationContradictoire && d.validationContradictoire.statut === "Observation formulée";
+    }).length;
+    setText("console-kpi-pub", pubCount + " / 20 dossiers");
+    setText("console-kpi-pri", priCount + " / 50 dossiers");
+    setText("console-kpi-contra-accept", String(contraAccept));
+    setText("console-kpi-contra-obs", String(contraObs));
+  }
+
   function refreshAllViews() {
     saveState();
     renderAuthGates();
     renderTopSummary();
+    renderConsoleKPIs();
     renderCollecteView();
     renderValidationView();
     renderDashboardView();
@@ -1757,6 +2140,67 @@
       });
     });
 
+    // Tri dans la console de validation
+    var sortSelect = document.getElementById("validation-sort-select");
+    if (sortSelect) {
+      sortSelect.addEventListener("change", function () {
+        state.validationSort = sortSelect.value || "CODE";
+        renderValidationView();
+      });
+    }
+
+    // Étape de validation contradictoire (Espace Entreprise : « J'accepte » / « Je formule une observation »)
+    var btnContraAccept = document.getElementById("btn-contradictoire-accept");
+    if (btnContraAccept) {
+      btnContraAccept.addEventListener("click", function () {
+        var dossier = getActiveDossier();
+        var obsInput = document.getElementById("contradictoire-observation-input");
+        var obsText = obsInput ? obsInput.value : "";
+        submitValidationContradictoire(dossier, "ACCEPTER", obsText);
+        refreshAllViews();
+        var fb = document.getElementById("contradictoire-feedback");
+        if (fb) {
+          fb.classList.remove("hidden");
+          fb.innerHTML = '<strong class="text-[#2CC3A0]">✓ Validation contradictoire enregistrée :</strong> Vous avez accepté les résultats et scores provisoires de la fiche de restitution.';
+        }
+      });
+    }
+
+    var btnContraObserve = document.getElementById("btn-contradictoire-observe");
+    if (btnContraObserve) {
+      btnContraObserve.addEventListener("click", function () {
+        var dossier = getActiveDossier();
+        var obsInput = document.getElementById("contradictoire-observation-input");
+        var obsText = obsInput ? obsInput.value.trim() : "";
+        var fb = document.getElementById("contradictoire-feedback");
+        if (!obsText) {
+          if (fb) {
+            fb.classList.remove("hidden");
+            fb.innerHTML = '<strong class="text-[#F39A1E]">Attention :</strong> Veuillez saisir le détail de votre observation contradictoire dans le champ prévu avant de soumettre.';
+          }
+          return;
+        }
+        submitValidationContradictoire(dossier, "OBSERVATION", obsText);
+        refreshAllViews();
+        if (fb) {
+          fb.classList.remove("hidden");
+          fb.innerHTML = '<strong class="text-[#F39A1E]">✓ Observation contradictoire enregistrée :</strong> Votre observation a été transmise à l\'équipe technique MAPERF et au Comité d\'orientation scientifique.';
+        }
+      });
+    }
+
+    // Bascule simulation validation du COS (Console Équipe MAPERF uniquement)
+    var btnToggleCos = document.getElementById("btn-toggle-cos-publication");
+    if (btnToggleCos) {
+      btnToggleCos.addEventListener("click", function () {
+        state.publicationCOS = !state.publicationCOS;
+        btnToggleCos.textContent = state.publicationCOS
+          ? "Masquer les résultats (revenir avant validation du COS)"
+          : "Simuler la validation du COS (après le 17 juin 2027)";
+        refreshAllViews();
+      });
+    }
+
     // Ajout d'une demande de précision contradictoire par l'analyste
     var btnAddClarif = document.getElementById("btn-add-clarification");
     if (btnAddClarif) {
@@ -1902,10 +2346,10 @@
       });
     }
 
-    // Gestion du hash dans l'URL (#presentation, #espace-collecte, #espace-validation, #tableau-de-bord, #consolidation)
+    // Gestion du hash dans l'URL (#presentation, #espace-collecte, #contradictoire, #espace-validation, #tableau-de-bord, #consolidation)
     function checkHash() {
       var h = (window.location.hash || "").replace("#", "");
-      if (["presentation", "espace-collecte", "espace-validation", "tableau-de-bord", "consolidation"].indexOf(h) !== -1) {
+      if (["presentation", "espace-collecte", "contradictoire", "espace-validation", "tableau-de-bord", "consolidation"].indexOf(h) !== -1) {
         switchMainTab(h);
       }
     }
@@ -1915,16 +2359,30 @@
 
   function initBarometre() {
     loadState();
-    if (!document.getElementById("barometre-app-root")) return;
+    var root = document.getElementById("barometre-app-root");
+    if (!root) return;
+    var defaultTab = root.getAttribute("data-default-tab");
+    if (defaultTab && !window.location.hash) {
+      state.activeTab = defaultTab;
+    }
     renderPresentationDimensions("PUBLIC");
     bindGlobalActions();
-    refreshAllViews();
+    if (defaultTab && !window.location.hash) {
+      switchMainTab(defaultTab);
+    } else {
+      refreshAllViews();
+    }
   }
 
   // Exposition de l'API publique du moteur pour les tests automatisés QA
   window.MAPERF_BAROMETRE_ENGINE = {
     evaluateDossier: evaluateDossier,
     computeFieldIndicatorScore: computeFieldIndicatorScore,
+    computeRubriqueProgress: computeRubriqueProgress,
+    getFieldContextualHelp: getFieldContextualHelp,
+    computeVariationInfo: computeVariationInfo,
+    submitValidationContradictoire: submitValidationContradictoire,
+    setPublicationCOS: function (val) { state.publicationCOS = !!val; },
     runCoherenceChecks: runCoherenceChecks,
     validateStandardPassword: validateStandardPassword,
     createNewCongoDossier: createNewCongoDossier,

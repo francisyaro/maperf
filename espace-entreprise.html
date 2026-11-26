@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Espace Entreprise — Saisie pluriannuelle, validation contradictoire et restitution | Baromètre MAPERF 2027</title>
+  <meta name="description" content="Portail Espace Entreprise du Baromètre national de la performance MAPERF 2027 : saisie pluriannuelle 2023–2025, dépôt de pièces justificatives, validation contradictoire et fiche de restitution provisoire." />
+  <link rel="icon" type="image/png" href="assets/images/favicon.png" />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400..700;1,9..40,400..700&family=JetBrains+Mono:wght@400;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Design System MAPERF -->
+  <link rel="stylesheet" href="assets/css/maperf-design.css" />
+</head>
+<body class="bg-[#F4F7FA] text-[#0F1E33] antialiased selection:bg-[#2CC3A0] selection:text-[#0B2341]">
+
+  <!-- En-tête injecté par maperf-layout.js -->
+  <div id="maperf-header"></div>
+
+  <main id="barometre-app-root" class="portal-scope" data-default-tab="espace-collecte">
+    <!-- ===================================================================== -->
+    <!-- BANDEAU D'INFORMATION MAQUETTE V2 & BARRE DE CONTRÔLE ENTREPRISE      -->
+    <!-- ===================================================================== -->
+    <section class="hero-navy text-white pt-7 pb-8 border-b border-white/10">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Mention explicite du mode démonstration local vs version connectée -->
+        <div class="mb-5 p-3.5 rounded-xl bg-white/10 border border-white/15 flex flex-wrap items-center justify-between gap-3 text-xs">
+          <div class="flex items-center gap-2.5 text-slate-200">
+            <span class="badge badge-gold">Environnement de démonstration V2</span>
+            <span>
+              Dossiers fictifs pré-chargés (<strong class="text-white">Entreprise publique A/B</strong>, <strong class="text-white">Entreprise privée A/B</strong>). Sauvegarde locale dans votre navigateur — serveur sécurisé requis pour la collecte réelle.
+            </span>
+          </div>
+          <a href="barometre.html" class="text-[#2CC3A0] font-bold hover:underline flex items-center gap-1">
+            <i data-lucide="book-open" class="w-3.5 h-3.5"></i>
+            Consulter la méthode et le calendrier
+          </a>
+        </div>
+
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+          <div>
+            <div class="flex flex-wrap items-center gap-2 mb-2">
+              <span class="badge badge-teal"><i data-lucide="building-2" class="w-3.5 h-3.5"></i> Portail Espace Entreprise — Baromètre 2027</span>
+              <span id="header-volet-badge" class="badge badge-teal">Secteur public</span>
+              <span id="header-code-anonyme" class="badge bg-white/10 text-white border border-white/15 font-mono">PUB-2027-001</span>
+            </div>
+            <h1 id="header-org-name" class="text-2xl sm:text-3xl font-extrabold tracking-tight">
+              Entreprise publique A (EPA)
+            </h1>
+            <p class="text-slate-300 text-xs sm:text-sm mt-1">
+              Groupe homogène : <strong id="header-org-groupe" class="text-white">PUBLIC · Énergie, Eau et Infrastructures × GE 250+</strong>
+              · Statut du dossier : <strong id="header-workflow-statut" class="text-[#2CC3A0]">Vérifié — En validation contradictoire</strong>
+            </p>
+          </div>
+
+          <!-- Sélecteur de dossier de démonstration & Indicateur de sauvegarde locale -->
+          <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+            <div class="bg-white/10 border border-white/20 rounded-xl p-2.5">
+              <label for="barometre-dossier-select" class="block text-xs uppercase tracking-wider font-bold text-[#2CC3A0] mb-1">
+                Dossier Entreprise actif
+              </label>
+              <select id="barometre-dossier-select" class="bg-[#071629] text-white text-xs font-semibold rounded-lg px-3 py-2 border border-white/15 focus:outline-none focus:border-[#2CC3A0] w-full sm:w-72">
+                <!-- Injecté par barometre-engine.js -->
+              </select>
+            </div>
+            <button type="button" id="btn-new-entreprise" class="btn btn-teal text-xs py-2.5 px-4">
+              <i data-lucide="plus-circle" class="w-4 h-4"></i>
+              Inscrire une entreprise
+            </button>
+          </div>
+        </div>
+
+        <!-- Synthèse des 4 indicateurs du dossier actif + état de sauvegarde -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 mt-6">
+          <div class="p-3.5 rounded-xl bg-white/5 border border-white/10">
+            <div class="text-xs text-slate-300">Potentiel brut déclaré</div>
+            <div class="text-xl font-extrabold font-mono text-white mt-0.5"><span id="header-raw-score">0.0</span> <span class="text-xs font-normal text-slate-300">/ 100</span></div>
+            <div class="text-xs text-slate-300 mt-0.5">Coefficient déclaratif : 50 %</div>
+          </div>
+
+          <div class="p-3.5 rounded-xl bg-[#2CC3A0]/15 border border-[#2CC3A0]/40">
+            <div class="text-xs text-[#2CC3A0] font-bold">Indice MAPERF validé</div>
+            <div class="text-xl font-extrabold font-mono text-white mt-0.5"><span id="header-verified-score">0.0</span> <span class="text-xs font-normal text-slate-300">/ 100</span></div>
+            <div id="header-score-delta" class="text-xs text-[#2CC3A0] mt-0.5">Écart restant : +0.0 pts</div>
+          </div>
+
+          <div class="p-3.5 rounded-xl bg-white/5 border border-white/10">
+            <div class="flex items-center justify-between text-xs text-slate-300">
+              <span>Complétude (seuil ≥ 70 %)</span>
+              <span id="header-completude" class="font-mono font-bold text-white">0 %</span>
+            </div>
+            <div class="progress-track mt-2 bg-white/10">
+              <div id="header-completude-bar" class="progress-fill teal" style="width: 0%;"></div>
+            </div>
+          </div>
+
+          <div class="p-3.5 rounded-xl bg-white/5 border border-white/10">
+            <div class="flex items-center justify-between text-xs text-slate-300">
+              <span>Indice de fiabilité des preuves</span>
+              <span id="header-fiabilite" class="font-mono font-bold text-white">0 %</span>
+            </div>
+            <div class="progress-track mt-2 bg-white/10">
+              <div id="header-fiabilite-bar" class="progress-fill gold" style="width: 0%;"></div>
+            </div>
+          </div>
+
+          <div class="p-3.5 rounded-xl bg-white/5 border border-white/10 flex flex-col justify-between">
+            <div id="header-publishable-badge"></div>
+            <div id="save-status-indicator" class="mt-2">
+              <span class="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-300">● Enregistré dans le navigateur</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- NAVIGATION PAR ONGLETS DE L'ESPACE ENTREPRISE                         -->
+    <!-- ===================================================================== -->
+    <div class="bg-white border-b border-slate-200 sticky top-[112px] z-30 shadow-sm">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5 flex flex-wrap items-center justify-between gap-3">
+        <div class="flex flex-wrap items-center gap-2">
+          <button type="button" data-main-tab="espace-collecte" class="tab active text-xs">
+            <i data-lucide="clipboard-edit" class="w-4 h-4"></i>
+            1. Saisie pluriannuelle (2023–2025) et pièces justificatives
+          </button>
+          <button type="button" data-main-tab="contradictoire" class="tab text-xs">
+            <i data-lucide="scale" class="w-4 h-4"></i>
+            2. Validation contradictoire (10–21 mai 2027)
+          </button>
+          <button type="button" data-main-tab="tableau-de-bord" class="tab text-xs">
+            <i data-lucide="pie-chart" class="w-4 h-4"></i>
+            3. Fiche de restitution provisoire
+          </button>
+        </div>
+        <a href="barometre.html#documents" class="text-xs font-bold text-[#1B6B93] hover:underline flex items-center gap-1">
+          <i data-lucide="download" class="w-3.5 h-3.5"></i>
+          Grilles Excel et TDR
+        </a>
+      </div>
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- PANNEAU D'INSCRIPTION D'UNE NOUVELLE ENTREPRISE                       -->
+    <!-- ===================================================================== -->
+    <div id="new-org-panel" class="hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
+      <div class="bg-white rounded-2xl p-6 border-2 border-[#2CC3A0] shadow-lg">
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <span class="badge badge-teal mb-1">Nouveau dossier Entreprise — République du Congo</span>
+            <h2 class="text-lg font-extrabold text-[#0B2341]">Inscrire une entreprise dans l'environnement de démonstration</h2>
+          </div>
+          <button type="button" id="btn-close-new-org-panel" class="btn btn-outline text-xs py-1.5 px-3">Fermer</button>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+          <div>
+            <label for="new-org-volet" class="block text-xs font-bold text-slate-700 mb-1">Volet</label>
+            <select id="new-org-volet" class="barometre-input">
+              <option value="PRIVE">Secteur privé (SA / SARL OHADA)</option>
+              <option value="PUBLIC">Secteur public (EPIC / Société d'État)</option>
+            </select>
+          </div>
+          <div>
+            <label for="new-org-raison" class="block text-xs font-bold text-slate-700 mb-1">Raison sociale (fictive ou test)</label>
+            <input type="text" id="new-org-raison" class="barometre-input" placeholder="Ex. Entreprise privée C" value="Entreprise privée C" />
+          </div>
+          <div>
+            <label for="new-org-sigle" class="block text-xs font-bold text-slate-700 mb-1">Sigle</label>
+            <input type="text" id="new-org-sigle" class="barometre-input" placeholder="EPC" value="EPC" />
+          </div>
+          <div>
+            <label for="new-org-ville" class="block text-xs font-bold text-slate-700 mb-1">Ville du siège (Congo)</label>
+            <select id="new-org-ville" class="barometre-input">
+              <option value="Brazzaville">Brazzaville</option>
+              <option value="Pointe-Noire">Pointe-Noire</option>
+              <option value="Dolisie">Dolisie</option>
+              <option value="Oyo">Oyo</option>
+              <option value="Ouesso">Ouesso</option>
+            </select>
+          </div>
+          <div>
+            <label for="new-org-secteur" class="block text-xs font-bold text-slate-700 mb-1">Macro-secteur</label>
+            <input type="text" id="new-org-secteur" class="barometre-input" value="Industrie, Logistique et Services" />
+          </div>
+          <div>
+            <label for="new-org-effectif" class="block text-xs font-bold text-slate-700 mb-1">Effectif permanent 2025</label>
+            <input type="number" id="new-org-effectif" class="barometre-input mono" value="140" />
+          </div>
+          <div>
+            <label for="new-org-pf-nom" class="block text-xs font-bold text-slate-700 mb-1">Nom du Point focal</label>
+            <input type="text" id="new-org-pf-nom" class="barometre-input" value="Point focal Entreprise C" />
+          </div>
+          <div>
+            <label for="new-org-pf-email" class="block text-xs font-bold text-slate-700 mb-1">Courriel professionnel</label>
+            <input type="email" id="new-org-pf-email" class="barometre-input" value="pointfocal@entreprise-c.cg" />
+          </div>
+        </div>
+        <div class="flex flex-wrap items-center justify-between gap-4 pt-3 border-t border-slate-200">
+          <label class="inline-flex items-center gap-2 text-xs text-slate-700 cursor-pointer">
+            <input type="checkbox" id="new-org-prefill" checked class="rounded border-slate-300" />
+            <span>Pré-remplir avec un jeu de données de démonstration en statut « Déclarée (50 %) »</span>
+          </label>
+          <button type="button" id="btn-Confirm-new-org" class="btn btn-teal text-xs">
+            <i data-lucide="check-circle" class="w-4 h-4"></i>
+            Créer et ouvrir le dossier
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- ONGLET 1 : SAISIE PLURIANNUELLE ET PIÈCES JUSTIFICATIVES              -->
+    <!-- ===================================================================== -->
+    <section id="panel-espace-collecte" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <!-- Porte d'authentification Espace Entreprise -->
+      <div id="auth-gate-entreprise" class="max-w-xl mx-auto bg-white rounded-2xl p-8 border border-slate-200 shadow-sm my-6">
+        <div class="flex items-center gap-2.5 mb-3">
+          <span class="badge badge-teal"><i data-lucide="lock" class="w-3.5 h-3.5"></i> Accès Point focal Entreprise</span>
+          <span class="badge badge-gold">Démonstration V2</span>
+        </div>
+        <h2 class="text-xl font-extrabold text-[#0B2341] mb-2">
+          Connexion à l'Espace Entreprise
+        </h2>
+        <p class="text-xs text-slate-600 leading-relaxed mb-5">
+          Sélectionnez l'un des dossiers fictifs de démonstration et renseignez le code d'accès standard de la maquette (<code class="font-mono font-bold text-[#0B2341] bg-slate-100 px-1.5 py-0.5 rounded">Entreprise2027</code>) pour accéder à la saisie pluriannuelle 2023–2025, au dépôt des pièces probantes et à la validation contradictoire.
+        </p>
+
+        <div class="space-y-4">
+          <div>
+            <label for="login-ent-dossier-select" class="block text-xs font-bold text-slate-700 mb-1">
+              1. Choisir le dossier Entreprise à ouvrir
+            </label>
+            <select id="login-ent-dossier-select" class="barometre-input"></select>
+          </div>
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <label for="login-ent-password" class="block text-xs font-bold text-slate-700">
+                2. Code d'accès Point focal
+              </label>
+              <button type="button" id="btn-fill-pwd-entreprise" class="text-xs font-bold text-[#1B6B93] hover:underline">
+                Remplir « Entreprise2027 »
+              </button>
+            </div>
+            <input type="password" id="login-ent-password" value="Entreprise2027" class="barometre-input mono" placeholder="Entreprise2027" />
+          </div>
+          <div id="login-ent-error" class="hidden p-3 rounded-lg bg-red-50 border border-red-200 text-xs text-red-700 font-semibold"></div>
+          <button type="button" id="btn-login-entreprise" class="btn btn-teal w-full text-sm">
+            <i data-lucide="log-in" class="w-4 h-4"></i>
+            Accéder au dossier de l'entreprise
+          </button>
+        </div>
+      </div>
+
+      <!-- Espace de travail Entreprise déverrouillé -->
+      <div id="workspace-entreprise-content" class="space-y-8">
+        <!-- Barre de session Point focal -->
+        <div class="bg-white rounded-2xl p-4 border border-slate-200 flex flex-wrap items-center justify-between gap-4">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-[#0B2341] text-[#2CC3A0] flex items-center justify-center font-extrabold">PF</div>
+            <div>
+              <div class="text-xs text-slate-500">Session Point focal active</div>
+              <div id="session-ent-name" class="text-sm font-extrabold text-[#0B2341]">Entreprise publique A (PUB-2027-001 · Brazzaville)</div>
+            </div>
+          </div>
+          <div class="flex flex-wrap items-center gap-2.5">
+            <button type="button" id="btn-open-new-org-panel" class="btn btn-outline text-xs py-2 px-3.5">
+              <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+              Nouvelle entreprise
+            </button>
+            <button type="button" id="btn-submit-to-maperf" class="btn btn-primary text-xs py-2 px-4">
+              <i data-lucide="send" class="w-3.5 h-3.5"></i>
+              Transmettre le dossier pour vérification
+            </button>
+            <button type="button" id="btn-logout-entreprise" class="btn btn-outline text-xs py-2 px-3">
+              Déconnexion
+            </button>
+          </div>
+        </div>
+
+        <div id="submit-ent-feedback" class="hidden p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-950"></div>
+
+        <!-- A. FICHE SIGNALÉTIQUE & QUALIFICATION DU GROUPE HOMOGÈNE -->
+        <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
+          <div class="flex flex-wrap items-center justify-between gap-4 mb-5">
+            <div>
+              <span class="badge badge-navy mb-1">Étape 1 · Identification et qualification</span>
+              <h2 class="text-lg font-extrabold text-[#0B2341]">
+                Fiche signalétique de l'entreprise et rattachement au groupe homogène
+              </h2>
+            </div>
+            <button type="button" id="btn-save-identification" class="btn btn-teal text-xs py-2 px-4">
+              <i data-lucide="save" class="w-4 h-4"></i>
+              Enregistrer la fiche signalétique
+            </button>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div>
+              <label for="ident-raison-sociale" class="block text-xs font-bold text-slate-700 mb-1">Dénomination sociale</label>
+              <input type="text" id="ident-raison-sociale" class="barometre-input" />
+            </div>
+            <div>
+              <label for="ident-sigle" class="block text-xs font-bold text-slate-700 mb-1">Sigle</label>
+              <input type="text" id="ident-sigle" class="barometre-input" />
+            </div>
+            <div>
+              <label for="ident-statut-juridique" class="block text-xs font-bold text-slate-700 mb-1">Forme juridique (OHADA / Congo)</label>
+              <input type="text" id="ident-statut-juridique" class="barometre-input" />
+            </div>
+            <div>
+              <label for="ident-secteur" class="block text-xs font-bold text-slate-700 mb-1">Macro-secteur d'activité</label>
+              <input type="text" id="ident-secteur" class="barometre-input" />
+            </div>
+            <div>
+              <label for="ident-ville" class="block text-xs font-bold text-slate-700 mb-1">Ville du siège (République du Congo)</label>
+              <input type="text" id="ident-ville" class="barometre-input" />
+            </div>
+            <div>
+              <label for="ident-effectif" class="block text-xs font-bold text-slate-700 mb-1">Effectif permanent au 31/12/2025</label>
+              <input type="number" id="ident-effectif" class="barometre-input mono" />
+            </div>
+            <div>
+              <label for="ident-osp" class="block text-xs font-bold text-slate-700 mb-1">Obligations de service public (OSP)</label>
+              <select id="ident-osp" class="barometre-input">
+                <option value="Oui">Oui</option>
+                <option value="Non">Non</option>
+              </select>
+            </div>
+            <div>
+              <label for="ident-pf-nom" class="block text-xs font-bold text-slate-700 mb-1">Nom et prénom du Point focal</label>
+              <input type="text" id="ident-pf-nom" class="barometre-input" />
+            </div>
+            <div>
+              <label for="ident-pf-fonction" class="block text-xs font-bold text-slate-700 mb-1">Fonction du Point focal</label>
+              <input type="text" id="ident-pf-fonction" class="barometre-input" />
+            </div>
+            <div>
+              <label for="ident-pf-email" class="block text-xs font-bold text-slate-700 mb-1">Courriel professionnel</label>
+              <input type="email" id="ident-pf-email" class="barometre-input" />
+            </div>
+            <div>
+              <label for="ident-pf-tel" class="block text-xs font-bold text-slate-700 mb-1">Téléphone (+242)</label>
+              <input type="text" id="ident-pf-tel" class="barometre-input mono" />
+            </div>
+          </div>
+        </div>
+
+        <!-- B. SAISIE PLURIANNUELLE (2023, 2024, 2025) PAR RUBRIQUE AVEC PROGRESSION DYNAMIQUE -->
+        <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
+          <div class="mb-4">
+            <span class="badge badge-teal mb-1">Étape 2 · Questionnaire pluriannuel (2023, 2024 et 2025)</span>
+            <h2 class="text-lg font-extrabold text-[#0B2341]">
+              Saisie des données par rubrique métier avec aide contextuelle
+            </h2>
+            <p class="text-xs text-slate-600 mt-1">
+              Chaque rubrique affiche sa progression en temps réel (nombre d'indicateurs renseignés ou non applicables sur le total de la rubrique). Les trois exercices <strong class="text-[#0B2341]">2023, 2024 et 2025</strong> sont affichés côte à côte.
+            </p>
+          </div>
+
+          <!-- Onglets des 5 rubriques avec compteur dynamique (ex. Données financières : 16/16) -->
+          <div id="collecte-rubrique-tabs" class="flex flex-wrap items-center gap-2 mb-5 pb-3 border-b border-slate-200">
+            <!-- Injecté par barometre-engine.js -->
+          </div>
+
+          <!-- Tableau de saisie pluriannuelle -->
+          <div class="overflow-x-auto">
+            <table class="barometre-table">
+              <thead>
+                <tr>
+                  <th class="w-32">Code et dim.</th>
+                  <th>Indicateur et aide contextuelle (définition, unité, source)</th>
+                  <th class="w-32 text-right">Exercice 2023</th>
+                  <th class="w-32 text-right">Exercice 2024</th>
+                  <th class="w-32 text-right">Exercice 2025</th>
+                  <th class="w-40">Applicabilité et réf. pièce</th>
+                  <th class="w-32">Statut preuve</th>
+                  <th class="w-32">Score (Brut / Validé)</th>
+                </tr>
+              </thead>
+              <tbody id="collecte-fields-tbody">
+                <!-- Injecté par barometre-engine.js -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- C. CONTRÔLES AUTOMATIQUES DE COHÉRENCE ET D'INTÉGRITÉ -->
+        <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
+          <div class="mb-4">
+            <span class="badge badge-navy mb-1">Étape 3 · Contrôles automatiques de cohérence</span>
+            <h2 class="text-lg font-extrabold text-[#0B2341]">
+              Vérification automatique de cohérence comptable, sociale et opérationnelle
+            </h2>
+            <p class="text-xs text-slate-600 mt-1">
+              Ces contrôles s'exécutent instantanément lors de la saisie afin de détecter les écarts de ventilation ou les variations atypiques avant transmission.
+            </p>
+          </div>
+          <div id="collecte-coherence-list" class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <!-- Injecté par barometre-engine.js -->
+          </div>
+        </div>
+
+        <!-- D. DÉPÔT DES PIÈCES JUSTIFICATIVES (GLISSER-DÉPOSER & PRÉVISUALISATION) -->
+        <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
+          <div class="mb-4">
+            <span class="badge badge-gold mb-1">Étape 4 · Dossier probatoire</span>
+            <h2 class="text-lg font-extrabold text-[#0B2341]">
+              Bordereau des pièces justificatives (glisser-déposer et prévisualisation)
+            </h2>
+            <p class="text-xs text-slate-600 mt-1">
+              Glissez-déposez vos justificatifs (PDF, Excel) ou cliquez sur « Choisir un fichier ». Statuts : <strong>Reçue</strong> (transmise par l'entreprise), <strong>Acceptée</strong> (vérifiée ou auditée), <strong>À compléter</strong> (pièce attendue ou précision requise).
+            </p>
+          </div>
+
+          <div id="evidence-upload-feedback" class="hidden mb-4 p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-900"></div>
+          <div id="evidence-preview-panel" class="hidden mb-4 p-4 rounded-xl bg-slate-50 border border-slate-300"></div>
+
+          <div id="collecte-evidences-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <!-- Injecté par barometre-engine.js -->
+          </div>
+        </div>
+
+        <!-- E. ÉCHANGES ET DEMANDES DE PRÉCISION -->
+        <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
+          <div class="mb-4">
+            <span class="badge badge-teal mb-1">Suivi contradictoire des pièces</span>
+            <h2 class="text-lg font-extrabold text-[#0B2341]">
+              Demandes de précision et réponses du Point focal
+            </h2>
+          </div>
+          <div id="collecte-clarifications-box" class="space-y-3">
+            <!-- Injecté par barometre-engine.js -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- ONGLET 2 : VALIDATION CONTRADICTOIRE (10 AU 21 MAI 2027)              -->
+    <!-- ===================================================================== -->
+    <section id="panel-contradictoire" class="hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+      <div class="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200 shadow-sm">
+        <div class="flex flex-wrap items-center justify-between gap-4 mb-5">
+          <div>
+            <span class="badge badge-gold mb-2"><i data-lucide="calendar-check" class="w-3.5 h-3.5"></i> Phase officielle : 10 au 21 mai 2027</span>
+            <h2 class="text-xl sm:text-2xl font-extrabold text-[#0B2341]">
+              Étape de validation contradictoire de la fiche de restitution provisoire
+            </h2>
+            <p class="text-xs sm:text-sm text-slate-600 mt-1 max-w-3xl">
+              Conformément aux Termes de référence du Baromètre, chaque entreprise participante dispose d'un droit de revue contradictoire sur ses scores provisoires par dimension avant l'homologation finale par le Comité d'orientation scientifique (COS).
+            </p>
+          </div>
+          <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-right">
+            <div class="text-xs text-slate-500">Statut contradictoire actuel</div>
+            <div id="contradictoire-status-badge" class="mt-1"></div>
+            <div id="contradictoire-date-label" class="text-xs text-slate-500 mt-1"></div>
+          </div>
+        </div>
+
+        <!-- Récapitulatif des scores provisoires soumis à validation contradictoire -->
+        <h3 class="text-sm font-extrabold text-[#0B2341] uppercase tracking-wider mb-3">
+          Scores provisoires par dimension soumis à votre validation contradictoire
+        </h3>
+        <div id="contradictoire-dimensions-summary" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-6">
+          <!-- Injecté par barometre-engine.js (renderContradictoireSection) -->
+        </div>
+
+        <!-- Formulaire de décision contradictoire : « J'accepte » ou « Je formule une observation » -->
+        <div class="p-6 rounded-2xl bg-slate-50 border border-slate-200">
+          <h3 class="text-base font-extrabold text-[#0B2341] mb-2">
+            Décision contradictoire du Point focal de l'entreprise
+          </h3>
+          <p class="text-xs text-slate-600 leading-relaxed mb-4">
+            Vous pouvez soit <strong>accepter les résultats provisoires</strong> tels qu'établis après vérification documentaire, soit <strong>formuler une observation contradictoire motivée</strong> (en précisant le code de l'indicateur ou la pièce justificative complémentaire invoquée).
+          </p>
+
+          <div class="mb-4">
+            <label for="contradictoire-observation-input" class="block text-xs font-bold text-slate-700 mb-1.5">
+              Observation contradictoire ou commentaire du Point focal (obligatoire en cas d'observation)
+            </label>
+            <textarea id="contradictoire-observation-input" rows="3" class="barometre-input" placeholder="Précisez ici vos observations éventuelles sur un indicateur, un retraitement comptable ou une pièce justificative..."></textarea>
+          </div>
+
+          <div id="contradictoire-feedback" class="hidden mb-4 p-3.5 rounded-xl bg-white border border-slate-200 text-xs"></div>
+
+          <div class="flex flex-wrap items-center gap-3">
+            <button type="button" id="btn-contradictoire-accept" class="btn btn-teal text-sm">
+              <i data-lucide="check-circle-2" class="w-4 h-4"></i>
+              J'accepte
+            </button>
+            <button type="button" id="btn-contradictoire-observe" class="btn btn-primary text-sm">
+              <i data-lucide="message-square-warning" class="w-4 h-4"></i>
+              Je formule une observation
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- ONGLET 3 : FICHE DE RESTITUTION PROVISOIRE (TABLEAU DE BORD)          -->
+    <!-- ===================================================================== -->
+    <section id="panel-tableau-de-bord" class="hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+      <div class="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200 shadow-sm">
+        <div class="flex flex-wrap items-center justify-between gap-4 mb-6 pb-4 border-b border-slate-200">
+          <div>
+            <div class="flex flex-wrap items-center gap-2 mb-1">
+              <span class="badge badge-navy">Fiche de restitution individuelle confidentielle</span>
+              <span id="dash-code-anonyme" class="badge badge-teal font-mono">PUB-2027-001</span>
+            </div>
+            <h2 id="dash-org-title" class="text-xl sm:text-2xl font-extrabold text-[#0B2341]">
+              Entreprise publique A (EPA)
+            </h2>
+            <p id="dash-org-subtitle" class="text-xs sm:text-sm text-slate-600 mt-0.5">
+              Secteur public · Groupe homogène
+            </p>
+          </div>
+          <div class="flex items-center gap-4">
+            <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-center">
+              <div class="text-xs text-slate-500">Score brut déclaré</div>
+              <div id="dash-raw-score" class="text-xl font-extrabold font-mono text-slate-800">0.0 / 100</div>
+            </div>
+            <div class="p-3.5 rounded-xl bg-[#0B2341] text-white text-center">
+              <div class="text-xs text-[#2CC3A0] font-bold">Indice MAPERF validé</div>
+              <div id="dash-verified-score" class="text-xl font-extrabold font-mono">0.0 / 100</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bandeau de disponibilité conditionnelle de la comparaison au groupe homogène (après validation du COS / 17 juin 2027) -->
+        <div id="dash-benchmark-notice" class="mb-6">
+          <!-- Injecté par barometre-engine.js -->
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          <!-- Radar SVG des 6 dimensions -->
+          <div class="lg:col-span-5 bg-slate-50 rounded-2xl p-5 border border-slate-200">
+            <h3 class="text-sm font-extrabold text-[#0B2341] mb-1">
+              Profil multidimensionnel de l'Indice MAPERF
+            </h3>
+            <p class="text-xs text-slate-600 mb-3">
+              Comparaison entre le potentiel brut déclaré (pointillés dorés), le score validé (turquoise) et, après publication officielle, la médiane du groupe homogène.
+            </p>
+            <div id="dash-radar-svg-box" class="w-full max-w-[340px] mx-auto"></div>
+          </div>
+
+          <!-- Détail des 6 dimensions -->
+          <div class="lg:col-span-7 space-y-4">
+            <h3 class="text-sm font-extrabold text-[#0B2341]">
+              Décomposition par dimension d'évaluation (A à F)
+            </h3>
+            <div id="dash-dimensions-bars" class="space-y-3">
+              <!-- Injecté par barometre-engine.js -->
+            </div>
+
+            <!-- Matrice d'alignement Pratiques déclarées vs Résultats observés -->
+            <div class="p-5 rounded-xl bg-slate-50 border border-slate-200 mt-4">
+              <div class="text-xs font-bold uppercase tracking-wider text-[#1B6B93] mb-2">
+                Diagnostic d'alignement managérial
+              </div>
+              <div class="grid grid-cols-3 gap-3 mb-3">
+                <div class="p-3 rounded-lg bg-white border border-slate-200">
+                  <div class="text-xs text-slate-500">Indice Pratiques (C, D, E, F)</div>
+                  <div id="dash-score-pratiques" class="text-base font-extrabold font-mono text-[#0B2341] mt-0.5">0.0 / 100</div>
+                </div>
+                <div class="p-3 rounded-lg bg-white border border-slate-200">
+                  <div class="text-xs text-slate-500">Indice Résultats (A, B)</div>
+                  <div id="dash-score-resultats" class="text-base font-extrabold font-mono text-[#0B2341] mt-0.5">0.0 / 100</div>
+                </div>
+                <div class="p-3 rounded-lg bg-white border border-slate-200">
+                  <div class="text-xs text-slate-500">Écart (Pratiques − Résultats)</div>
+                  <div id="dash-ecart-pr" class="text-base font-extrabold font-mono text-[#1B6B93] mt-0.5">0.0 pts</div>
+                </div>
+              </div>
+              <p id="dash-ecart-diagnostic" class="text-xs text-slate-700 leading-relaxed"></p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Pied de page injecté par maperf-layout.js -->
+  <div id="maperf-footer"></div>
+
+  <!-- Scripts -->
+  <script src="assets/js/maperf-config.js"></script>
+  <script src="assets/js/maperf-layout.js"></script>
+  <script src="assets/js/barometre-data.js"></script>
+  <script src="assets/js/barometre-engine.js"></script>
+</body>
+</html>

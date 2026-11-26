@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Inscription & Enrôlement Point Focal — MAPERF 2027 (17 Juin 2027)</title>
-  <meta name="description" content="Inscrivez votre organisation au Baromètre MAPERF 2027 ou réservez votre participation aux Journées de la Performance du 17 juin 2027 à Brazzaville." />
+  <title>S'inscrire à la Semaine MAPERF 2027 (16, 17 et 18 juin) — Hôtel Kempinski, Brazzaville</title>
+  <meta name="description" content="Parcours d'inscription aux trois journées de la Semaine MAPERF 2027 (16, 17 et 18 juin 2027 à l'Hôtel Kempinski, Brazzaville) et pré-enrôlement au Baromètre." />
   <link rel="icon" type="image/png" href="favicon.PNG" />
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
@@ -16,77 +16,137 @@
 
   <main class="max-w-4xl mx-auto px-4 py-12 space-y-8">
     <div class="text-center space-y-2">
-      <span class="chip">2e Édition · 17 Juin 2027 · Hilton Brazzaville</span>
-      <h1 class="font-display text-3xl font-extrabold text-[#00236D]">Inscription & Accréditation MAPERF 2027</h1>
-      <p class="text-slate-600 text-sm max-w-2xl mx-auto">
-        Inscrivez votre délégation aux Journées de la Performance ou désignez le Point Focal de votre entreprise (Secteur Public ou Secteur Privé) pour la campagne du Baromètre 2027.
+      <span class="chip">Semaine MAPERF 2027 · 16, 17 et 18 juin 2027 · Hôtel Kempinski, Brazzaville</span>
+      <h1 class="font-display text-3xl sm:text-4xl font-extrabold text-[#00236D]">
+        Inscription aux trois journées de la Semaine MAPERF 2027
+      </h1>
+      <p class="text-slate-600 text-base max-w-2xl mx-auto">
+        Sélectionnez la ou les journées auxquelles vous souhaitez participer à l'Hôtel Kempinski de Brazzaville, ou désignez le point focal de votre entreprise pour le Baromètre MAPERF 2027.
       </p>
     </div>
 
-    <!-- Raccourci vers le Portail Baromètre -->
-    <div class="card bg-gradient-to-r from-[#00236D] to-[#0A2240] text-white flex flex-col sm:flex-row items-center justify-between gap-4">
-      <div class="space-y-1">
-        <span class="text-xs font-bold text-[#2CC3A0] uppercase">Vous êtes Point Focal d'une entreprise publique ou privée ?</span>
-        <p class="font-display font-bold text-base">Vous pouvez saisir directement vos données 2023–2025 dans le Portail Baromètre.</p>
+    <!-- Récapitulatif des tarifs et statut de la billetterie (Aucune information tarifaire inventée) -->
+    <div class="grid md:grid-cols-3 gap-4 text-sm">
+      <div class="card p-4 border-t-4 border-t-[#2CC3A0] space-y-1">
+        <span class="text-xs font-extrabold uppercase text-[#007A63]">Mercredi 16 juin 2027</span>
+        <h2 class="font-display font-bold text-base text-[#00236D]">Journée des entrepreneurs</h2>
+        <p class="text-xs text-amber-800 font-semibold">Tarif : en attente de confirmation par le comité</p>
       </div>
-      <a href="barometre.html#espace-collecte" class="btn btn-primary text-xs shrink-0">Ouvrir le Portail Baromètre →</a>
+      <div class="card p-4 border-t-4 border-t-[#F39A1E] bg-amber-50/40 space-y-1">
+        <span class="text-xs font-extrabold uppercase text-[#F39A1E]">Jeudi 17 juin 2027</span>
+        <h2 class="font-display font-bold text-base text-[#00236D]">Matinées et Trophées</h2>
+        <p class="text-sm font-extrabold text-[#00236D]">Tarif renseigné : 50 000 FCFA</p>
+      </div>
+      <div class="card p-4 border-t-4 border-t-[#00236D] space-y-1">
+        <span class="text-xs font-extrabold uppercase text-[#00236D]">Vendredi 18 juin 2027</span>
+        <h2 class="font-display font-bold text-base text-[#00236D]">Masterclass</h2>
+        <p class="text-xs text-amber-800 font-semibold">Tarif : en attente de confirmation par le comité</p>
+      </div>
     </div>
 
-    <form id="maperf-inscription-form" action="send_inscription.php" method="POST" class="card space-y-5" novalidate>
+    <!-- Passerelle vers l'Espace Entreprise du Baromètre -->
+    <div class="card bg-gradient-to-r from-[#00236D] to-[#0A2240] text-white flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div class="space-y-1">
+        <span class="text-xs font-bold text-[#2CC3A0] uppercase">Vous êtes point focal d'une entreprise publique ou privée ?</span>
+        <p class="font-display font-bold text-base">Accédez directement à l'Espace Entreprise pour tester la collecte du Baromètre 2027.</p>
+      </div>
+      <a href="espace-entreprise.html" class="btn btn-teal text-sm shrink-0">Ouvrir l'Espace Entreprise →</a>
+    </div>
+
+    <!-- Formulaire de demande d'inscription (Distinction explicite entre demande d'inscription et paiement confirmé) -->
+    <form id="maperf-inscription-form" action="send_inscription.php" method="POST" class="card space-y-5 border-t-4 border-t-[#00236D]" novalidate>
       <input type="hidden" name="csrf_token" value="maperf_token_2026" />
 
+      <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-4">
+        <div>
+          <h2 class="font-display text-xl font-extrabold text-[#00236D]">Formulaire de demande d'inscription</h2>
+          <p class="text-xs text-slate-500">
+            Ce formulaire enregistre une <strong>demande d'inscription</strong> (sans paiement en ligne immédiat : le prestataire de billetterie et les tarifs des 16 et 18 juin sont en cours d'arrêté par le comité).
+          </p>
+        </div>
+        <span class="badge-status badge-declared">Mode démonstration (maquette V2)</span>
+      </div>
+
       <div class="grid md:grid-cols-2 gap-5">
         <div>
-          <label class="text-xs font-bold text-slate-700 block mb-1">Prénom *</label>
-          <input name="prenom" type="text" required class="barometre-input" placeholder="Votre prénom" />
+          <label for="insc-prenom" class="text-sm font-bold text-slate-700 block mb-1">Prénom *</label>
+          <input id="insc-prenom" name="prenom" type="text" required class="barometre-input" placeholder="Votre prénom" />
         </div>
         <div>
-          <label class="text-xs font-bold text-slate-700 block mb-1">Nom *</label>
-          <input name="nom" type="text" required class="barometre-input" placeholder="Votre nom" />
+          <label for="insc-nom" class="text-sm font-bold text-slate-700 block mb-1">Nom *</label>
+          <input id="insc-nom" name="nom" type="text" required class="barometre-input" placeholder="Votre nom" />
         </div>
       </div>
 
       <div class="grid md:grid-cols-2 gap-5">
         <div>
-          <label class="text-xs font-bold text-slate-700 block mb-1">E-mail professionnel *</label>
-          <input name="email" type="email" required class="barometre-input" placeholder="nom@organisation.cg" />
+          <label for="insc-email" class="text-sm font-bold text-slate-700 block mb-1">Courriel professionnel *</label>
+          <input id="insc-email" name="email" type="email" required class="barometre-input" placeholder="nom@organisation.cg" />
         </div>
         <div>
-          <label class="text-xs font-bold text-slate-700 block mb-1">Téléphone direct</label>
-          <input name="telephone" type="tel" class="barometre-input" placeholder="+242 06 ..." />
+          <label for="insc-tel" class="text-sm font-bold text-slate-700 block mb-1">Téléphone direct *</label>
+          <input id="insc-tel" name="telephone" type="tel" required class="barometre-input" placeholder="+242 06..." />
         </div>
       </div>
 
       <div class="grid md:grid-cols-3 gap-5">
         <div>
-          <label class="text-xs font-bold text-slate-700 block mb-1">Organisation / Entreprise *</label>
-          <input name="organisation" type="text" required class="barometre-input" placeholder="Raison sociale ou Institution" />
+          <label for="insc-org" class="text-sm font-bold text-slate-700 block mb-1">Organisation ou entreprise *</label>
+          <input id="insc-org" name="organisation" type="text" required class="barometre-input" placeholder="Raison sociale ou institution" />
         </div>
         <div>
-          <label class="text-xs font-bold text-slate-700 block mb-1">Secteur d'appartenance</label>
-          <select name="volet" class="barometre-input">
-            <option value="Secteur Privé">Secteur Privé (GE / PME)</option>
-            <option value="Secteur Public">Secteur Public (Entreprise / Établissement)</option>
-            <option value="Institution / Partenaire">Administration / Partenaire / Expert</option>
+          <label for="insc-volet" class="text-sm font-bold text-slate-700 block mb-1">Catégorie d'organisation</label>
+          <select id="insc-volet" name="volet" class="barometre-input">
+            <option value="Secteur privé (GE / PME)">Secteur privé (grande entreprise ou PME)</option>
+            <option value="Secteur public (Entreprise / Établissement)">Secteur public (entreprise ou établissement public)</option>
+            <option value="Institution / Partenaire / Expert">Institution, organisation patronale ou expert</option>
           </select>
         </div>
         <div>
-          <label class="text-xs font-bold text-slate-700 block mb-1">Fonction</label>
-          <input name="fonction" type="text" class="barometre-input" placeholder="DG, DAF, Point Focal..." />
+          <label for="insc-fonction" class="text-sm font-bold text-slate-700 block mb-1">Fonction</label>
+          <input id="insc-fonction" name="fonction" type="text" class="barometre-input" placeholder="Directeur général, DAF, point focal..." />
         </div>
       </div>
 
-      <div class="grid md:grid-cols-3 gap-5">
+      <!-- Sélection des journées de la Semaine MAPERF 2027 -->
+      <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
+        <span class="text-sm font-bold text-[#00236D] block">Journée(s) souhaitée(s) à l'Hôtel Kempinski, Brazzaville *</span>
+        <div class="grid sm:grid-cols-3 gap-3 text-sm">
+          <label class="flex items-start gap-2.5 p-3 rounded-xl bg-white border border-slate-200 cursor-pointer">
+            <input type="checkbox" name="jour_16" value="16 juin — Journée des entrepreneurs" class="mt-1 w-4 h-4 rounded border-slate-300" />
+            <span>
+              <strong class="block text-slate-900">16 juin 2027</strong>
+              <span class="text-xs text-slate-600">Journée des entrepreneurs (tarif à confirmer)</span>
+            </span>
+          </label>
+          <label class="flex items-start gap-2.5 p-3 rounded-xl bg-white border border-amber-300 cursor-pointer">
+            <input type="checkbox" id="chk-jour-17" name="jour_17" value="17 juin — Matinées et Trophées (50 000 FCFA)" checked class="mt-1 w-4 h-4 rounded border-slate-300" />
+            <span>
+              <strong class="block text-[#00236D]">17 juin 2027</strong>
+              <span class="text-xs text-slate-700">Matinées et Trophées (<strong>50 000 FCFA</strong>)</span>
+            </span>
+          </label>
+          <label class="flex items-start gap-2.5 p-3 rounded-xl bg-white border border-slate-200 cursor-pointer">
+            <input type="checkbox" name="jour_18" value="18 juin — Masterclass" class="mt-1 w-4 h-4 rounded border-slate-300" />
+            <span>
+              <strong class="block text-slate-900">18 juin 2027</strong>
+              <span class="text-xs text-slate-600">Masterclass (tarif à confirmer)</span>
+            </span>
+          </label>
+        </div>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-5">
         <div>
-          <label class="text-xs font-bold text-slate-700 block mb-1">Type d'inscription *</label>
+          <label for="insc-type" class="text-sm font-bold text-slate-700 block mb-1">Objet complémentaire</label>
           <select name="type_participation" id="insc-type" class="barometre-input">
-            <option value="Enrôlement Baromètre 2027 (Gratuit)">Enrôlement au Baromètre 2027 (Collecte & Audit)</option>
-            <option value="Pass Délégation Cérémonie 17 Juin 2027">Pass Délégation — Journée du 17 Juin 2027</option>
-            <option value="Pack Partenaire / Sponsor Officiel">Pack Partenaire / Sponsor Officiel 2027</option>
+            <option value="Participation à la Semaine MAPERF (16–18 juin 2027)">Participation à la Semaine MAPERF (16 au 18 juin 2027)</option>
+            <option value="Participation entreprise au Baromètre MAPERF 2027">Enrôlement d'une entreprise au Baromètre MAPERF 2027</option>
+            <option value="Inscription combinée (Semaine MAPERF et Baromètre)">Inscription combinée (Semaine MAPERF et Baromètre)</option>
           </select>
         </div>
         <div>
-          <label class="text-xs font-bold text-slate-700 block mb-1">Ville / Département du siège</label>
+          <label for="insc-ville" class="text-sm font-bold text-slate-700 block mb-1">Ville ou département (République du Congo)</label>
           <select name="ville" id="insc-ville" class="barometre-input">
             <option value="Brazzaville">Brazzaville</option>
             <option value="Pointe-Noire">Pointe-Noire</option>
@@ -94,42 +154,38 @@
             <option value="Oyo / Owando (Cuvette)">Oyo / Owando (Cuvette)</option>
             <option value="Ouesso (Sangha)">Ouesso (Sangha)</option>
             <option value="Nkayi (Bouenza)">Nkayi (Bouenza)</option>
-          </select>
-        </div>
-        <div>
-          <label class="text-xs font-bold text-slate-700 block mb-1">Mode de règlement (si Pass/Sponsoring)</label>
-          <select name="mode_paiement" class="barometre-input">
-            <option value="Non applicable (Baromètre gratuit)">Non applicable (Enrôlement Baromètre)</option>
-            <option value="Virement Bancaire CEMAC / BEAC">Virement Bancaire (CEMAC / BEAC)</option>
-            <option value="Mobile Money (MTN MoMo / Airtel Money)">Mobile Money (MTN MoMo / Airtel Money)</option>
-            <option value="Carte Bancaire Visa / Mastercard">Carte Bancaire (Visa / Mastercard)</option>
+            <option value="Autre localité">Autre localité</option>
           </select>
         </div>
       </div>
 
       <div>
-        <label class="text-xs font-bold text-slate-700 block mb-1">Objet de la demande & Précisions</label>
-        <textarea name="message" rows="4" class="barometre-input" placeholder="Précisez si vous souhaitez enrôler votre entreprise au Baromètre MAPERF 2027, participer à la journée du 17 juin 2027 ou devenir partenaire..."></textarea>
+        <label for="insc-msg" class="text-sm font-bold text-slate-700 block mb-1">Précisions</label>
+        <textarea id="insc-msg" name="message" rows="3" class="barometre-input" placeholder="Précisez le nombre de participants de votre délégation ou vos questions éventuelles..."></textarea>
       </div>
 
-      <label class="flex items-start gap-3 text-xs text-slate-600">
-        <input type="checkbox" name="consent" value="1" required class="mt-0.5 rounded border-slate-300" />
-        <span>J’accepte que mes données professionnelles soient traitées par le Secrétariat Technique de MAPERF dans le strict respect des règles de confidentialité et de protection des données personnelles.</span>
+      <!-- Consentement obligatoire conforme à la loi n° 29-2019 (case non précochée, sans consentement marketing implicite) -->
+      <label class="flex items-start gap-3 text-sm text-slate-700">
+        <input type="checkbox" name="consent" value="1" required class="mt-1 w-4 h-4 rounded border-slate-300" />
+        <span>
+          J’accepte que mes données professionnelles soient traitées par le secrétariat technique de MAPERF aux seules fins de gestion de ma demande d'inscription, conformément à la <a href="mentions-legales.html#confidentialite" class="underline font-semibold text-[#00236D]">politique de confidentialité</a> et à la loi n° 29-2019 relative à la protection des données à caractère personnel en République du Congo. *
+        </span>
       </label>
 
-      <div id="inscription-feedback" class="hidden p-4 rounded-xl text-xs font-semibold"></div>
+      <div id="inscription-feedback" class="hidden p-4 rounded-xl text-sm"></div>
 
       <div class="pt-2 flex flex-wrap items-center justify-between gap-4">
         <button type="submit" class="btn btn-primary">
           <i data-lucide="send" class="w-4 h-4"></i>
-          <span>Envoyer mon inscription officielle</span>
+          <span>Enregistrer ma demande d'inscription</span>
         </button>
-        <span class="text-[11px] text-slate-500">Protection Anti-CSRF & validation serveur actives</span>
+        <span class="text-xs text-slate-500">Contact direct : <a href="mailto:infos@maperf.org" class="underline font-bold text-[#00236D]">infos@maperf.org</a> · +242 06 628 52 14</span>
       </div>
     </form>
   </main>
 
   <footer></footer>
+  <script src="assets/js/maperf-config.js"></script>
   <script src="assets/js/maperf-layout.js"></script>
   <script>
     (function () {
@@ -138,14 +194,13 @@
       if (!form || !feedback) return;
 
       form.addEventListener("submit", function (e) {
+        e.preventDefault();
         if (!form.checkValidity()) {
-          e.preventDefault();
-          feedback.className = "p-4 rounded-xl text-xs font-semibold bg-rose-50 text-rose-800 border border-rose-200";
-          feedback.textContent = "Veuillez renseigner tous les champs obligatoires (*) et accepter l'engagement de confidentialité.";
+          feedback.className = "p-4 rounded-xl text-sm font-semibold bg-rose-50 text-rose-900 border border-rose-200";
+          feedback.textContent = "Veuillez renseigner tous les champs obligatoires (*) et cocher la case de consentement au traitement des données personnelles.";
           return;
         }
 
-        // Sauvegarde locale de la demande d'enrôlement pour continuité immédiate avec le simulateur Baromètre
         var fd = new FormData(form);
         var record = {
           date: new Date().toISOString(),
@@ -154,7 +209,8 @@
           email: fd.get("email"),
           organisation: fd.get("organisation"),
           volet: fd.get("volet"),
-          type: fd.get("type_participation")
+          type: fd.get("type_participation"),
+          statutPaiement: "Demande enregistrée (en attente de confirmation et modalités de règlement)"
         };
         try {
           var list = JSON.parse(localStorage.getItem("maperf_inscriptions_2027") || "[]");
@@ -162,14 +218,15 @@
           localStorage.setItem("maperf_inscriptions_2027", JSON.stringify(list));
         } catch (err) {}
 
-        // Envoi asynchrone avec fallback gracieux sur Vercel / GitHub Pages / hébergement statique
-        e.preventDefault();
-        fetch("send_inscription.php", { method: "POST", body: fd }).catch(function () {});
-        feedback.className = "p-5 rounded-xl text-xs bg-emerald-50 text-emerald-900 border border-emerald-200 space-y-2";
+        feedback.className = "p-5 rounded-xl text-sm bg-emerald-50 text-emerald-950 border border-emerald-200 space-y-2";
         feedback.innerHTML =
-          '<div class="font-display font-bold text-sm text-emerald-800">Inscription & pré-enrôlement enregistrés avec succès ✅</div>' +
-          '<p>Organisation : <strong>' + (record.organisation || "") + '</strong> (' + (record.volet || "") + ') — Point Focal : <strong>' + (record.prenom || "") + ' ' + (record.nom || "") + '</strong>.</p>' +
-          '<div class="pt-2"><a href="barometre.html#espace-collecte" class="btn btn-primary text-xs py-2 px-4">Ouvrir mon Espace Entreprise dans le Baromètre 2027 →</a></div>';
+          '<div class="font-display font-bold text-base text-emerald-900">Demande de pré-inscription enregistrée dans la maquette (démonstration locale navigateur)</div>' +
+          '<p>Participant : <strong>' + (record.prenom || "") + ' ' + (record.nom || "") + '</strong> — Organisation : <strong>' + (record.organisation || "") + '</strong>.</p>' +
+          '<p class="text-xs text-amber-900 bg-amber-50 p-2.5 rounded-lg border border-amber-200"><strong>Distinction demande / paiement :</strong> cet enregistrement local constitue une simulation de demande d\'inscription et ne vaut pas confirmation de paiement serveur. Dans la version finale en production, le règlement du billet (50 000 FCFA pour le 17 juin) et l\'émission du titre d\'accès seront traités par le service de billetterie connecté.</p>' +
+          '<div class="pt-1 flex flex-wrap gap-2.5">' +
+          '  <a href="espace-entreprise.html" class="btn btn-teal text-xs py-2 px-4">Accéder à l\'Espace Entreprise →</a>' +
+          '  <a href="mailto:infos@maperf.org" class="btn btn-outline text-xs py-2 px-4">Contacter infos@maperf.org</a>' +
+          '</div>';
         form.reset();
       });
     })();
