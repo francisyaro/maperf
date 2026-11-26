@@ -3,9 +3,9 @@
  * Implémente intégralement les règles du TDR et des classeurs Excel (Secteur Public & Secteur Privé)
  */
 (function () {
-  var STORAGE_KEY = "maperf_2027_barometre_dossiers_v2";
-  var AUDIT_KEY = "maperf_2027_barometre_audit_v2";
-  var AUTH_KEY = "maperf_2027_barometre_auth_v2";
+  var STORAGE_KEY = "maperf_2027_barometre_dossiers_v3_103_104";
+  var AUDIT_KEY = "maperf_2027_barometre_audit_v3";
+  var AUTH_KEY = "maperf_2027_barometre_auth_v3";
 
   var STANDARD_PASSWORDS = {
     ENTREPRISE: ["entreprise2027", "entreprise2027!", "congo2027", "maperf2027"],
@@ -190,23 +190,29 @@
     var docMatch = (window.MAPERF_BAROMETRE_DATA.evidenceCatalog || []).find(function (doc) {
       return doc.codes && doc.codes.indexOf(field.code) !== -1;
     });
-    var sourceAttendue = docMatch ? (docMatch.id + " (" + docMatch.titre + ")") : "Pièce justificative interne ou déclarative";
-    var def = "";
-    if (field.type === "maturity") {
-      def = "Échelle de maturité de 0 à 4 (0 = inexistant, 1 = ad hoc, 2 = formalisé, 3 = déployé et mesuré, 4 = optimisé et audité).";
-    } else if (field.dir === "growth") {
-      def = "Variation annuelle mesurée sur la série 2023–2025 (cible haute : +" + Math.round(field.high * 100) + " %).";
-    } else if (field.dir === "margin_ca") {
-      def = "Ratio rapporté au chiffre d'affaires 2025 (borne basse : " + Math.round(field.low * 100) + " %, cible haute : " + Math.round(field.high * 100) + " %).";
-    } else if (field.dir === "cost_va") {
-      def = "Part dans la valeur ajoutée brute (maîtrise des coûts : cible entre " + Math.round(field.low * 100) + " % et " + Math.round(field.high * 100) + " %).";
-    } else if (field.dir === "info") {
-      def = "Grandeur structurelle du bilan ou de l'effectif utilisée pour les contrôles automatiques de cohérence OHADA.";
-    } else {
-      def = "Indicateur évalué entre le seuil minimal (" + field.low + " " + field.unite + ") et la cible de performance (" + field.high + " " + field.unite + ").";
+    var sourceAttendue = docMatch
+      ? (docMatch.id + " (" + docMatch.titre + ")")
+      : (field.sourceAttendue || "Pièce justificative interne ou déclarative");
+    var def = field.definition && field.definition.trim().length > 5 ? field.definition.trim() : "";
+    if (!def) {
+      if (field.type === "maturity") {
+        def = "Échelle de maturité de 0 à 4 (0 = inexistant, 1 = ad hoc, 2 = formalisé, 3 = déployé et mesuré, 4 = optimisé et audité).";
+      } else if (field.dir === "growth") {
+        def = "Variation annuelle mesurée sur la série 2023–2025 (cible haute : +" + Math.round(field.high * 100) + " %).";
+      } else if (field.dir === "margin_ca") {
+        def = "Ratio rapporté au chiffre d'affaires 2025 (borne basse : " + Math.round(field.low * 100) + " %, cible haute : " + Math.round(field.high * 100) + " %).";
+      } else if (field.dir === "cost_va") {
+        def = "Part dans la valeur ajoutée brute (maîtrise des coûts : cible entre " + Math.round(field.low * 100) + " % et " + Math.round(field.high * 100) + " %).";
+      } else if (field.dir === "info") {
+        def = "Grandeur structurelle du bilan ou de l'effectif utilisée pour les contrôles automatiques de cohérence OHADA.";
+      } else {
+        def = "Indicateur évalué entre le seuil minimal (" + field.low + " " + field.unite + ") et la cible de performance (" + field.high + " " + field.unite + ").";
+      }
     }
     return {
       definition: def,
+      question: field.question || "",
+      sousDim: field.sousDim || ("Dimension " + field.dim),
       unite: field.unite,
       sourceCode: docMatch ? docMatch.id : "DOC.03",
       sourceAttendue: sourceAttendue,

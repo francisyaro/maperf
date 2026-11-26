@@ -137,7 +137,19 @@ test("Évaluation des 4 dossiers fictifs de démonstration (2 Publics, 2 Privés
   });
 });
 
-test("Progression dynamique par rubrique (ex. FIN : 8/8) recalculée en temps réel", () => {
+test("Référentiel intégral des 103 données (Secteur public) et 104 données (Secteur privé) chargé et pré-rempli dans les 4 dossiers", () => {
+  assert.strictEqual(DATA.fields.PUBLIC.length, 103, `Attendu 103 données Secteur public, obtenu ${DATA.fields.PUBLIC.length}`);
+  assert.strictEqual(DATA.fields.PRIVE.length, 104, `Attendu 104 données Secteur privé, obtenu ${DATA.fields.PRIVE.length}`);
+
+  DATA.initialDossiers.forEach(d => {
+    const expectedTotal = d.volet === "PUBLIC" ? 103 : 104;
+    const progAll = ENGINE.computeRubriqueProgress(d);
+    assert.strictEqual(progAll.total, expectedTotal, `Total attendu ${expectedTotal} pour ${d.codeAnonyme}`);
+    assert.strictEqual(progAll.filled, expectedTotal, `Toutes les ${expectedTotal} données doivent être renseignées dans le dossier de démonstration ${d.codeAnonyme}`);
+  });
+});
+
+test("Progression dynamique par rubrique (ex. FIN : 31/31) recalculée en temps réel", () => {
   const dossier = JSON.parse(JSON.stringify(DATA.initialDossiers[0]));
   const progFull = ENGINE.computeRubriqueProgress(dossier, "FIN");
   assert.ok(progFull.total > 0, "La rubrique FIN doit comporter des indicateurs");
